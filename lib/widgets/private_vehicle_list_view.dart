@@ -4,10 +4,14 @@ import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class PrivateVehicleListview extends StatelessWidget {
   const PrivateVehicleListview(
-      {super.key, required this.vehicleState, required this.polylinesState});
+      {super.key,
+      required this.vehicleState,
+      required this.polylinesState,
+      required this.icon});
 
   final dynamic vehicleState;
   final PolylinesState polylinesState;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +65,7 @@ class PrivateVehicleListview extends StatelessWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.only(right: 10),
-                              child: const Icon(
-                                  Icons.sports_motorsports_outlined,
-                                  color: Colors.green,
-                                  size: 30),
+                              child: Icon(icon, color: Colors.green, size: 30),
                             ),
                             Expanded(
                               child: Padding(

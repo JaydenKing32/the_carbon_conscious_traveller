@@ -238,6 +238,7 @@ class _CarSettingsState extends State<CarSettings> {
                         PrivateVehicleListview(
                           polylinesState: polylinesState,
                           vehicleState: carState,
+                          icon: Icons.directions_car_outlined,
                         ),
                       ],
                     ),

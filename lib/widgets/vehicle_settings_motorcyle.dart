@@ -200,6 +200,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                         PrivateVehicleListview(
                           polylinesState: polylinesState,
                           vehicleState: motorcycleState,
+                          icon: Icons.sports_motorsports_outlined,
                         ),
                       ],
                     ),
