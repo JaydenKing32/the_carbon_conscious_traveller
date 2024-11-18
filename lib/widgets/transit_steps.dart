@@ -25,6 +25,8 @@ class TransitSteps extends StatelessWidget {
 
   Widget _buildStepIcon(BuildContext context, dynamic step) {
     // Display icon for walking steps
+    var shortNameText =
+        step.transit?.line?.shortName ?? step.transit?.line?.name;
     if (step.transit?.line?.vehicle?.icon == null &&
         step.travelMode == TravelMode.walking) {
       return Column(
@@ -62,7 +64,7 @@ class TransitSteps extends StatelessWidget {
                     color: parseColor(step.transit?.line?.color, Colors.white),
                   ),
                   child: Text(
-                    "${step.transit?.line?.shortName}",
+                    shortNameText,
                     style: TextStyle(
                         color: step.transit?.line?.textColor != null
                             ? parseColor(
@@ -88,7 +90,7 @@ class TransitSteps extends StatelessWidget {
       );
     } else {
       return Padding(
-        // Display icon for transit steps
+        // Display icon for transit steps if local icon doesn't exist
         padding: const EdgeInsets.only(right: 5),
         child: Column(
           children: [
@@ -107,7 +109,7 @@ class TransitSteps extends StatelessWidget {
                     color: parseColor(step.transit?.line?.color, Colors.white),
                   ),
                   child: Text(
-                    "${step.transit?.line?.shortName}",
+                    shortNameText,
                     style: TextStyle(
                       color: step.transit?.line?.textColor != null
                           ? parseColor(
