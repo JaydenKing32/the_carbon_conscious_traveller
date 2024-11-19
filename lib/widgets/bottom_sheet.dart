@@ -1,41 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
-import 'package:the_carbon_conscious_traveller/widgets/travel_mode_flying.dart';
-import 'package:the_carbon_conscious_traveller/widgets/travel_mode_transit.dart';
-import 'package:the_carbon_conscious_traveller/widgets/vehicle_settings_car.dart';
-import 'package:the_carbon_conscious_traveller/widgets/vehicle_settings_motorcyle.dart';
+import 'package:the_carbon_conscious_traveller/widgets/drag_handle.dart';
+import 'package:the_carbon_conscious_traveller/widgets/travel_mode_view.dart';
 
-class TravelModeBottomSheet extends StatefulWidget {
+class TravelModeBottomSheet extends StatelessWidget {
   const TravelModeBottomSheet({super.key});
 
   @override
-  State<TravelModeBottomSheet> createState() => _TravelModeBottomSheetState();
-}
-
-class _TravelModeBottomSheetState extends State<TravelModeBottomSheet> {
-  @override
   Widget build(BuildContext context) {
-    return Consumer<PolylinesState>(builder: (context, polylinesState, child) {
-      return Builder(builder: (context) {
-        if (polylinesState.result.isNotEmpty) {
-          if (polylinesState.mode == "motorcycling") {
-            return const MotorcyleSettings();
-          } else if (polylinesState.mode == "transit") {
-            return const Transit();
-          } else if (polylinesState.mode == "flying") {
-            return const Flying();
-          } else if (polylinesState.mode == "driving") {
-            return const CarSettings();
-          }
-        }
-        return Center(
-          child: Text("Start by entering a start and end location",
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  )),
-        );
-      });
-    });
+    return DraggableScrollableSheet(
+        initialChildSize: 0.3,
+        minChildSize: 0.15,
+        maxChildSize: 0.7,
+        snap: true,
+        builder: (BuildContext context, ScrollController scrollController) {
+          return Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: CustomScrollView(
+                    controller: scrollController,
+                    slivers: [
+                      const SliverAppBar(
+                        automaticallyImplyLeading: false,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        pinned: true,
+                        expandedHeight: 20,
+                        flexibleSpace: FlexibleSpaceBar(
+                          title: DragHandle(),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: const TravelModeView()),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 }

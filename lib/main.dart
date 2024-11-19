@@ -6,10 +6,10 @@ import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
+import 'package:the_carbon_conscious_traveller/widgets/bottom_sheet.dart';
 import 'package:the_carbon_conscious_traveller/widgets/drawer.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_map_view.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_places_view.dart';
-import 'package:the_carbon_conscious_traveller/widgets/bottom_sheet.dart';
 
 void main() {
   runApp(
@@ -81,42 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
         ),
-        body: Stack(
+        body: const Stack(
           children: [
-            const GoogleMapView(),
-            const GooglePlacesView(),
-            DraggableScrollableSheet(
-                initialChildSize: 0.3,
-                minChildSize: 0.15,
-                maxChildSize: 0.6,
-                snap: true,
-                builder:
-                    (BuildContext context, ScrollController scrollController) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 20),
-                          child: const TravelModeBottomSheet()),
-                    ),
-                  );
-                }),
+            GoogleMapView(),
+            GooglePlacesView(),
+            TravelModeBottomSheet(),
           ],
         ),
       ),

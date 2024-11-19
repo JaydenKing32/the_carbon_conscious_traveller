@@ -58,7 +58,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.only(bottom: 20),
                     child: Title(
                       color: Colors.black,
                       child: Text(
