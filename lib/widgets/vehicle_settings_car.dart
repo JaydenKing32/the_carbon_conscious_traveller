@@ -16,6 +16,8 @@ class CarSettings extends StatefulWidget {
 class _CarSettingsState extends State<CarSettings> {
   CarSize? selectedSize;
   CarFuelType? selectedFuelType;
+  int? currCarSizeIdx;
+  late List<CarFuelType> availableFuelTypes = [];
   late PrivateCarEmissionsCalculator emissionCalculator;
   List<String> treeIcons = [];
 
@@ -54,6 +56,20 @@ class _CarSettingsState extends State<CarSettings> {
           carState.updateVisibility(isVisible);
         }
 
+        void setFuelTypeItems(int selectedSizeIndex) {
+          List<CarFuelType> availOptions = [];
+          availableFuelTypes = []; //reset the fuel types
+          for (double matrixValue in carValuesMatrix[selectedSizeIndex]) {
+            int index = carValuesMatrix[selectedSizeIndex].indexWhere((value) =>
+                value == matrixValue); //get the indices for the matrix columns
+            if (matrixValue != 0) {
+              availOptions.add(CarFuelType
+                  .values[index]); //use the index to get the fuel types
+            }
+          }
+          availableFuelTypes.addAll(availOptions);
+        }
+
         return Column(
           children: <Widget>[
             Visibility(
@@ -82,6 +98,9 @@ class _CarSettingsState extends State<CarSettings> {
                           label: const Text('Car Size'),
                           onSelected: (CarSize? size) {
                             carState.updateSelectedSize(size ?? CarSize.label);
+                            if (currCarSizeIdx != size!.index) {
+                              setFuelTypeItems(size.index);
+                            }
                             setState(() {
                               selectedSize = carState.selectedSize;
                             });
@@ -117,7 +136,7 @@ class _CarSettingsState extends State<CarSettings> {
                               selectedFuelType = fuelType;
                             });
                           },
-                          dropdownMenuEntries: CarFuelType.values
+                          dropdownMenuEntries: availableFuelTypes
                               .map<DropdownMenuEntry<CarFuelType>>(
                                   (CarFuelType type) {
                             return DropdownMenuEntry<CarFuelType>(
