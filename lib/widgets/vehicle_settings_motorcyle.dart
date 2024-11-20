@@ -19,6 +19,13 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
   late PrivateVehicleEmissionsCalculator emissionCalculator;
   List<int> emissions = [];
   List<String> treeIconName = [];
+  bool _isBtnDisabled = false;
+
+  @override
+  void initState() {
+    _isBtnDisabled = true;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +89,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                                 size ?? MotorcycleSize.label);
                             setState(() {
                               selectedSize = motorcycleState.selectedValue;
+                              _isBtnDisabled = false;
                             });
                           },
                           dropdownMenuEntries: MotorcycleSize.values
@@ -100,11 +108,13 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                     ),
                   ),
                   FilledButton(
-                    onPressed: () {
-                      changeVisibility(true);
-                      getEmissions();
-                      getMinMaxEmissions();
-                    },
+                    onPressed: _isBtnDisabled
+                        ? null
+                        : () {
+                            changeVisibility(true);
+                            getEmissions();
+                            getMinMaxEmissions();
+                          },
                     child: const Text('Calculate Emissions'),
                   ),
                 ],
