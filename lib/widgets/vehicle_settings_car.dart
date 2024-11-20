@@ -20,6 +20,15 @@ class _CarSettingsState extends State<CarSettings> {
   late List<CarFuelType> availableFuelTypes = [];
   late PrivateCarEmissionsCalculator emissionCalculator;
   List<String> treeIcons = [];
+  bool _isBtnDisabled = false;
+  bool _isDropDownEnabled = true;
+
+  @override
+  void initState() {
+    _isBtnDisabled = true;
+    _isDropDownEnabled = false;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +112,7 @@ class _CarSettingsState extends State<CarSettings> {
                             }
                             setState(() {
                               selectedSize = carState.selectedSize;
+                              _isDropDownEnabled = true;
                             });
                           },
                           dropdownMenuEntries: CarSize.values
@@ -126,6 +136,7 @@ class _CarSettingsState extends State<CarSettings> {
                       children: <Widget>[
                         DropdownMenu<CarFuelType>(
                           width: 300,
+                          enabled: _isDropDownEnabled,
                           initialSelection: carState.selectedFuelType,
                           requestFocusOnTap: false,
                           label: const Text('Fuel Type'),
@@ -134,6 +145,7 @@ class _CarSettingsState extends State<CarSettings> {
                                 fuelType ?? CarFuelType.label);
                             setState(() {
                               selectedFuelType = fuelType;
+                              _isBtnDisabled = false;
                             });
                           },
                           dropdownMenuEntries: availableFuelTypes
@@ -152,15 +164,18 @@ class _CarSettingsState extends State<CarSettings> {
                     ),
                   ),
                   FilledButton(
-                    onPressed: () {
-                      if (selectedSize == null || selectedFuelType == null) {
-                        return;
-                      } else {
-                        changeVisibility(true);
-                        getMinMaxEmissions();
-                        getCarEmissions();
-                      }
-                    },
+                    onPressed: _isBtnDisabled
+                        ? null
+                        : () {
+                            if (selectedSize == null ||
+                                selectedFuelType == null) {
+                              return;
+                            } else {
+                              changeVisibility(true);
+                              getMinMaxEmissions();
+                              getCarEmissions();
+                            }
+                          },
                     child: const Text("Calculate Emissions"),
                   ),
                 ],
