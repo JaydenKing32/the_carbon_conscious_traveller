@@ -32,13 +32,6 @@ class GoogleMapViewState extends State<GoogleMapView> {
   Set<maps.Marker> markers = {};
   static maps.LatLng? _currentLocation;
 
-  // maps.CameraPosition _originPlace = maps.CameraPosition(
-  //   target: _currentPosition ??
-  //       const maps.LatLng(-26.853387500000004,
-  //           133.27515449999999), // Australia in lieu of user location
-  //   zoom: 3.4746,
-  // );
-
   maps.CameraPosition? _initialLocation;
 
   PolylinePoints polylinePoints = PolylinePoints();
@@ -46,7 +39,6 @@ class GoogleMapViewState extends State<GoogleMapView> {
 
   @override
   Widget build(BuildContext context) {
-    print("GoogleMapViewState $_initialLocation");
     final markerModel = Provider.of<MarkerState>(context);
     final polylineModel = Provider.of<PolylinesState>(context);
     return Scaffold(
