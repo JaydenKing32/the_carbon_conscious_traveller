@@ -317,12 +317,12 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
   void getUserLocationDetails() {
     final place = MapService().getAddressFromLatLng();
-    setState(() {
-      _enableOriginForm = false;
-    });
 
     place.then((placemark) {
       if (placemark != null) {
+        setState(() {
+          _enableOriginForm = false;
+        });
         final currentAddress =
             "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
         originController.text = currentAddress;
