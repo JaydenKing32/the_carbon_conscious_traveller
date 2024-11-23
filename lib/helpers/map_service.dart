@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -43,8 +44,6 @@ class MapService {
     final GoogleMapController controller = await _controller.future;
 
     if (!context.mounted) return;
-
-    await getUserLocation();
 
     if (_currentPosition != null) {
       await controller.moveCamera(
@@ -93,5 +92,15 @@ class MapService {
 
   void setController(GoogleMapController controller) {
     _controller.complete(controller);
+  }
+
+  Future<Placemark?> getAddressFromLatLng() async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        _currentPosition!.latitude, _currentPosition!.longitude);
+    return placemarks.isNotEmpty ? placemarks[0] : null;
+  }
+
+  LatLng? getUserLatLng() {
+    return LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
   }
 }

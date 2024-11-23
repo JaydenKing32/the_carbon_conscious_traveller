@@ -11,6 +11,7 @@ import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
+import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 
 class GooglePlacesView extends StatefulWidget {
@@ -103,10 +104,12 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                   });
                 },
                 onChanged: (value) => _onPredictTextChanged(value, "start"),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     label: Text("Enter a start location"),
                     icon: Icon(Icons.location_searching_outlined,
-                        color: Colors.grey)),
+                        color: Colors.grey),
+                    suffixIcon:
+                        LocationButton(callback: getUserLocationDetails)),
               ),
               TextFormField(
                 controller: destinationController,
@@ -310,5 +313,30 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
     final polylineState = Provider.of<PolylinesState>(context, listen: false);
     polylineState.getPolyline(coordsState.coordinates);
+  }
+
+  void getUserLocationDetails() {
+    final place = MapService().getAddressFromLatLng();
+    setState(() {
+      _enableOriginForm = false;
+    });
+
+    place.then((placemark) {
+      if (placemark != null) {
+        final currentAddress =
+            "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
+        originController.text = currentAddress;
+      } else {
+        _buildErrorWidget(
+            "Address not found. Try entering an address manually");
+      }
+    });
+    setUserMarker();
+  }
+
+  void setUserMarker() {
+    final latLng = MapService().getUserLatLng();
+    _addOriginMarker(latLng!); //Place the marker and save Lat and Lng to state
+    _enableDestForm = true;
   }
 }
