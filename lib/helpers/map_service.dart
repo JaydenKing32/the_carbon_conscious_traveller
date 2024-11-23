@@ -69,25 +69,20 @@ class MapService {
 // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      print('Location services are disabled.');
       return null;
     }
 // Request permission to get the user's location
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
-      print(
-          'location permissions are permanently denied, we cannot request permissions.');
       return null;
     }
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse &&
           permission != LocationPermission.always) {
-        print('Location permissions are denied (actual value: $permission).');
         return null;
       }
     }
-    print("permission accepted? $permission");
   }
 
   Future<Position?> getUserLocation() async {
