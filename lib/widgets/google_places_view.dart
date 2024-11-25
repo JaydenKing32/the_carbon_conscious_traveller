@@ -105,8 +105,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                 },
                 onChanged: (value) => _onPredictTextChanged(value, "start"),
                 decoration: InputDecoration(
-                    label: Text("Enter a start location"),
-                    icon: Icon(Icons.location_searching_outlined,
+                    label: const Text("Enter a start location"),
+                    icon: const Icon(Icons.location_searching_outlined,
                         color: Colors.grey),
                     suffixIcon:
                         LocationButton(callback: getUserLocationDetails)),
