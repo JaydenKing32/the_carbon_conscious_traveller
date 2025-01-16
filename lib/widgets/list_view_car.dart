@@ -41,16 +41,10 @@ class _CarListViewState extends State<CarListView> {
             itemCount: widget.polylinesState.resultForPrivateVehicle.length,
             itemBuilder: (BuildContext context, int index) {
               widget.vehicleState.getTreeIcons(index);
-
               selectedIndex = polylinesState.carActiveRouteIndex;
 
-              //Change the border color of the active route
-              Color color = Colors.transparent;
-              if (selectedIndex == index) {
-                color = Colors.green;
-              } else {
-                color = Colors.transparent;
-              }
+              // Change the border color of the active route
+              Color color = selectedIndex == index ? Colors.green : Colors.transparent;
 
               return InkWell(
                 onTap: () {
@@ -81,17 +75,15 @@ class _CarListViewState extends State<CarListView> {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.only(right: 10),
-                                  child: Icon(widget.icon,
-                                      color: Colors.green, size: 30),
+                                  child: Icon(widget.icon, color: Colors.green, size: 30),
                                 ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.only(right: 30),
                                     child: Text(
-                                        'via ${widget.polylinesState.routeSummary[index]}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge),
+                                      'via ${widget.polylinesState.routeSummary[index]}',
+                                      style: Theme.of(context).textTheme.bodyLarge,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -106,31 +98,36 @@ class _CarListViewState extends State<CarListView> {
                           children: [
                             Row(
                               children: [
-                                Text(formatNumber(
-                                    widget.vehicleState.getEmission(index))),
-                                Image.asset('assets/icons/co2e.png',
-                                    width: 30, height: 30),
+                                Text(formatNumber(widget.vehicleState.getEmission(index))),
+                                Image.asset('assets/icons/co2e.png', width: 30, height: 30),
                               ],
                             ),
                             Text(widget.polylinesState.distanceTexts[index],
                                 style: Theme.of(context).textTheme.bodySmall),
                             Text(widget.polylinesState.durationTexts[index],
                                 style: Theme.of(context).textTheme.bodySmall),
-                            TreeIcons(
-                                treeIconName: widget.vehicleState.treeIcons),
+                            TreeIcons(treeIconName: widget.vehicleState.treeIcons),
                           ],
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: Colors.green, size: 28),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Trip added!")),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
               );
             },
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(),
+            separatorBuilder: (BuildContext context, int index) => const Divider(),
           ),
         ],
       );
     });
   }
 }
+
