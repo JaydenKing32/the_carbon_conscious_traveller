@@ -47,6 +47,17 @@ extension CarSizeExtension on CarSize {
   }
 }
 
+/// Convert a CarSize to string, e.g. "CarSize.smallCar"
+String carSizeToString(CarSize carSize) => carSize.toString();
+
+/// Convert back from string to CarSize, defaulting to CarSize.label if not found
+CarSize stringToCarSize(String carSizeStr) {
+  return CarSize.values.firstWhere(
+    (e) => e.toString() == carSizeStr,
+    orElse: () => CarSize.label,
+  );
+}
+
 enum CarFuelType {
   diesel,
   petrol,

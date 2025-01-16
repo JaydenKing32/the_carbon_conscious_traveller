@@ -10,6 +10,7 @@ import 'package:the_carbon_conscious_traveller/widgets/bottom_sheet.dart';
 import 'package:the_carbon_conscious_traveller/widgets/drawer.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_map_view.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_places_view.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
 void main() {
   runApp(
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => PrivateMotorcycleState()),
         ChangeNotifierProvider(create: (context) => PrivateCarState()),
         ChangeNotifierProvider(create: (context) => TransitState()),
+        ChangeNotifierProvider(create: (context) => SettingsState()),
       ],
       child: const MyApp(),
     ),

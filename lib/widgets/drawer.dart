@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:the_carbon_conscious_traveller/screens/placeholder.dart';
+import 'package:the_carbon_conscious_traveller/screens/settings.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -21,8 +22,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => const PlaceholderPage()),
+                MaterialPageRoute(builder: (context) => const PlaceholderPage()),
               );
             },
           ),
@@ -32,8 +32,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => const PlaceholderPage()),
+                MaterialPageRoute(builder: (context) => const PlaceholderPage()),
               );
             },
           ),
@@ -43,8 +42,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => const PlaceholderPage()),
+                MaterialPageRoute(builder: (context) => const PlaceholderPage()),
               );
             },
           ),
@@ -54,8 +52,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => const PlaceholderPage()),
+                MaterialPageRoute(builder: (context) => const PlaceholderPage()),
               );
             },
           ),
@@ -66,7 +63,8 @@ class _AppDrawerState extends State<AppDrawer> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                    builder: (context) => const PlaceholderPage()),
+                  builder: (context) => const SettingsScreen(),
+                ),
               );
             },
           ),
@@ -75,3 +73,4 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 }
+
