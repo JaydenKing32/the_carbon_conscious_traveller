@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
+import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
+import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class CarListView extends StatefulWidget {
-  const CarListView(
-      {super.key,
-      required this.vehicleState,
-      required this.polylinesState,
-      required this.icon});
+  const CarListView({
+    super.key,
+    required this.vehicleState,
+    required this.polylinesState,
+    required this.icon,
+  });            
 
   final dynamic vehicleState;
   final PolylinesState polylinesState;
@@ -19,19 +22,79 @@ class CarListView extends StatefulWidget {
 }
 
 class _CarListViewState extends State<CarListView> {
+  final Set<int> _savedTripIds = {}; 
+  final Map<int, int> _indexToTripId = {}; 
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedTrips();
+  }
+
+ 
+  Future<void> _loadSavedTrips() async {
+    List<Trip> trips = await TripDatabase.instance.getAllTrips();
+    setState(() {
+      _savedTripIds.clear();
+      _indexToTripId.clear();
+      for (var trip in trips) {
+        _savedTripIds.add(trip.id!);
+      }
+    });
+  }
+
+  Future<void> _saveTrip(int index) async {
+    final trip = Trip(
+      date: DateTime.now().toIso8601String(),
+      origin: widget.polylinesState.routeSummary[index],
+      origLat: 0.0, // Placeholder 
+      origLng: 0.0,
+      destination: widget.polylinesState.routeSummary[index],
+      destLat: 0.0,
+      destLng: 0.0,
+      distance: widget.polylinesState.distanceTexts[index],
+      emissions: widget.vehicleState.getEmission(index).toDouble(),
+      mode: "Car",
+    );
+
+    int id = await TripDatabase.instance.insertTrip(trip);
+
+    setState(() {
+      _savedTripIds.add(id);
+      _indexToTripId[index] = id;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Trip saved to database with ID: $id")),
+    );
+  }
+
+
+  Future<void> _deleteTrip(int index) async {
+    int? tripId = _indexToTripId[index];
+    if (tripId != null && _savedTripIds.contains(tripId)) {
+      await TripDatabase.instance.deleteTrip(tripId);
+
+      setState(() {
+        _savedTripIds.remove(tripId);
+        _indexToTripId.remove(index);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Trip deleted from database with ID: $tripId")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String formatNumber(int number) {
-      if (number >= 1000) {
-        return '${(number / 1000).toStringAsFixed(2)} kg';
-      } else {
-        return '${number.round()} g';
-      }
+      return number >= 1000
+          ? '${(number / 1000).toStringAsFixed(2)} kg'
+          : '${number.round()} g';
     }
 
-    int selectedIndex;
-
-    return Consumer(builder: (context, PolylinesState polylinesState, child) {
+    return Consumer<PolylinesState>(builder: (context, polylinesState, child) {
       return Column(
         children: [
           ListView.separated(
@@ -41,17 +104,15 @@ class _CarListViewState extends State<CarListView> {
             itemCount: widget.polylinesState.resultForPrivateVehicle.length,
             itemBuilder: (BuildContext context, int index) {
               widget.vehicleState.getTreeIcons(index);
-              selectedIndex = polylinesState.carActiveRouteIndex;
-
-              // Change the border color of the active route
-              Color color = selectedIndex == index ? Colors.green : Colors.transparent;
+              int selectedIndex = polylinesState.carActiveRouteIndex;
+              Color color =
+                  selectedIndex == index ? Colors.green : Colors.transparent;
 
               return InkWell(
                 onTap: () {
                   setState(() {
-                    selectedIndex = index;
+                    polylinesState.setActiveRoute(index);
                   });
-                  polylinesState.setActiveRoute(selectedIndex);
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -75,14 +136,17 @@ class _CarListViewState extends State<CarListView> {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.only(right: 10),
-                                  child: Icon(widget.icon, color: Colors.green, size: 30),
+                                  child: Icon(widget.icon,
+                                      color: Colors.green, size: 30),
                                 ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.only(right: 30),
                                     child: Text(
                                       'via ${widget.polylinesState.routeSummary[index]}',
-                                      style: Theme.of(context).textTheme.bodyLarge,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge,
                                     ),
                                   ),
                                 ),
@@ -98,24 +162,35 @@ class _CarListViewState extends State<CarListView> {
                           children: [
                             Row(
                               children: [
-                                Text(formatNumber(widget.vehicleState.getEmission(index))),
-                                Image.asset('assets/icons/co2e.png', width: 30, height: 30),
+                                Text(formatNumber(
+                                    widget.vehicleState.getEmission(index))),
+                                Image.asset('assets/icons/co2e.png',
+                                    width: 30, height: 30),
                               ],
                             ),
                             Text(widget.polylinesState.distanceTexts[index],
                                 style: Theme.of(context).textTheme.bodySmall),
                             Text(widget.polylinesState.durationTexts[index],
                                 style: Theme.of(context).textTheme.bodySmall),
-                            TreeIcons(treeIconName: widget.vehicleState.treeIcons),
+                            TreeIcons(
+                                treeIconName: widget.vehicleState.treeIcons),
                           ],
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: Colors.green, size: 28),
+                        icon: Icon(
+                          _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                              ? Icons.remove_circle_outline 
+                              : Icons.add_circle_outline,
+                          color: Colors.green,
+                          size: 28,
+                        ),
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Trip added!")),
-                          );
+                          if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                            _deleteTrip(index);
+                          } else {
+                            _saveTrip(index);
+                          }
                         },
                       ),
                     ],
@@ -123,11 +198,11 @@ class _CarListViewState extends State<CarListView> {
                 ),
               );
             },
-            separatorBuilder: (BuildContext context, int index) => const Divider(),
+            separatorBuilder: (BuildContext context, int index) =>
+                const Divider(),
           ),
         ],
       );
     });
   }
 }
-

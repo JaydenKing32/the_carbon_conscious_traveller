@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
+import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
@@ -19,6 +21,69 @@ class MotorcycleListView extends StatefulWidget {
 }
 
 class _MotorcycleListViewState extends State<MotorcycleListView> {
+  final Set<int> _savedTripIds = {};
+  final Map<int, int> _indexToTripId = {}; 
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedTrips();
+  }
+
+  Future<void> _loadSavedTrips() async {
+    List<Trip> trips = await TripDatabase.instance.getAllTrips();
+    setState(() {
+      _savedTripIds.clear();
+      _indexToTripId.clear();
+      for (var trip in trips) {
+        _savedTripIds.add(trip.id!);
+      }
+    });
+  }
+
+  Future<void> _saveTrip(int index) async {
+    final trip = Trip(
+      date: DateTime.now().toIso8601String(),
+      origin: widget.polylinesState.routeSummary[index],
+      origLat: 0.0, // Placeholder 
+      origLng: 0.0,
+      destination: widget.polylinesState.routeSummary[index],
+      destLat: 0.0,
+      destLng: 0.0,
+      distance: widget.polylinesState.distanceTexts[index],
+      emissions: widget.vehicleState.getEmission(index).toDouble(),
+      mode: "Motorcycle",
+    );
+
+    int id = await TripDatabase.instance.insertTrip(trip);
+
+    setState(() {
+      _savedTripIds.add(id);
+      _indexToTripId[index] = id;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Trip saved to database with ID: $id")),
+    );
+  }
+
+  Future<void> _deleteTrip(int index) async {
+    int? tripId = _indexToTripId[index];
+    if (tripId != null && _savedTripIds.contains(tripId)) {
+      await TripDatabase.instance.deleteTrip(tripId);
+    
+
+      setState(() {
+        _savedTripIds.remove(tripId);
+        _indexToTripId.remove(index);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Trip deleted from database with ID: $tripId")),
+      );
+    } 
+  }
+  
   @override
   Widget build(BuildContext context) {
     String formatNumber(int number) {
@@ -44,7 +109,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
 
               selectedIndex = polylinesState.motorcycleActiveRouteIndex;
 
-              //Change the border color of the active route
+          
               Color color = Colors.transparent;
               if (selectedIndex == index) {
                 color = Colors.green;
@@ -120,6 +185,22 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 treeIconName: widget.vehicleState.treeIcons),
                           ],
                         ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                              ? Icons.remove_circle_outline 
+                              : Icons.add_circle_outline, 
+                          color: Colors.green,
+                          size: 28,
+                        ),
+                        onPressed: () {
+                          if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                            _deleteTrip(index);
+                          } else {
+                            _saveTrip(index);
+                          }
+                        },
                       ),
                     ],
                   ),

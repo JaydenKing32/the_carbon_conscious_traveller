@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_carbon_conscious_traveller/screens/placeholder.dart';
 import 'package:the_carbon_conscious_traveller/screens/settings.dart';
+import 'package:the_carbon_conscious_traveller/screens/trips_screen.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -32,7 +33,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+                 MaterialPageRoute(builder: (context) => const TripsScreen()),
               );
             },
           ),

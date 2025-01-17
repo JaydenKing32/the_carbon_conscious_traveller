@@ -6,7 +6,7 @@ class PlaceholderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: const Text("This is a plaxceholder page")),
+      body: Center(child: const Text("This is a placeholder page")),
     );
   }
 }
