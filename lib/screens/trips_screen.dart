@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/widgets/trip_details_widget.dart';
 
 class TripsScreen extends StatefulWidget {
   const TripsScreen({super.key});
@@ -19,7 +20,6 @@ class _TripsScreenState extends State<TripsScreen> {
     _trips = TripDatabase.instance.getAllTrips();
   }
 
-  /// Deletes a trip and refreshes the list
   void _deleteTrip(int id) async {
     await TripDatabase.instance.deleteTrip(id);
     setState(() {
@@ -27,7 +27,6 @@ class _TripsScreenState extends State<TripsScreen> {
     });
   }
 
-  /// Returns the correct transport icon based on mode
   IconData _getTransportIcon(String mode) {
     switch (mode.toLowerCase()) {
       case 'car':
@@ -41,14 +40,12 @@ class _TripsScreenState extends State<TripsScreen> {
     }
   }
 
-  /// Formats emissions (g vs. kg)
   String _formatEmissions(double emissions) {
     return emissions >= 1000
         ? '${(emissions / 1000).toStringAsFixed(2)} kg'
         : '${emissions.round()} g';
   }
 
-  /// Formats date from ISO string to YYYY-MM-DD
   String _formatDate(String isoDate) {
     DateTime dateTime = DateTime.parse(isoDate);
     return DateFormat('yyyy-MM-dd').format(dateTime);
@@ -59,7 +56,7 @@ class _TripsScreenState extends State<TripsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Trips"),
-        backgroundColor: const Color.fromARGB(255, 7, 179, 110), 
+        backgroundColor: const Color.fromARGB(255, 7, 179, 110),
       ),
       body: FutureBuilder<List<Trip>>(
         future: _trips,
@@ -78,32 +75,46 @@ class _TripsScreenState extends State<TripsScreen> {
                   size: 32,
                 ),
                 title: Text(
-                  trip.destination,
+                  trip.mode,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Date: ${_formatDate(trip.date)}"), 
-                   Text.rich(
+                    Text("Date: ${_formatDate(trip.date)}"),
+                    Text.rich(
                       TextSpan(
                         text: "Emissions: ",
                         children: [
                           TextSpan(
                             text: _formatEmissions(trip.emissions),
                             style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),],),)
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete),
+                  icon: const Icon(Icons.delete, color: Colors.black),
                   onPressed: () => _deleteTrip(trip.id!),
                 ),
+                onTap: () => _showTripDetails(context, trip),
               );
             },
           );
         },
       ),
+    );
+  }
+
+  void _showTripDetails(BuildContext context, Trip trip) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      builder: (context) => TripDetailsWidget(trip: trip),
     );
   }
 }
