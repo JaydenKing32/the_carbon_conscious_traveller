@@ -75,7 +75,7 @@ class _TripsScreenState extends State<TripsScreen> {
                   size: 32,
                 ),
                 title: Text(
-                  trip.mode,
+                  trip.destination,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(

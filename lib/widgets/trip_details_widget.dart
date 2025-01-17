@@ -54,7 +54,7 @@ class TripDetailsWidget extends StatelessWidget {
               _infoRow("Destination", trip.destination),
 
               // Mode of Transport
-              _infoRow("Mode", trip.mode.toUpperCase()),
+              _infoRow("Mode", trip.mode),
 
               // Distance
               _infoRow("Distance", _formatDistance(trip.distance)),
