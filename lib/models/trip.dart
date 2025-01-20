@@ -2,14 +2,17 @@ class Trip {
   int? id;
   String date;
   String origin;
-  double origLat; // Added
-  double origLng; // Added
+  double origLat;
+  double origLng;
   String destination;
-  double destLat; // Added
-  double destLng; // Added
+  double destLat;
+  double destLng;
   String distance;
   double emissions;
   String mode;
+  double reduction;  
+  bool complete;    
+  String model;      
 
   Trip({
     this.id,
@@ -23,6 +26,9 @@ class Trip {
     required this.distance,
     required this.emissions,
     required this.mode,
+    required this.reduction,  
+    required this.complete,   
+    required this.model,      
   });
 
   Map<String, dynamic> toMap() {
@@ -30,14 +36,17 @@ class Trip {
       'id': id,
       'date': date,
       'origin': origin,
-      'origLat': origLat, // Added
-      'origLng': origLng, // Added
+      'origLat': origLat,
+      'origLng': origLng,
       'destination': destination,
-      'destLat': destLat, // Added
-      'destLng': destLng, // Added
+      'destLat': destLat,
+      'destLng': destLng,
       'distance': distance,
       'emissions': emissions,
       'mode': mode,
+      'reduction': reduction, 
+      'complete': complete ? 1 : 0, 
+      'model': model,           
     };
   }
 
@@ -46,14 +55,17 @@ class Trip {
       id: map['id'],
       date: map['date'],
       origin: map['origin'],
-      origLat: map['origLat'] ?? 0.0, // Added
-      origLng: map['origLng'] ?? 0.0, // Added
+      origLat: map['origLat'] ?? 0.0,
+      origLng: map['origLng'] ?? 0.0,
       destination: map['destination'],
-      destLat: map['destLat'] ?? 0.0, // Added
-      destLng: map['destLng'] ?? 0.0, // Added
+      destLat: map['destLat'] ?? 0.0,
+      destLng: map['destLng'] ?? 0.0,
       distance: map['distance'],
       emissions: map['emissions'],
       mode: map['mode'],
+      reduction: map['reduction'] ?? 0.0,   
+      complete: (map['complete'] ?? 0) == 1, 
+      model: map['model'] ?? "",      
     );
   }
 }

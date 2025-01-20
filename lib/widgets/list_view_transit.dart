@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -47,6 +49,13 @@ class _TransitListViewState extends State<TransitListView> {
 
 
   Future<void> _saveTrip(int index) async {
+     int maxEmission = widget.emissions.isNotEmpty
+        ? widget.emissions.map((e) => e.toInt()).reduce(max)
+        : 0;
+
+    double selectedEmission = widget.emissions[index];
+    double reduction = max(0, maxEmission - selectedEmission);
+
     final trip = Trip(
       date: DateTime.now().toIso8601String(),
       origin: widget.snapshot.data![index].legs.first.startAddress ?? "Unknown",
@@ -59,6 +68,9 @@ class _TransitListViewState extends State<TransitListView> {
       distance: widget.snapshot.data![index].legs.first.distance?.text ?? "0 km",
       emissions: widget.emissions[index],
       mode: "Transit",
+      reduction: reduction,
+      complete: false,
+      model: "Public Transport",
     );
 
     int id = await TripDatabase.instance.insertTrip(trip);

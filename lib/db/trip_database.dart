@@ -32,55 +32,53 @@ class TripDatabase {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
         origin TEXT NOT NULL,
-        origLat REAL NOT NULL DEFAULT 0,
-        origLng REAL NOT NULL DEFAULT 0,
+        origLat REAL NOT NULL,
+        origLng REAL NOT NULL,
         destination TEXT NOT NULL,
-        destLat REAL NOT NULL DEFAULT 0,
-        destLng REAL NOT NULL DEFAULT 0,
+        destLat REAL NOT NULL,
+        destLng REAL NOT NULL,
         distance TEXT NOT NULL,
         emissions REAL NOT NULL,
         mode TEXT NOT NULL,
-        vehicle TEXT NULL  -- Allow vehicle to be NULL
+        reduction REAL NOT NULL DEFAULT 0,  
+        complete INTEGER NOT NULL DEFAULT 0, 
+        model TEXT NOT NULL DEFAULT ""     
       )
     ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('''
-        ALTER TABLE trips ADD COLUMN vehicle TEXT NULL
-      ''');
+      await db.execute('ALTER TABLE trips ADD COLUMN reduction REAL NOT NULL DEFAULT 0');
+      await db.execute('ALTER TABLE trips ADD COLUMN complete INTEGER NOT NULL DEFAULT 0');
+      await db.execute('ALTER TABLE trips ADD COLUMN model TEXT NOT NULL DEFAULT ""');
     }
   }
 
   Future<int> insertTrip(Trip trip) async {
     final db = await instance.database;
-    return await db.insert(
+    return await db.insert('trips', trip.toMap());
+  }
+
+  Future<int> updateTripCompletion(int id, bool complete) async {
+    final db = await instance.database;
+    return await db.update(
       'trips',
-      trip.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      {'complete': complete ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
   Future<List<Trip>> getAllTrips() async {
     final db = await instance.database;
     final result = await db.query('trips');
-    return result.map((json) => Trip.fromMap(json)).toList();
+    return result.map((map) => Trip.fromMap(map)).toList();
   }
 
   Future<int> deleteTrip(int id) async {
     final db = await instance.database;
-    return await db.delete(
-      'trips',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<void> close() async {
-    final db = await _database;
-    if (db != null) {
-      await db.close();
-    }
+    return await db.delete('trips', where: 'id = ?', whereArgs: [id]);
   }
 }
+

@@ -17,14 +17,23 @@ class _TripsScreenState extends State<TripsScreen> {
   @override
   void initState() {
     super.initState();
-    _trips = TripDatabase.instance.getAllTrips();
+    _loadTrips();
+  }
+
+  void _loadTrips() {
+    setState(() {
+      _trips = TripDatabase.instance.getAllTrips();
+    });
   }
 
   void _deleteTrip(int id) async {
     await TripDatabase.instance.deleteTrip(id);
-    setState(() {
-      _trips = TripDatabase.instance.getAllTrips();
-    });
+    _loadTrips();
+  }
+
+  Future<void> _toggleTripCompletion(int id, bool currentStatus) async {
+    await TripDatabase.instance.updateTripCompletion(id, !currentStatus);
+    _loadTrips();
   }
 
   IconData _getTransportIcon(String mode) {
@@ -69,14 +78,18 @@ class _TripsScreenState extends State<TripsScreen> {
             separatorBuilder: (context, index) => const Divider(),
             itemBuilder: (context, index) {
               final trip = snapshot.data![index];
+
+              Color statusColor = trip.complete ? Colors.green : Colors.red;
+
               return ListTile(
                 leading: Icon(
                   _getTransportIcon(trip.mode),
                   size: 32,
+                  color: statusColor,
                 ),
                 title: Text(
                   trip.destination,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: statusColor),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,9 +108,23 @@ class _TripsScreenState extends State<TripsScreen> {
                     ),
                   ],
                 ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.black),
-                  onPressed: () => _deleteTrip(trip.id!),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    
+                    IconButton(
+                      icon: Icon(
+                        trip.complete ? Icons.check_circle : Icons.cancel_outlined,
+                        color: trip.complete ? Colors.green : Colors.red,
+                      ),
+                      onPressed: () => _toggleTripCompletion(trip.id!, trip.complete),
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.black),
+                      onPressed: () => _deleteTrip(trip.id!),
+                    ),
+                  ],
                 ),
                 onTap: () => _showTripDetails(context, trip),
               );
@@ -111,8 +138,11 @@ class _TripsScreenState extends State<TripsScreen> {
   void _showTripDetails(BuildContext context, Trip trip) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
       builder: (context) => TripDetailsWidget(trip: trip),
     );

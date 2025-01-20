@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
@@ -44,10 +46,19 @@ class _CarListViewState extends State<CarListView> {
   }
 
   Future<void> _saveTrip(int index) async {
+       
+    int maxEmission = widget.vehicleState.emissions.isNotEmpty
+    ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce((a, b) => a > b ? a : b)
+    : 0;
+    double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
+    double reduction = max(0, maxEmission - selectedEmission);
+    String carModel = "${widget.vehicleState.selectedSize?.toString().split('.').last} - ${widget.vehicleState.selectedFuelType?.toString().split('.').last}";
+
+
     final trip = Trip(
       date: DateTime.now().toIso8601String(),
       origin: widget.polylinesState.routeSummary[index],
-      origLat: 0.0, // Placeholder 
+      origLat: 0.0,
       origLng: 0.0,
       destination: widget.polylinesState.routeSummary[index],
       destLat: 0.0,
@@ -55,6 +66,10 @@ class _CarListViewState extends State<CarListView> {
       distance: widget.polylinesState.distanceTexts[index],
       emissions: widget.vehicleState.getEmission(index).toDouble(),
       mode: "Car",
+      reduction: reduction,
+      complete: false,
+       model: carModel
+
     );
 
     int id = await TripDatabase.instance.insertTrip(trip);

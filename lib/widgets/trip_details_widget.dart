@@ -6,82 +6,97 @@ class TripDetailsWidget extends StatelessWidget {
 
   const TripDetailsWidget({super.key, required this.trip});
 
-  String _formatEmissions(double emissions) {
-    return emissions >= 1000
-        ? '${(emissions / 1000).toStringAsFixed(2)} kg'
-        : '${emissions.round()} g';
-  }
-
-  String _formatDistance(String distance) {
-    if (distance.contains("m") || distance.contains("km")) return distance;
-    double meters = double.tryParse(distance) ?? 0;
-    return meters >= 1000
-        ? "${(meters / 1000).toStringAsFixed(1)} km"
-        : "$meters m";
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        margin: const EdgeInsets.all(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Trip Details",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 7, 179, 110),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // ✅ Trip Completion Status
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Trip Details",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green[700],
-                    ),
+              const Text(
+                "Status",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
-
-              // Date
-              _infoRow("Date", trip.date.split("T").first),
-
-              // Origin
-              _infoRow("Origin", trip.origin),
-
-              // Destination
-              _infoRow("Destination", trip.destination),
-
-              // Mode of Transport
-              _infoRow("Mode", trip.mode),
-
-              // Distance
-              _infoRow("Distance", _formatDistance(trip.distance)),
-
-              // Emissions
-              _infoRow(
-                "Emissions",
-                _formatEmissions(trip.emissions),
-                isBold: true,
+              Text(
+                trip.complete ? "✔ Completed" : "❌ Not Completed",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: trip.complete ? Colors.green : Colors.red,
+                ),
               ),
             ],
           ),
-        ),
+          const Divider(),
+          _tripDetailRow("Date", trip.date.substring(0, 10)),
+
+          _tripDetailRow("Origin", trip.origin),
+
+          _tripDetailRow("Destination", trip.destination),
+
+          _tripDetailRow("Mode", trip.mode),
+
+          _tripDetailRow("Type", trip.model),
+
+          _tripDetailRow("Distance", trip.distance),
+
+          _tripDetailRow("Emissions", formatGrams(trip.emissions), isBold: true),
+
+          _tripDetailRow("Reduction", formatGrams(trip.reduction), isBold: true, color: Colors.green),
+        ],
       ),
     );
   }
 
-  Widget _infoRow(String label, String value, {bool isBold = false}) {
+  /// Converts grams to kg if necessary
+  String formatGrams(double grams) {
+    return grams >= 1000 ? '${(grams / 1000).toStringAsFixed(2)} kg' : '${grams.round()} g';
+  }
+
+  Widget _tripDetailRow(String title, String value, {bool isBold = false, Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           Text(
             value,
-            style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontSize: 14,
+              color: color ?? Colors.black, // Apply color if provided
+            ),
           ),
         ],
       ),
