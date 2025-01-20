@@ -37,7 +37,6 @@ class TripDetailsWidget extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // ✅ Trip Completion Status
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -75,31 +74,36 @@ class TripDetailsWidget extends StatelessWidget {
     );
   }
 
-  /// Converts grams to kg if necessary
   String formatGrams(double grams) {
     return grams >= 1000 ? '${(grams / 1000).toStringAsFixed(2)} kg' : '${grams.round()} g';
   }
 
-  Widget _tripDetailRow(String title, String value, {bool isBold = false, Color? color}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Text(
+ Widget _tripDetailRow(String title, String value, {bool isBold = false, Color? color}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start, 
+      children: [
+        Text(
+          "$title: ",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Expanded(
+          child: Text(
             value,
             style: TextStyle(
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               fontSize: 14,
-              color: color ?? Colors.black, // Apply color if provided
+              color: color ?? Colors.black, 
             ),
+            softWrap: true, 
+            overflow: TextOverflow.visible,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }
+
+}
+

@@ -80,5 +80,18 @@ class TripDatabase {
     final db = await instance.database;
     return await db.delete('trips', where: 'id = ?', whereArgs: [id]);
   }
+  Future<Trip?> getTripById(int id) async {
+  final db = await database;
+  final maps = await db.query(
+    'trips',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+
+  if (maps.isNotEmpty) {
+    return Trip.fromMap(maps.first);
+  }
+  return null;
+}
 }
 

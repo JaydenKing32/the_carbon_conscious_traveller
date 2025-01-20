@@ -28,6 +28,7 @@ class TransitListView extends StatefulWidget {
 class _TransitListViewState extends State<TransitListView> {
   final Set<int> _savedTripIds = {}; // Store trip IDs from DB
   final Map<int, int> _indexToTripId = {}; // Maps UI index -> DB trip ID
+  final Map<int, bool> _tripCompletionStatus = {};
 
   @override
   void initState() {
@@ -79,10 +80,6 @@ class _TransitListViewState extends State<TransitListView> {
       _savedTripIds.add(id);
       _indexToTripId[index] = id;
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Transit trip saved to database with ID: $id")),
-    );
   }
 
 
@@ -96,10 +93,6 @@ class _TransitListViewState extends State<TransitListView> {
         _savedTripIds.remove(tripId);
         _indexToTripId.remove(index);
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Transit trip deleted from database with ID: $tripId")),
-      );
     } 
   }
 
@@ -108,6 +101,21 @@ class _TransitListViewState extends State<TransitListView> {
       return '${(number / 1000).toStringAsFixed(2)} kg';
     } else {
       return '${number.round()} g';
+    }
+  }
+
+ Future<void> _toggleTripCompletion(int index) async {
+    int? tripId = _indexToTripId[index];
+    if (tripId != null && _savedTripIds.contains(tripId)) {
+      Trip? trip = await TripDatabase.instance.getTripById(tripId);
+      if (trip != null) {
+        bool newStatus = !trip.complete;
+        await TripDatabase.instance.updateTripCompletion(tripId, newStatus);
+
+        setState(() {
+          _tripCompletionStatus[tripId] = newStatus;
+        });
+      }
     }
   }
 
@@ -135,16 +143,18 @@ class _TransitListViewState extends State<TransitListView> {
               List<double> stepEmissions =
                   transitEmissionsCalculator.calculateStepEmissions(steps);
 
-              int selectedIndex = polylinesState.transitActiveRouteIndex;
+              //int selectedIndex = polylinesState.transitActiveRouteIndex;
+
+              int? selectedIndex = _indexToTripId[index];
+              bool isCompleted = selectedIndex != null ? _tripCompletionStatus[selectedIndex] ?? false : false;
 
               Color color = selectedIndex == index ? Colors.green : Colors.transparent;
 
               return InkWell(
                 onTap: () {
                   setState(() {
-                    selectedIndex = index;
+                    polylinesState.setActiveRoute(index);
                   });
-                  polylinesState.setActiveRoute(selectedIndex);
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -209,21 +219,35 @@ class _TransitListViewState extends State<TransitListView> {
                           ),
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          _savedTripIds.contains(_indexToTripId[index] ?? -1)
-                              ? Icons.remove_circle_outline
-                              : Icons.add_circle_outline,
-                          color: Colors.green,
-                          size: 28,
-                        ),
-                        onPressed: () {
-                          if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
-                            _deleteTrip(index);
-                          } else {
-                            _saveTrip(index);
-                          }
-                        },
+                     Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              isCompleted ? Icons.check_circle : Icons.cancel_outlined,
+                              color: isCompleted ? Colors.green : Colors.black,
+                              size: 28,
+                            ),
+                            onPressed: () => _toggleTripCompletion(index),
+                          ),
+
+                          IconButton(
+                            icon: Icon(
+                              _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                                  ? Icons.remove_circle_outline
+                                  : Icons.add_circle_outline,
+                              color: Colors.green,
+                              size: 28,
+                            ),
+                            onPressed: () {
+                              if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                                _deleteTrip(index);
+                              } else {
+                                _saveTrip(index);
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 5),
+                        ],
                       ),
                     ],
                   ),

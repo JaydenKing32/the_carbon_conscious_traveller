@@ -79,7 +79,7 @@ class _TripsScreenState extends State<TripsScreen> {
             itemBuilder: (context, index) {
               final trip = snapshot.data![index];
 
-              Color statusColor = trip.complete ? Colors.green : Colors.red;
+              Color statusColor = trip.complete ? Colors.green : Colors.black;
 
               return ListTile(
                 leading: Icon(
@@ -115,7 +115,7 @@ class _TripsScreenState extends State<TripsScreen> {
                     IconButton(
                       icon: Icon(
                         trip.complete ? Icons.check_circle : Icons.cancel_outlined,
-                        color: trip.complete ? Colors.green : Colors.red,
+                        color: trip.complete ? Colors.green : Colors.black,
                       ),
                       onPressed: () => _toggleTripCompletion(trip.id!, trip.complete),
                     ),

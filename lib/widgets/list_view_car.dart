@@ -26,6 +26,7 @@ class CarListView extends StatefulWidget {
 class _CarListViewState extends State<CarListView> {
   final Set<int> _savedTripIds = {}; 
   final Map<int, int> _indexToTripId = {}; 
+  final Map<int, bool> _tripCompletionStatus = {};
 
   @override
   void initState() {
@@ -78,10 +79,6 @@ class _CarListViewState extends State<CarListView> {
       _savedTripIds.add(id);
       _indexToTripId[index] = id;
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Trip saved to database with ID: $id")),
-    );
   }
 
 
@@ -94,21 +91,34 @@ class _CarListViewState extends State<CarListView> {
         _savedTripIds.remove(tripId);
         _indexToTripId.remove(index);
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Trip deleted from database with ID: $tripId")),
-      );
     }
   }
 
+ Future<void> _toggleTripCompletion(int index) async {
+    int? tripId = _indexToTripId[index];
+    if (tripId != null && _savedTripIds.contains(tripId)) {
+      Trip? trip = await TripDatabase.instance.getTripById(tripId);
+      if (trip != null) {
+        bool newStatus = !trip.complete;
+        await TripDatabase.instance.updateTripCompletion(tripId, newStatus);
+
+        setState(() {
+          _tripCompletionStatus[tripId] = newStatus;
+        });
+      }
+    }
+  }
+
+ String formatEmission(int emission) {
+  if (emission >= 1000) {
+    return "${(emission / 1000).toStringAsFixed(2)} kg";
+  } else {
+    return "$emission g";
+  }
+}
+
   @override
   Widget build(BuildContext context) {
-    String formatNumber(int number) {
-      return number >= 1000
-          ? '${(number / 1000).toStringAsFixed(2)} kg'
-          : '${number.round()} g';
-    }
-
     return Consumer<PolylinesState>(builder: (context, polylinesState, child) {
       return Column(
         children: [
@@ -119,9 +129,9 @@ class _CarListViewState extends State<CarListView> {
             itemCount: widget.polylinesState.resultForPrivateVehicle.length,
             itemBuilder: (BuildContext context, int index) {
               widget.vehicleState.getTreeIcons(index);
-              int selectedIndex = polylinesState.carActiveRouteIndex;
-              Color color =
-                  selectedIndex == index ? Colors.green : Colors.transparent;
+
+              int? tripId = _indexToTripId[index];
+              bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
 
               return InkWell(
                 onTap: () {
@@ -133,21 +143,18 @@ class _CarListViewState extends State<CarListView> {
                   decoration: BoxDecoration(
                     border: Border(
                       left: BorderSide(
-                        color: color,
+                        color: isCompleted ? Colors.green : Colors.transparent,
                         width: 4.0,
                       ),
                     ),
                   ),
                   padding: const EdgeInsets.all(10),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         flex: 2,
-                        child: Column(
-                          children: [
-                            Row(
+                        child: Row(
                               children: [
                                 Container(
                                   padding: const EdgeInsets.only(right: 10),
@@ -167,17 +174,15 @@ class _CarListViewState extends State<CarListView> {
                                 ),
                               ],
                             ),
-                          ],
-                        ),
                       ),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Row(
                               children: [
-                                Text(formatNumber(
+                                Text(formatEmission(
                                     widget.vehicleState.getEmission(index))),
                                 Image.asset('assets/icons/co2e.png',
                                     width: 30, height: 30),
@@ -192,29 +197,42 @@ class _CarListViewState extends State<CarListView> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          _savedTripIds.contains(_indexToTripId[index] ?? -1)
-                              ? Icons.remove_circle_outline 
-                              : Icons.add_circle_outline,
-                          color: Colors.green,
-                          size: 28,
-                        ),
-                        onPressed: () {
-                          if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
-                            _deleteTrip(index);
-                          } else {
-                            _saveTrip(index);
-                          }
-                        },
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              isCompleted ? Icons.check_circle : Icons.cancel_outlined,
+                              color: isCompleted ? Colors.green : Colors.black,
+                              size: 28,
+                            ),
+                            onPressed: () => _toggleTripCompletion(index),
+                          ),
+
+                          IconButton(
+                            icon: Icon(
+                              _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                                  ? Icons.remove_circle_outline
+                                  : Icons.add_circle_outline,
+                              color: Colors.green,
+                              size: 28,
+                            ),
+                            onPressed: () {
+                              if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                                _deleteTrip(index);
+                              } else {
+                                _saveTrip(index);
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 5),
+                        ],
                       ),
                     ],
                   ),
                 ),
               );
             },
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(),
+            separatorBuilder: (BuildContext context, int index) => const Divider(),
           ),
         ],
       );
