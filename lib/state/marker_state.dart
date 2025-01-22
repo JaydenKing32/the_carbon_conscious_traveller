@@ -5,6 +5,11 @@ class MarkerState extends ChangeNotifier {
   final Set<Marker> _markers = {};
 
   Set<Marker> get markers => _markers;
+  
+  void clearMarkers() {
+    _markers.clear();
+    notifyListeners();
+  }
 
   void addMarker(LatLng position) {
     final newMarker = Marker(

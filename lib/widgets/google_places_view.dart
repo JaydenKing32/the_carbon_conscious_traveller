@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart'
     as places;
@@ -5,12 +7,17 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_directions_api/google_directions_api.dart' as dir;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:the_carbon_conscious_traveller/constants.dart';
+import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/helpers/map_service.dart';
+import 'package:the_carbon_conscious_traveller/helpers/private_car_emissions_calculator.dart';
+import 'package:the_carbon_conscious_traveller/helpers/private_vehicle_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/state/marker_state.dart';
 import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
+import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
+import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 
@@ -40,8 +47,6 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
   bool _fetchingPlace = false; // Fetching place state
   dynamic _fetchingPlaceErr; // Fetching place error
   dynamic _predictErr; // Prediction error
-  bool _enableOriginForm = true; // Origin textfield state
-  bool _enableDestForm = false; // Destination textfield state
 
   RoutesModel? routes;
 
@@ -96,7 +101,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             children: [
               TextFormField(
                 controller: originController,
-                enabled: _enableOriginForm,
+               
                 onTapOutside: (PointerDownEvent event) {
                   setState(() {
                     //hide the keyboard when the user taps outside the textfield
@@ -119,7 +124,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                     FocusScope.of(context).unfocus();
                   });
                 },
-                enabled: _enableDestForm,
+              
                 onChanged: (value) =>
                     _onPredictTextChanged(value, "destination"),
                 decoration: const InputDecoration(
@@ -232,88 +237,210 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
   //When a predicted item is clicked, fetch the place details
   void _onItemTapped(places.AutocompletePrediction item) async {
-    if (_fetchingPlace) {
-      return; // Fetching in progress
-    }
-
-    try {
-      final result =
-          await _places.fetchPlace(item.placeId, fields: _placeFields);
-
-      if (fieldType == "start") {
-        originController.text = item.fullText;
-
-        setState(() {
-          origin = result.place;
-          _fetchingPlace = false;
-          originLatLng = origin?.latLng;
-          _addOriginMarker(LatLng(originLatLng!.lat, originLatLng!.lng));
-          _enableOriginForm = false;
-          _enableDestForm = true;
-          _predictions = [];
-        });
-        if (mounted) {
-          MapService().goToLocation(
-              context, LatLng(originLatLng!.lat, originLatLng!.lng));
-        }
-      } else if (fieldType == "destination") {
-        destinationController.text = item.fullText;
-        setState(() {
-          destination = result.place;
-          _fetchingPlace = false;
-          destinationLatLng = destination?.latLng;
-          _addDestinationMarker(
-              LatLng(destinationLatLng!.lat, destinationLatLng!.lng));
-          _enableDestForm = false;
-          _predictions = [];
-          final polylineState =
-              Provider.of<PolylinesState>(context, listen: false);
-          if (polylineState.mode == "") {
-            polylineState.transportMode = "driving";
-          } else {
-            polylineState.transportMode = polylineState.mode;
-          }
-        });
-        if (mounted) {
-          MapService().goToLocation(
-              context, LatLng(destinationLatLng!.lat, destinationLatLng!.lng));
-        }
-      }
-    } catch (err) {
-      setState(() {
-        _fetchingPlaceErr = err;
-        _fetchingPlace = false;
-      });
-    }
+  if (_fetchingPlace) {
+    return; // Fetching in progress
   }
 
-  void _addOriginMarker(LatLng originLatLng) {
-    LatLng position = originLatLng;
-    final markerModel = Provider.of<MarkerState>(context, listen: false);
-    markerModel.addMarker(LatLng(position.latitude, position.longitude));
-
-    final coordinatesModel =
-        Provider.of<CoordinatesState>(context, listen: false);
-    coordinatesModel
-        .saveOriginCoords(LatLng(position.latitude, position.longitude));
-  }
-
-  void _addDestinationMarker(LatLng destinationLatLng) {
-    LatLng position = destinationLatLng;
+  try {
+    final result = await _places.fetchPlace(item.placeId, fields: _placeFields);
 
     final markerState = Provider.of<MarkerState>(context, listen: false);
-    markerState.addMarker(
-      LatLng(position.latitude, position.longitude),
-    );
-
     final coordsState = Provider.of<CoordinatesState>(context, listen: false);
-    coordsState.saveDestinationCoords(
-      LatLng(position.latitude, position.longitude),
-    );
-
     final polylineState = Provider.of<PolylinesState>(context, listen: false);
-    polylineState.getPolyline(coordsState.coordinates);
+
+    // Clear previous markers and polylines before adding new ones
+    markerState.clearMarkers();
+    polylineState.clearPolylines();
+    coordsState.clearCoordinates(); // if needed
+    coordsState.clearRouteData();   // if needed
+    
+    if (fieldType == "start") {
+      originController.text = item.fullText;
+      setState(() {
+        origin = result.place;
+        _fetchingPlace = false;
+        originLatLng = origin?.latLng;
+        _predictions = [];
+      });
+
+      if (originLatLng != null) {
+        LatLng originPosition = LatLng(originLatLng!.lat, originLatLng!.lng);
+        _addOriginMarker(originPosition);
+        if (mounted) {
+          MapService().goToLocation(context, originPosition);
+        }
+      }
+    } else if (fieldType == "destination") {
+      destinationController.text = item.fullText;
+      setState(() {
+        destination = result.place;
+        _fetchingPlace = false;
+        destinationLatLng = destination?.latLng;
+        _predictions = [];
+      });
+
+      if (destinationLatLng != null) {
+        LatLng destPosition = LatLng(destinationLatLng!.lat, destinationLatLng!.lng);
+        _addDestinationMarker(destPosition);
+        if (mounted) {
+          MapService().goToLocation(context, destPosition);
+        }
+      }
+    }
+
+    // **Set default transport mode after both origin and destination are set**
+    if (coordsState.originCoords != const LatLng(0, 0) &&
+        coordsState.destinationCoords != const LatLng(0, 0)) {
+      if (polylineState.mode.isEmpty) {
+        polylineState.transportMode = "driving"; // Default mode
+      }
+      // Alternatively, set based on user selection
+    }
+  } catch (err) {
+    setState(() {
+      _fetchingPlaceErr = err;
+      _fetchingPlace = false;
+    });
   }
+}
+
+
+
+void _addOriginMarker(LatLng originLatLng) {
+  final markerModel = Provider.of<MarkerState>(context, listen: false);
+  markerModel.addMarker(originLatLng);
+
+  final coordinatesModel = Provider.of<CoordinatesState>(context, listen: false);
+  coordinatesModel.saveOriginCoords(originLatLng);
+
+  if (coordinatesModel.destinationCoords != const LatLng(0, 0)) {
+    final polylineState = Provider.of<PolylinesState>(context, listen: false);
+   
+    final currentMode = polylineState.mode;
+
+    polylineState.getPolyline([
+      coordinatesModel.originCoords,
+      coordinatesModel.destinationCoords
+    ]).then((_) {
+    
+      if (currentMode == 'driving') {
+        final carState = Provider.of<PrivateCarState>(context, listen: false);
+
+        final emissionsCalculator = PrivateCarEmissionsCalculator(
+          polylinesState: polylineState,
+          vehicleSize: carState.selectedSize ?? CarSize.label,
+          vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
+        );
+
+        List<int> calculatedEmissions = [];
+        for (int i = 0; i < polylineState.distances.length; i++) {
+          double emission = emissionsCalculator.calculateEmissions(
+            i,
+            carState.selectedSize ?? CarSize.label,
+            carState.selectedFuelType ?? CarFuelType.label,
+          );
+          calculatedEmissions.add(emission.toInt());
+        }
+
+        carState.saveEmissions(calculatedEmissions);
+        if (calculatedEmissions.isNotEmpty) {
+          carState.updateMinEmission(calculatedEmissions.reduce(min));
+          carState.updateMaxEmission(calculatedEmissions.reduce(max));
+        }
+      } else if (currentMode != 'driving') {
+        final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
+
+        final emissionsCalculator = PrivateVehicleEmissionsCalculator(
+          polylinesState: polylineState,
+          vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
+        );
+
+        List<int> calculatedEmissions = [];
+        for (int i = 0; i < polylineState.distances.length; i++) {
+          double emission = emissionsCalculator.calculateEmission(i);
+          calculatedEmissions.add(emission.toInt());
+        }
+
+        motorcycleState.saveEmissions(calculatedEmissions);
+        if (calculatedEmissions.isNotEmpty) {
+          motorcycleState.updateMinEmission(calculatedEmissions.reduce(min));
+          motorcycleState.updateMaxEmission(calculatedEmissions.reduce(max));
+        }
+      }
+
+    });
+  }
+}
+
+
+void _addDestinationMarker(LatLng destinationLatLng) {
+  final markerState = Provider.of<MarkerState>(context, listen: false);
+  markerState.addMarker(destinationLatLng);
+
+  final coordsState = Provider.of<CoordinatesState>(context, listen: false);
+  coordsState.saveDestinationCoords(destinationLatLng);
+
+  // Once both origin and destination are set, retrieve and update route:
+  if (coordsState.originCoords != const LatLng(0,0)) {
+    final polylineState = Provider.of<PolylinesState>(context, listen: false);
+    // Determine current mode from polylineState or another source
+    final currentMode = polylineState.mode;
+    
+    polylineState.getPolyline([
+      coordsState.originCoords,
+      coordsState.destinationCoords
+    ]).then((_) {
+      if (currentMode == 'driving') {
+        final carState = Provider.of<PrivateCarState>(context, listen: false);
+
+        final emissionsCalculator = PrivateCarEmissionsCalculator(
+          polylinesState: polylineState,
+          vehicleSize: carState.selectedSize ?? CarSize.label,
+          vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
+        );
+
+        List<int> calculatedEmissions = [];
+        for (int i = 0; i < polylineState.distances.length; i++) {
+          double emission = emissionsCalculator.calculateEmissions(
+            i,
+            carState.selectedSize ?? CarSize.label,
+            carState.selectedFuelType ?? CarFuelType.label,
+          );
+          calculatedEmissions.add(emission.toInt());
+        }
+
+        carState.saveEmissions(calculatedEmissions);
+        if (calculatedEmissions.isNotEmpty) {
+          carState.updateMinEmission(calculatedEmissions.reduce(min));
+          carState.updateMaxEmission(calculatedEmissions.reduce(max));
+        }
+      } else if (currentMode == 'motorcycling') {
+        final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
+
+        final emissionsCalculator = PrivateVehicleEmissionsCalculator(
+          polylinesState: polylineState,
+          vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
+        );
+
+        List<int> calculatedEmissions = [];
+        for (int i = 0; i < polylineState.distances.length; i++) {
+          double emission = emissionsCalculator.calculateEmission(i);
+          calculatedEmissions.add(emission.toInt());
+        }
+
+        motorcycleState.saveEmissions(calculatedEmissions);
+        if (calculatedEmissions.isNotEmpty) {
+          motorcycleState.updateMinEmission(calculatedEmissions.reduce(min));
+          motorcycleState.updateMaxEmission(calculatedEmissions.reduce(max));
+        }
+      }
+      // Additional modes (e.g., transit) can be handled with further else-if blocks.
+    });
+  }
+}
+
+
+
 
   void getUserLocationDetails() {
     final place = MapService().getAddressFromLatLng();
@@ -321,7 +448,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     place.then((placemark) {
       if (placemark != null) {
         setState(() {
-          _enableOriginForm = false;
+         // _enableOriginForm = false;
         });
         final currentAddress =
             "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
@@ -337,6 +464,6 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
   void setUserMarker() {
     final latLng = MapService().getUserLatLng();
     _addOriginMarker(latLng!); //Place the marker and save Lat and Lng to state
-    _enableDestForm = true;
+   // _enableDestForm = true;
   }
 }

@@ -54,56 +54,61 @@ class PolylinesState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getPolyline(List<LatLng> coordinates) async {
-    resetPolyline();
+Future<void> getPolyline(List<LatLng> coordinates) async {
+  resetPolyline();
 
-    Future<List<DirectionsRoute>> fetchRouteInfo() async {
-      routesModel = RoutesModel(
-        origin: GeoCoord(coordinates[0].latitude, coordinates[0].longitude),
-        destination:
-            GeoCoord(coordinates[1].latitude, coordinates[1].longitude),
-        travelMode: _transportMode,
-      );
-      routes = await routesModel?.getRouteInfo();
-      if (routes == null) {
-        return [];
-      } else {
-        return routes!;
-      }
-    }
-
-    // This result is used to render polylines
-    // and to get route info such as distance, duration, summary
-    result = await fetchRouteInfo();
-
-    // This result is used to retrieve the correct array length for driving mode
-    // so that the app doesn't crash when switching from transit mode to car or motorcycle mode
-    // (used in vehicle_settings_motorcyle.dart and vehicle_settings_dar.dart)
-    // It appears that the above request does not get enough time to
-    // complete when switching back to car or driving mode
-    if (_transportMode == TravelMode.driving) {
-      resultForPrivateVehicle = await fetchRouteInfo();
-    }
-
-    if (result.isNotEmpty) {
-      for (int i = 0; i < result.length; i++) {
-        List<LatLng> routeCoordinate = [];
-
-        if (result[i].overviewPolyline!.points!.isEmpty) {
-          return;
-        } else {
-          List<LatLng> decodedPoints = _polylinePoints
-              .decodePolyline(result[i].overviewPolyline!.points!)
-              .map((point) => LatLng(point.latitude, point.longitude))
-              .toList();
-          routeCoordinate.addAll(decodedPoints);
-        }
-        routeCoordinates.add(routeCoordinate);
-      }
-    }
-    _updateActiveRoute(_activeRouteIndex);
-    notifyListeners();
+  Future<List<DirectionsRoute>> fetchRouteInfo() async {
+    routesModel = RoutesModel(
+      origin: GeoCoord(coordinates[0].latitude, coordinates[0].longitude),
+      destination: GeoCoord(coordinates[1].latitude, coordinates[1].longitude),
+      travelMode: _transportMode,
+    );
+    routes = await routesModel?.getRouteInfo();
+    return routes ?? [];
   }
+
+  // Fetch route info for general use and for driving mode specifically.
+  result = await fetchRouteInfo();
+  if (_transportMode == TravelMode.driving) {
+    resultForPrivateVehicle = await fetchRouteInfo();
+  }
+
+  // Clear and update distances for new routes.
+  _distances.clear();
+
+  if (result.isNotEmpty) {
+    for (int i = 0; i < result.length; i++) {
+      List<LatLng> routeCoordinate = [];
+
+      // Skip route if overview polyline is empty.
+      if (result[i].overviewPolyline?.points == null ||
+          result[i].overviewPolyline!.points!.isEmpty) {
+        continue;
+      }
+
+      // Decode polyline points for the route.
+      List<LatLng> decodedPoints = _polylinePoints
+          .decodePolyline(result[i].overviewPolyline!.points!)
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList();
+      routeCoordinate.addAll(decodedPoints);
+      routeCoordinates.add(routeCoordinate);
+
+      // Extract distance for the route.
+      double routeDistance = 0.0;
+      if (result[i].legs != null &&
+          result[i].legs!.isNotEmpty &&
+          result[i].legs!.first.distance != null) {
+        routeDistance = result[i].legs!.first.distance!.value?.toDouble() ?? 0.0;
+      }
+      _distances.add(routeDistance);
+    }
+  }
+
+  _updateActiveRoute(_activeRouteIndex);
+  notifyListeners();
+}
+
 
   void _updateActiveRoute(int index) {
     _activeRouteIndex = index;
@@ -217,5 +222,16 @@ class PolylinesState extends ChangeNotifier {
     } else {
       "No results";
     }
+  }
+
+  void clearPolylines() {
+    _polylines.clear();
+    _routeCoordinates.clear();
+    _distances.clear();
+    _distanceTexts.clear();
+    _durationTexts.clear();
+    _routeSummary.clear();
+    
+    notifyListeners();
   }
 }

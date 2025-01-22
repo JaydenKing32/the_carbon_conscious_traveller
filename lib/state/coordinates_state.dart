@@ -38,4 +38,14 @@ class CoordinatesState with ChangeNotifier {
     }
     notifyListeners();
   }
+  
+    void clearCoordinates() {
+    _coordinates.clear();
+    notifyListeners();
+  }
+
+  void clearRouteData() {
+    _routeData.clear();
+    notifyListeners();
+  }
 }
