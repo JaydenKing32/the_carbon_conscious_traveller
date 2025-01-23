@@ -88,8 +88,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       return "You've traveled a distance beyond Earth's orbit! 🛰️";
     }
   }
-
-  @override
+@override
   Widget build(BuildContext context) {
     String formattedMonth = DateFormat('MMMM yyyy').format(_selectedDate);
     Map<int, Map<String, double>> dailyData = _aggregateData();
@@ -105,9 +104,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            
-
-        
+            // Facts Container with row-based text + emoji inline
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -116,18 +113,48 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
               child: Column(
                 children: [
-                  Text(
-                    "You consciously traveled about ${totalDistance.toStringAsFixed(1)} km! 🌏",
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  // Distance traveled + earth emoji on the same line
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "You consciously traveled about "
+                          "${totalDistance.toStringAsFixed(1)} km!",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      // Earth emoji sized the same as the text
+                      const Text(
+                        "🌏",
+                        style: TextStyle(
+                          fontSize: 14, // matches text style
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 5),
-                  Text(funFact, style: const TextStyle(fontSize: 14)),
+                  // Fun fact + rocket emoji inline
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          funFact,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-
             const SizedBox(height: 10),
-        
+            
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -135,25 +162,41 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   icon: const Icon(Icons.arrow_left, size: 30),
                   onPressed: () => _changeMonth(-1),
                 ),
-                Text(formattedMonth, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  formattedMonth,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 IconButton(
                   icon: const Icon(Icons.arrow_right, size: 30),
                   onPressed: () => _changeMonth(1),
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
 
+            // Chart
             Expanded(
               child: _completedTrips.isEmpty
-                  ? const Center(child: Text("No data available for this time period"))
+                  ? const Center(
+                      child: Text("No data available for this time period"),
+                    )
                   : SfCartesianChart(
-                      primaryXAxis: const NumericAxis(title: AxisTitle(text: "Day")),
-                      primaryYAxis: const NumericAxis(title: AxisTitle(text: "kg CO₂e")),
-                      legend: const Legend(isVisible: true, position: LegendPosition.bottom),
+                      primaryXAxis: const NumericAxis(
+                        title: AxisTitle(text: "Day"),
+                      ),
+                      primaryYAxis: const NumericAxis(
+                        title: AxisTitle(text: "kg CO₂e"),
+                      ),
+                      legend: const Legend(
+                        isVisible: true,
+                        position: LegendPosition.bottom,
+                      ),
                       tooltipBehavior: TooltipBehavior(enable: true),
-                      series: <CartesianSeries<MapEntry<int, Map<String, double>>, int>>[
+                      series:
+                          <CartesianSeries<MapEntry<int, Map<String, double>>, int>>[
                         ColumnSeries<MapEntry<int, Map<String, double>>, int>(
                           name: "Emissions",
                           dataSource: dailyData.entries.toList(),

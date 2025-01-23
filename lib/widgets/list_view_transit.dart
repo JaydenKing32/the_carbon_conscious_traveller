@@ -169,7 +169,7 @@ class _TransitListViewState extends State<TransitListView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        flex: 2,
+                        flex: 1,
                         child: Padding(
                           padding: const EdgeInsets.only(
                               left: 12, right: 20, top: 16, bottom: 10),
