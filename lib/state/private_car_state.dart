@@ -23,6 +23,13 @@ class PrivateCarState extends ChangeNotifier {
     _selectedSize = newValue;
     notifyListeners();
   }
+  
+   void resetEmissions() {
+    _emissions = [];
+    _minEmission = 0;
+    _maxEmission = 0;
+    notifyListeners();
+  }
 
   void updateSelectedFuelType(CarFuelType newValue) {
     _selectedFuelType = newValue;

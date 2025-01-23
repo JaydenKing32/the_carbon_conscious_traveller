@@ -17,6 +17,14 @@ class PrivateMotorcycleState extends ChangeNotifier {
   List<int> get emissions => _emissions;
   List<String> get treeIcons => _treeIcons;
 
+  void resetEmissions() {
+    _emissions = [];
+    _minEmission = 0;
+    _maxEmission = 0;
+    _treeIcons = [];
+    notifyListeners();
+  }
+  
   void updateSelectedValue(MotorcycleSize newValue) {
     _selectedValue = newValue;
     notifyListeners();

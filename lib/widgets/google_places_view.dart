@@ -316,99 +316,25 @@ void _addOriginMarker(LatLng originLatLng) {
   if (coordinatesModel.destinationCoords != const LatLng(0, 0)) {
     final polylineState = Provider.of<PolylinesState>(context, listen: false);
 
-    // Start fetching the polyline
+    // Reset emissions for both Car and Motorcycle
+    final carState = Provider.of<PrivateCarState>(context, listen: false);
+    final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
+
+    carState.resetEmissions();
+    motorcycleState.resetEmissions();
+
     polylineState.getPolyline([
       coordinatesModel.originCoords,
       coordinatesModel.destinationCoords
     ]).then((_) {
-      // Check if distances are available to prevent RangeError
       if (polylineState.distances.isEmpty) {
-        // Optionally, you can set an error state here
-        print("No distances available for the fetched route.");
-        return;
-      }
-
-      // **Calculate Emissions for Car**
-      final carState = Provider.of<PrivateCarState>(context, listen: false);
-
-      final carEmissionsCalculator = PrivateCarEmissionsCalculator(
-        polylinesState: polylineState,
-        vehicleSize: carState.selectedSize ?? CarSize.label,
-        vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
-      );
-
-      List<int> calculatedCarEmissions = [];
-      for (int i = 0; i < polylineState.distances.length; i++) {
-        double emission = carEmissionsCalculator.calculateEmissions(
-          i,
-          carState.selectedSize ?? CarSize.label,
-          carState.selectedFuelType ?? CarFuelType.label,
-        );
-        calculatedCarEmissions.add(emission.toInt());
-      }
-
-      carState.saveEmissions(calculatedCarEmissions);
-      if (calculatedCarEmissions.isNotEmpty) {
-        carState.updateMinEmission(calculatedCarEmissions.reduce(min));
-        carState.updateMaxEmission(calculatedCarEmissions.reduce(max));
-      }
-
-      // **Calculate Emissions for Motorcycle**
-      final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
-
-      final motorcycleEmissionsCalculator = PrivateVehicleEmissionsCalculator(
-        polylinesState: polylineState,
-        vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
-      );
-
-      List<int> calculatedMotorcycleEmissions = [];
-      for (int i = 0; i < polylineState.distances.length; i++) {
-        double emission = motorcycleEmissionsCalculator.calculateEmission(i);
-        calculatedMotorcycleEmissions.add(emission.toInt());
-      }
-
-      motorcycleState.saveEmissions(calculatedMotorcycleEmissions);
-      if (calculatedMotorcycleEmissions.isNotEmpty) {
-        motorcycleState.updateMinEmission(calculatedMotorcycleEmissions.reduce(min));
-        motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
-      }
-    }).catchError((error) {
-      // Handle any errors during polyline fetching
-      print("Error fetching polyline: $error");
-      // Optionally, you can set an error state here
-    });
-  }
-}
-
-
-void _addDestinationMarker(LatLng destinationLatLng) {
-  final markerState = Provider.of<MarkerState>(context, listen: false);
-  markerState.addMarker(destinationLatLng);
-
-  final coordsState = Provider.of<CoordinatesState>(context, listen: false);
-  coordsState.saveDestinationCoords(destinationLatLng);
-
-  // Proceed only if origin is already set
-  if (coordsState.originCoords != const LatLng(0, 0)) {
-    final polylineState = Provider.of<PolylinesState>(context, listen: false);
-
-    // Start fetching the polyline
-    polylineState.getPolyline([
-      coordsState.originCoords,
-      coordsState.destinationCoords
-    ]).then((_) {
-      // Check if distances are available to prevent RangeError
-      if (polylineState.distances.isEmpty) {
-        // Optionally, set an error state or notify the user
         print("No distances available for the fetched route.");
         return;
       }
 
       try {
         // **Calculate Emissions for Car**
-        final carState = Provider.of<PrivateCarState>(context, listen: false);
-
-        final carEmissionsCalculator = PrivateCarEmissionsCalculator(
+        final emissionsCalculator = PrivateCarEmissionsCalculator(
           polylinesState: polylineState,
           vehicleSize: carState.selectedSize ?? CarSize.label,
           vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
@@ -416,7 +342,7 @@ void _addDestinationMarker(LatLng destinationLatLng) {
 
         List<int> calculatedCarEmissions = [];
         for (int i = 0; i < polylineState.distances.length; i++) {
-          double emission = carEmissionsCalculator.calculateEmissions(
+          double emission = emissionsCalculator.calculateEmissions(
             i,
             carState.selectedSize ?? CarSize.label,
             carState.selectedFuelType ?? CarFuelType.label,
@@ -431,14 +357,9 @@ void _addDestinationMarker(LatLng destinationLatLng) {
         }
 
         // **Calculate Emissions for Motorcycle**
-        final motorcycleState =
-            Provider.of<PrivateMotorcycleState>(context, listen: false);
-
-        final motorcycleEmissionsCalculator =
-            PrivateVehicleEmissionsCalculator(
+        final motorcycleEmissionsCalculator = PrivateVehicleEmissionsCalculator(
           polylinesState: polylineState,
-          vehicleSize:
-              motorcycleState.selectedValue ?? MotorcycleSize.label,
+          vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
         );
 
         List<int> calculatedMotorcycleEmissions = [];
@@ -449,20 +370,90 @@ void _addDestinationMarker(LatLng destinationLatLng) {
 
         motorcycleState.saveEmissions(calculatedMotorcycleEmissions);
         if (calculatedMotorcycleEmissions.isNotEmpty) {
-          motorcycleState.updateMinEmission(
-              calculatedMotorcycleEmissions.reduce(min));
-          motorcycleState.updateMaxEmission(
-              calculatedMotorcycleEmissions.reduce(max));
+          motorcycleState.updateMinEmission(calculatedMotorcycleEmissions.reduce(min));
+          motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
         }
       } catch (e) {
-        // Handle any errors during emissions calculation
         print("Error during emissions calculation: $e");
-        // Optionally, set an error state to inform the user
       }
     }).catchError((error) {
-      // Handle any errors during polyline fetching
       print("Error fetching polyline: $error");
-      // Optionally, set an error state to inform the user
+    });
+  }
+}
+
+void _addDestinationMarker(LatLng destinationLatLng) {
+  final markerState = Provider.of<MarkerState>(context, listen: false);
+  markerState.addMarker(destinationLatLng);
+
+  final coordsState = Provider.of<CoordinatesState>(context, listen: false);
+  coordsState.saveDestinationCoords(destinationLatLng);
+
+  if (coordsState.originCoords != const LatLng(0, 0)) {
+    final polylineState = Provider.of<PolylinesState>(context, listen: false);
+
+    // Reset emissions for both Car and Motorcycle
+    final carState = Provider.of<PrivateCarState>(context, listen: false);
+    final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
+
+    carState.resetEmissions();
+    motorcycleState.resetEmissions();
+
+    polylineState.getPolyline([
+      coordsState.originCoords,
+      coordsState.destinationCoords
+    ]).then((_) {
+      if (polylineState.distances.isEmpty) {
+        print("No distances available for the fetched route.");
+        return;
+      }
+
+      try {
+        // **Calculate Emissions for Car**
+        final emissionsCalculator = PrivateCarEmissionsCalculator(
+          polylinesState: polylineState,
+          vehicleSize: carState.selectedSize ?? CarSize.label,
+          vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
+        );
+
+        List<int> calculatedCarEmissions = [];
+        for (int i = 0; i < polylineState.distances.length; i++) {
+          double emission = emissionsCalculator.calculateEmissions(
+            i,
+            carState.selectedSize ?? CarSize.label,
+            carState.selectedFuelType ?? CarFuelType.label,
+          );
+          calculatedCarEmissions.add(emission.toInt());
+        }
+
+        carState.saveEmissions(calculatedCarEmissions);
+        if (calculatedCarEmissions.isNotEmpty) {
+          carState.updateMinEmission(calculatedCarEmissions.reduce(min));
+          carState.updateMaxEmission(calculatedCarEmissions.reduce(max));
+        }
+
+        // **Calculate Emissions for Motorcycle**
+        final motorcycleEmissionsCalculator = PrivateVehicleEmissionsCalculator(
+          polylinesState: polylineState,
+          vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
+        );
+
+        List<int> calculatedMotorcycleEmissions = [];
+        for (int i = 0; i < polylineState.distances.length; i++) {
+          double emission = motorcycleEmissionsCalculator.calculateEmission(i);
+          calculatedMotorcycleEmissions.add(emission.toInt());
+        }
+
+        motorcycleState.saveEmissions(calculatedMotorcycleEmissions);
+        if (calculatedMotorcycleEmissions.isNotEmpty) {
+          motorcycleState.updateMinEmission(calculatedMotorcycleEmissions.reduce(min));
+          motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
+        }
+      } catch (e) {
+        print("Error during emissions calculation: $e");
+      }
+    }).catchError((error) {
+      print("Error fetching polyline: $error");
     });
   }
 }

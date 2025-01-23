@@ -5,6 +5,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
 
 class PolylinesState extends ChangeNotifier {
+  final bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
   final poly.PolylinePoints _polylinePoints = poly.PolylinePoints();
   final Map<PolylineId, Polyline> _polylines = {};
   final List<List<LatLng>> _routeCoordinates = [];
