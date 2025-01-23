@@ -42,9 +42,6 @@ class _CarListViewState extends State<CarListView> {
       _indexToTripId.clear();
       for (var trip in trips) {
         _savedTripIds.add(trip.id!);
-        // Assuming each trip has an index; adjust as needed
-        // For example:
-        // _indexToTripId[trip.index] = trip.id!;
       }
     });
   }

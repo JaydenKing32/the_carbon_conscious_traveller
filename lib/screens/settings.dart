@@ -6,7 +6,7 @@ import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +42,10 @@ class SettingsScreen extends StatelessWidget {
                         }
                       },
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text('Use specified car'),
                           Text(
                             'Use the below settings for car mode',
@@ -144,10 +144,10 @@ class SettingsScreen extends StatelessWidget {
                         }
                       },
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text('Use specified motorcycle'),
                           Text(
                             'Use the below settings for motorcycle mode',
