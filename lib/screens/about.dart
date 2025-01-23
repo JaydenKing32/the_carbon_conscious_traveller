@@ -39,7 +39,6 @@ class AboutScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Прокручиваемая основная часть
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -47,7 +46,7 @@ class AboutScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "The Carbon Conscious Traveller 🌿",
+                      "The Carbon Conscious Traveller",
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
@@ -73,10 +72,9 @@ class AboutScreen extends StatelessWidget {
                     _featureItem(context, "📊 Visual Carbon Stats", "Track emissions with charts & fun facts."),
                     const SizedBox(height: 20),
 
-                    // Кнопки действий
                     ElevatedButton.icon(
                       icon: const Icon(Icons.favorite),
-                      label: const Text("Support Us 💖"),
+                      label: const Text("Support Us"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         foregroundColor: Colors.white,
@@ -121,7 +119,6 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Футер
             Container(
               padding: const EdgeInsets.symmetric(vertical: 10),
               color: Colors.grey[200],

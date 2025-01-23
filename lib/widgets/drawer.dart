@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:the_carbon_conscious_traveller/screens/placeholder.dart';
+import 'package:the_carbon_conscious_traveller/screens/privacy.dart';
 import 'package:the_carbon_conscious_traveller/screens/settings.dart';
 import 'package:the_carbon_conscious_traveller/screens/trips_screen.dart';
 import 'package:the_carbon_conscious_traveller/screens/stat.dart';
@@ -55,7 +55,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+                MaterialPageRoute(builder: (context) => const PrivacyPolicyScreen()),
               );
             },
           ),
