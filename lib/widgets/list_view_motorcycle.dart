@@ -1,5 +1,3 @@
-// motorcycle_list_view.dart
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,11 +9,11 @@ import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class MotorcycleListView extends StatefulWidget {
   const MotorcycleListView({
-    Key? key,
+    super.key,
     required this.vehicleState,
     required this.polylinesState,
     required this.icon,
-  }) : super(key: key);
+  });
 
   final PrivateMotorcycleState vehicleState; // Specific type instead of dynamic
   final PolylinesState polylinesState;
@@ -52,7 +50,6 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
   Future<void> _saveTrip(int index) async {
     // Validate index to prevent RangeError
     if (!_isValidIndex(index)) {
-      print("Invalid index: $index");
       return;
     }
 
@@ -60,13 +57,6 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     // Check if a trip for this route already exists
     if (_routeToTripId.containsKey(route)) {
       // Trip already exists, do not save again
-      print("Trip for route '$route' already exists.");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Trip for route '$route' already exists."),
-          backgroundColor: Colors.orange,
-        ),
-      );
       return;
     }
 
@@ -103,31 +93,18 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
       _routeToTripId[route] = id;
     });
 
-    // Show confirmation message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Trip for route '$route' saved successfully!"),
-        backgroundColor: Colors.green,
-      ),
-    );
+  
   }
 
   /// Deletes a trip from the database and updates the local state.
   Future<void> _deleteTrip(int index) async {
     if (!_isValidIndex(index)) {
-      print("Invalid index: $index");
       return;
     }
 
     String route = widget.polylinesState.routeSummary[index];
     if (!_routeToTripId.containsKey(route)) {
-      print("No trip found for route: $route");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("No trip found for route: $route"),
-          backgroundColor: Colors.red,
-        ),
-      );
+  
       return;
     }
 
@@ -140,32 +117,18 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
         _tripCompletionStatus.remove(tripId);
       });
 
-      // Show confirmation message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Trip for route '$route' deleted successfully!"),
-          backgroundColor: Colors.red,
-        ),
-      );
+    
     }
   }
 
   /// Toggles the completion status of a trip.
   Future<void> _toggleTripCompletion(int index) async {
     if (!_isValidIndex(index)) {
-      print("Invalid index: $index");
       return;
     }
 
     String route = widget.polylinesState.routeSummary[index];
     if (!_routeToTripId.containsKey(route)) {
-      print("No trip found for route: $route");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("No trip found for route: $route"),
-          backgroundColor: Colors.red,
-        ),
-      );
       return;
     }
 
@@ -178,15 +141,6 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
         setState(() {
           _tripCompletionStatus[tripId] = newStatus;
         });
-
-        // Show confirmation message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                "Trip for route '$route' marked as ${newStatus ? 'completed' : 'incomplete'}."),
-            backgroundColor: Colors.blue,
-          ),
-        );
       }
     }
   }
@@ -230,7 +184,14 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
               itemBuilder: (BuildContext context, int index) {
                 // Validate index to prevent RangeError
                 if (!_isValidIndex(index)) {
-                  return const SizedBox.shrink(); // Or display a placeholder widget
+                  return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 10),
+                          ],
+                        ),); // Or display a placeholder widget
                 }
 
                 // Fetch the trip ID and completion status for the current route
@@ -243,100 +204,134 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 widget.vehicleState.getTreeIcons(index);
 
                 return InkWell(
-                  onTap: () {
-                    setState(() {
-                      polylinesState.setActiveRoute(index);
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: isCompleted ? Colors.green : Colors.transparent,
-                          width: 4.0,
-                        ),
+              onTap: () {
+                setState(() {
+                  polylinesState.setActiveRoute(index);
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
+                      color: isCompleted ? Colors.green : Colors.transparent,
+                      width: 4.0,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 1, 
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Icon(
+                              widget.icon,
+                              color: Colors.green,
+                              size: 30,
+                            ),
+                          ),
+                          
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10), 
+                              child: Text(
+                                'via ${widget.polylinesState.routeSummary[index]}',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                softWrap: true, 
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    padding: const EdgeInsets.all(10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Icon and Route Summary
-                        Expanded(
-                          flex: 2,
-                          child: Row(
+                   
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                       
+                          Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Icon(
-                                  widget.icon,
-                                  color: Colors.green,
-                                  size: 30,
-                                ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 30),
-                                  child: Text(
-                                    'via ${widget.polylinesState.routeSummary[index]}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
+                              Flexible(
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: formatEmission(widget.vehicleState.getEmission(index)),
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                      ),
+                                      const WidgetSpan(
+                                        alignment: PlaceholderAlignment.middle,
+                                        child: SizedBox(width: 4), 
+                                      ),
+                                      WidgetSpan(
+                                        child: Image.asset(
+                                          'assets/icons/co2e.png',
+                                          width: 20, 
+                                          height: 20,
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return const Icon(
+                                              Icons.error,
+                                              size: 20,
+                                              color: Colors.red,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  overflow: TextOverflow.ellipsis, 
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        // Emissions, Distance, Duration, and Tree Icons
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    formatEmission(
-                                      widget.vehicleState.getEmission(index),
-                                    ),
+                          const SizedBox(height: 4), 
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: widget.polylinesState.distanceTexts[index].split(' ').first,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                                const TextSpan(
+                                  text: ' km',
+                                  style: TextStyle(
+                                    fontSize: 12,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Image.asset(
-                                    'assets/icons/co2e.png',
-                                    width: 30,
-                                    height: 30,
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                widget.polylinesState.distanceTexts[index],
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              Text(
-                                widget.polylinesState.durationTexts[index],
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              //TreeIcons(
-                               // treeIconName:
-                              //      widget.vehicleState.treeIcons[index],
-                              //),
-                            ],
-                          ),
-                        ),
-                        // Action Buttons: Complete and Save/Delete
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                isCompleted
-                                    ? Icons.check_circle
-                                    : Icons.cancel_outlined,
-                                color: isCompleted ? Colors.green : Colors.black,
-                                size: 28,
-                              ),
-                              onPressed: () => _toggleTripCompletion(index),
+                                ),
+                              ],
                             ),
-                            IconButton(
+                            softWrap: false, 
+                            overflow: TextOverflow.ellipsis, 
+                          ),
+                          const SizedBox(height: 2),
+                        
+                          Text(
+                            widget.polylinesState.durationTexts[index],
+                            style: Theme.of(context).textTheme.bodySmall,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                          ),
+                          const SizedBox(height: 4),
+                          // Иконки Дерева
+                          TreeIcons(
+                            treeIconName: widget.vehicleState.treeIcons,
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
                               icon: Icon(
                                 _savedTripIds
                                         .contains(_routeToTripId[route] ?? -1)
@@ -354,13 +349,25 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 }
                               },
                             ),
-                            const SizedBox(width: 5),
-                          ],
-                        ),
+                           IconButton(
+                              icon: Icon(
+                                isCompleted
+                                    ? Icons.check_circle
+                                    : Icons.cancel_outlined,
+                                color: isCompleted ? Colors.green : Colors.black,
+                                size: 28,
+                              ),
+                              onPressed: () => _toggleTripCompletion(index),
+                            ),
+                            
+                      
+                        const SizedBox(height: 5), // Вертикальный отступ
                       ],
                     ),
-                  ),
-                );
+                  ],
+                ),
+              ),
+            );
               },
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(),

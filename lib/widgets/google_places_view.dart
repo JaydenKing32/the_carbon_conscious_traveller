@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -328,7 +330,6 @@ void _addOriginMarker(LatLng originLatLng) {
       coordinatesModel.destinationCoords
     ]).then((_) {
       if (polylineState.distances.isEmpty) {
-        print("No distances available for the fetched route.");
         return;
       }
 
@@ -374,10 +375,10 @@ void _addOriginMarker(LatLng originLatLng) {
           motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
         }
       } catch (e) {
-        print("Error during emissions calculation: $e");
+       // print("Error during emissions calculation: $e");
       }
     }).catchError((error) {
-      print("Error fetching polyline: $error");
+     // print("Error fetching polyline: $error");
     });
   }
 }
@@ -404,7 +405,7 @@ void _addDestinationMarker(LatLng destinationLatLng) {
       coordsState.destinationCoords
     ]).then((_) {
       if (polylineState.distances.isEmpty) {
-        print("No distances available for the fetched route.");
+       // print("No distances available for the fetched route.");
         return;
       }
 
@@ -450,10 +451,10 @@ void _addDestinationMarker(LatLng destinationLatLng) {
           motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
         }
       } catch (e) {
-        print("Error during emissions calculation: $e");
+       // print("Error during emissions calculation: $e");
       }
     }).catchError((error) {
-      print("Error fetching polyline: $error");
+     // print("Error fetching polyline: $error");
     });
   }
 }

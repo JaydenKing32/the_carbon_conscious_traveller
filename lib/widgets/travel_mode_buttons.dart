@@ -117,7 +117,7 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
           transitState,
         );
 
-        String flyingEmission = ''; // If you don't handle flying emissions
+        //String flyingEmission = ''; // If you don't handle flying emissions
 
         return Container(
           padding: const EdgeInsets.all(8.0),

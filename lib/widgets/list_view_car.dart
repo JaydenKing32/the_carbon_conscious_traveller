@@ -1,5 +1,3 @@
-// car_list_view.dart
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +14,7 @@ class CarListView extends StatefulWidget {
     required this.icon,
   });
 
-  final dynamic vehicleState; // Consider using specific types instead of dynamic
+  final dynamic vehicleState;
   final PolylinesState polylinesState;
   final IconData icon;
 
@@ -53,7 +51,6 @@ class _CarListViewState extends State<CarListView> {
         index >= widget.polylinesState.distanceTexts.length ||
         index >= widget.polylinesState.durationTexts.length ||
         index >= widget.vehicleState.emissions.length) {
-      print("Invalid index: $index");
       return;
     }
 
@@ -127,7 +124,6 @@ class _CarListViewState extends State<CarListView> {
   Widget build(BuildContext context) {
     return Consumer<PolylinesState>(
       builder: (context, polylinesState, child) {
-        // Check if data is available
         if (polylinesState.resultForPrivateVehicle.isEmpty) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -142,12 +138,18 @@ class _CarListViewState extends State<CarListView> {
               padding: const EdgeInsets.all(8),
               itemCount: widget.polylinesState.resultForPrivateVehicle.length,
               itemBuilder: (BuildContext context, int index) {
-                // Safely access emissions
                 if (index >= widget.vehicleState.emissions.length ||
                     index >= widget.polylinesState.routeSummary.length ||
                     index >= widget.polylinesState.distanceTexts.length ||
                     index >= widget.polylinesState.durationTexts.length) {
-                  return const SizedBox.shrink(); // Or handle appropriately
+                  return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 10),
+                          ],
+                        ),);
                 }
 
                 widget.vehicleState.getTreeIcons(index);
@@ -157,106 +159,149 @@ class _CarListViewState extends State<CarListView> {
                     ? _tripCompletionStatus[tripId] ?? false
                     : false;
 
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      polylinesState.setActiveRoute(index);
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: isCompleted ? Colors.green : Colors.transparent,
-                          width: 4.0,
-                        ),
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Icon(widget.icon,
-                                    color: Colors.green, size: 30),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 30),
-                                  child: Text(
-                                    'via ${widget.polylinesState.routeSummary[index]}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(formatEmission(
-                                      widget.vehicleState.getEmission(index))),
-                                  Image.asset('assets/icons/co2e.png',
-                                      width: 30, height: 30),
-                                ],
-                              ),
-                              Text(widget.polylinesState.distanceTexts[index],
-                                  style: Theme.of(context).textTheme.bodySmall),
-                              Text(widget.polylinesState.durationTexts[index],
-                                  style: Theme.of(context).textTheme.bodySmall),
-                              TreeIcons(
-                                  treeIconName: widget.vehicleState.treeIcons),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                isCompleted
-                                    ? Icons.check_circle
-                                    : Icons.cancel_outlined,
-                                color: isCompleted ? Colors.green : Colors.black,
-                                size: 28,
-                              ),
-                              onPressed: () => _toggleTripCompletion(index),
-                            ),
-
-                            IconButton(
-                              icon: Icon(
-                                _savedTripIds.contains(_indexToTripId[index] ?? -1)
-                                    ? Icons.remove_circle_outline
-                                    : Icons.add_circle_outline,
-                                color: Colors.green,
-                                size: 28,
-                              ),
-                              onPressed: () {
-                                if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
-                                  _deleteTrip(index);
-                                } else {
-                                  _saveTrip(index);
-                                }
-                              },
-                            ),
-                            const SizedBox(width: 5),
-                          ],
-                        ),
-                      ],
+   return InkWell(
+              onTap: () {
+                setState(() {
+                  polylinesState.setActiveRoute(index);
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
+                      color: isCompleted ? Colors.green : Colors.transparent,
+                      width: 4.0,
                     ),
                   ),
-                );
+                ),
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start, 
+                  children: [
+                    Expanded(
+                      flex: 1, 
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Icon(
+                              widget.icon,
+                              color: Colors.green,
+                              size: 25,
+                            ),
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10), 
+                              child: Text(
+                                'via ${widget.polylinesState.routeSummary[index]}',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                softWrap: true, 
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1, 
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: formatEmission(widget.vehicleState.getEmission(index)),
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                const WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: SizedBox(width: 5),
+                                ),
+                                WidgetSpan(
+                                  child: Image.asset(
+                                    'assets/icons/co2e.png',
+                                    width: 20, 
+                                    height: 20,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4), 
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: widget.polylinesState.distanceTexts[index].split(' ').first,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                                TextSpan(
+                                  text: ' km',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.polylinesState.durationTexts[index],
+                            style: Theme.of(context).textTheme.bodySmall,
+                            softWrap: true, 
+                          ),
+                          const SizedBox(height: 4),
+                          TreeIcons(
+                            treeIconName: widget.vehicleState.treeIcons,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                                ? Icons.remove_circle_outline
+                                : Icons.add_circle_outline,
+                            color: Colors.green,
+                            size: 28,
+                          ),
+                          onPressed: () {
+                            if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                              _deleteTrip(index);
+                            } else {
+                              _saveTrip(index);
+                            }
+                          },
+                          tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                              ? 'Удалить поездку'
+                              : 'Сохранить поездку',
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            isCompleted ? Icons.check_circle : Icons.cancel_outlined,
+                            color: isCompleted ? Colors.green : Colors.black,
+                            size: 28,
+                          ),
+                          onPressed: () => _toggleTripCompletion(index),
+                          tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
+                        ),
+                        
+                        const SizedBox(height: 5), 
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+    
+
               },
               separatorBuilder: (BuildContext context, int index) => const Divider(),
             ),

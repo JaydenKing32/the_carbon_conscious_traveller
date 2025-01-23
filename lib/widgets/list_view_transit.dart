@@ -219,36 +219,41 @@ class _TransitListViewState extends State<TransitListView> {
                           ),
                         ),
                       ),
-                     Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              isCompleted ? Icons.check_circle : Icons.cancel_outlined,
-                              color: isCompleted ? Colors.green : Colors.black,
-                              size: 28,
-                            ),
-                            onPressed: () => _toggleTripCompletion(index),
+                     Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                                ? Icons.remove_circle_outline
+                                : Icons.add_circle_outline,
+                            color: Colors.green,
+                            size: 28,
                           ),
-
-                          IconButton(
-                            icon: Icon(
-                              _savedTripIds.contains(_indexToTripId[index] ?? -1)
-                                  ? Icons.remove_circle_outline
-                                  : Icons.add_circle_outline,
-                              color: Colors.green,
-                              size: 28,
-                            ),
-                            onPressed: () {
-                              if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
-                                _deleteTrip(index);
-                              } else {
-                                _saveTrip(index);
-                              }
-                            },
+                          onPressed: () {
+                            if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                              _deleteTrip(index);
+                            } else {
+                              _saveTrip(index);
+                            }
+                          },
+                          tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1)
+                              ? 'Удалить поездку'
+                              : 'Сохранить поездку',
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            isCompleted ? Icons.check_circle : Icons.cancel_outlined,
+                            color: isCompleted ? Colors.green : Colors.black,
+                            size: 28,
                           ),
-                          const SizedBox(width: 5),
-                        ],
-                      ),
+                          onPressed: () => _toggleTripCompletion(index),
+                          tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
+                        ),
+                        
+                        const SizedBox(height: 5), 
+                      ],
+                    ),
                     ],
                   ),
                 ),
