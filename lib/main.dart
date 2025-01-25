@@ -86,8 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
         body: const Stack(
           children: [
             GoogleMapView(),
-            GooglePlacesView(),
             TravelModeBottomSheet(),
+            GooglePlacesView(),
           ],
         ),
       ),

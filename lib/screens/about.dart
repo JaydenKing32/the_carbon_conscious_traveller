@@ -14,7 +14,7 @@ class AboutScreen extends StatelessWidget {
   Future<void> _launchSupportEmail() async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'support@tcctapp.com', 
+      path: 'the.carbon.conscious.traveller@gmail.com', 
       query: 'subject=Support Request',
     );
     if (!await launchUrl(emailUri)) {

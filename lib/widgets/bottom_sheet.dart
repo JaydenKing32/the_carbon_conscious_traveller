@@ -10,7 +10,7 @@ class TravelModeBottomSheet extends StatelessWidget {
     return DraggableScrollableSheet(
         initialChildSize: 0.3,
         minChildSize: 0.15,
-        maxChildSize: 0.7,
+        maxChildSize: 0.6,
         snap: true,
         builder: (BuildContext context, ScrollController scrollController) {
           return Container(
