@@ -184,6 +184,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
               itemBuilder: (BuildContext context, int index) {
                 // Validate index to prevent RangeError
                 if (!_isValidIndex(index)) {
+                  _loadSavedTrips();
                   return const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,

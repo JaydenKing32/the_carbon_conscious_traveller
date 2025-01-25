@@ -124,12 +124,6 @@ class _CarListViewState extends State<CarListView> {
   Widget build(BuildContext context) {
     return Consumer<PolylinesState>(
       builder: (context, polylinesState, child) {
-        if (polylinesState.resultForPrivateVehicle.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
         return Column(
           children: [
             ListView.separated(
@@ -142,6 +136,7 @@ class _CarListViewState extends State<CarListView> {
                     index >= widget.polylinesState.routeSummary.length ||
                     index >= widget.polylinesState.distanceTexts.length ||
                     index >= widget.polylinesState.durationTexts.length) {
+                    _loadSavedTrips();
                   return const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
