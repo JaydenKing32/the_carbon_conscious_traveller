@@ -251,7 +251,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     final polylineState = Provider.of<PolylinesState>(context, listen: false);
 
     // Clear previous markers and polylines before adding new ones
-    markerState.clearMarkers();
+    //markerState.clearMarkers();
     polylineState.clearPolylines();
     coordsState.clearCoordinates(); // if needed
     coordsState.clearRouteData();   // if needed
@@ -308,9 +308,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
 
 
+// Update GooglePlacesView.dart
+
 void _addOriginMarker(LatLng originLatLng) {
   final markerModel = Provider.of<MarkerState>(context, listen: false);
-  markerModel.addMarker(originLatLng);
+  markerModel.addOriginMarker(originLatLng);; // Use unique ID for origin
 
   final coordinatesModel = Provider.of<CoordinatesState>(context, listen: false);
   coordinatesModel.saveOriginCoords(originLatLng);
@@ -375,17 +377,17 @@ void _addOriginMarker(LatLng originLatLng) {
           motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
         }
       } catch (e) {
-       // print("Error during emissions calculation: $e");
+        // Handle errors if necessary
       }
     }).catchError((error) {
-     // print("Error fetching polyline: $error");
+      // Handle errors if necessary
     });
   }
 }
 
 void _addDestinationMarker(LatLng destinationLatLng) {
-  final markerState = Provider.of<MarkerState>(context, listen: false);
-  markerState.addMarker(destinationLatLng);
+  final markerModel = Provider.of<MarkerState>(context, listen: false);
+  markerModel.addDestinationMarker(destinationLatLng); 
 
   final coordsState = Provider.of<CoordinatesState>(context, listen: false);
   coordsState.saveDestinationCoords(destinationLatLng);
@@ -393,7 +395,7 @@ void _addDestinationMarker(LatLng destinationLatLng) {
   if (coordsState.originCoords != const LatLng(0, 0)) {
     final polylineState = Provider.of<PolylinesState>(context, listen: false);
 
-    // Reset emissions for both Car and Motorcycle
+
     final carState = Provider.of<PrivateCarState>(context, listen: false);
     final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
 
@@ -405,7 +407,6 @@ void _addDestinationMarker(LatLng destinationLatLng) {
       coordsState.destinationCoords
     ]).then((_) {
       if (polylineState.distances.isEmpty) {
-       // print("No distances available for the fetched route.");
         return;
       }
 
@@ -451,13 +452,14 @@ void _addDestinationMarker(LatLng destinationLatLng) {
           motorcycleState.updateMaxEmission(calculatedMotorcycleEmissions.reduce(max));
         }
       } catch (e) {
-       // print("Error during emissions calculation: $e");
+        // Handle errors if necessary
       }
     }).catchError((error) {
-     // print("Error fetching polyline: $error");
+      // Handle errors if necessary
     });
   }
 }
+
 
 
 
