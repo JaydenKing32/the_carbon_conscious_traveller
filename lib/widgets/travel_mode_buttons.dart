@@ -7,6 +7,7 @@ import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
+import 'package:the_carbon_conscious_traveller/widgets/travel_mode_flying.dart'; // Ensure correct import path
 
 class TravelModeButtons extends StatefulWidget {
   const TravelModeButtons({super.key});
@@ -18,7 +19,7 @@ class TravelModeButtons extends StatefulWidget {
 const String motorcycling = 'motorcycling';
 const String driving = 'driving';
 const String transit = 'transit';
-const String flying = 'flying'; // If you have emissions for flying, else handle appropriately
+const String flying = 'flying'; // Flying mode
 
 class _TravelModeButtonsState extends State<TravelModeButtons> {
   final List<bool> _selectedModes = <bool>[true, false, false, false];
@@ -117,7 +118,7 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
           transitState,
         );
 
-        //String flyingEmission = ''; // If you don't handle flying emissions
+        // String flyingEmission = ''; // If you don't handle flying emissions
 
         return Container(
           padding: const EdgeInsets.all(8.0),
@@ -129,6 +130,19 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                 scrollDirection: Axis.horizontal,
                 child: ToggleButtons(
                   onPressed: (int index) {
+                    String selectedMode = transportModes[index].mode;
+
+                    if (selectedMode == flying) {
+                      // For 'flying' mode, navigate to Flying widget
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Flying(),
+                        ),
+                      );
+                      return; // Exit the onPressed handler
+                    }
+
                     setState(() {
                       // The button that is tapped is set to true, and the others to false
                       for (int i = 0; i < _selectedModes.length; i++) {
@@ -136,7 +150,7 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                       }
                     });
 
-                    polylineState.transportMode = transportModes[index].mode;
+                    polylineState.transportMode = selectedMode;
 
                     // If coordinates are set, fetch new polyline
                     if (coordinatesState.coordinates.isNotEmpty) {
