@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// Import your states, enums, etc.
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 
@@ -15,280 +13,108 @@ class SettingsScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Settings'),
+            backgroundColor: const Color(0xFF07B36E),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ------------------- Car Settings --------------------
                 const SizedBox(height: 16),
-                const Text(
-                  'Car',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                _buildSectionTitle('Car'),
 
-                // "Use specified car"
-                Row(
-                  children: [
-                    Checkbox(
-                      value: settings.useSpecifiedCar,
-                      onChanged: (bool? value) {
-                        if (value != null) {
-                          settings.toggleUseSpecifiedCar(value);
-                        }
-                      },
-                    ),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Use specified car'),
-                          Text(
-                            'Use the below settings for car mode',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                _buildCheckbox(
+                    "Use specified car",
+                    settings.useSpecifiedCar,
+                    settings.toggleUseSpecifiedCar,
+                    "Use the below settings for car mode"),
 
-                // Car size
-                ListTile(
-                  title: const Text('Car size'),
-                  subtitle: DropdownButton<CarSize>(
-                    isExpanded: true,
+                _buildDropdown<CarSize>(
+                    title: "Car size",
                     value: settings.selectedCarSize,
-                    onChanged: settings.useSpecifiedCar
-                        ? (CarSize? newVal) {
-                            if (newVal != null) {
-                              settings.selectedCarSize = newVal;
-                              settings.notifyListeners();
-                            }
-                          }
-                        : null, // disable if not "useSpecifiedCar"
-                    items: CarSize.values
-                        .where((e) => e != CarSize.label)
-                        .map<DropdownMenuItem<CarSize>>((CarSize carSize) {
-                      return DropdownMenuItem<CarSize>(
-                        value: carSize,
-                        child: Text(carSize.name),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                    enabled: settings.useSpecifiedCar,
+                    onChanged: (newVal) {
+                      settings.selectedCarSize = newVal!;
+                      settings.notifyListeners();
+                    },
+                    items: CarSize.values),
 
-                // Car fuel type
-                ListTile(
-                  title: const Text('Car fuel type'),
-                  subtitle: DropdownButton<CarFuelType>(
-                    isExpanded: true,
+                _buildDropdown<CarFuelType>(
+                    title: "Car fuel type",
                     value: settings.selectedCarFuelType,
-                    onChanged: settings.useSpecifiedCar
-                        ? (CarFuelType? newVal) {
-                            if (newVal != null) {
-                              settings.selectedCarFuelType = newVal;
-                              settings.notifyListeners();
-                            }
-                          }
-                        : null, // disable if not "useSpecifiedCar"
-                    items: CarFuelType.values
-                        .where((e) => e != CarFuelType.label)
-                        .map<DropdownMenuItem<CarFuelType>>((CarFuelType cft) {
-                      return DropdownMenuItem<CarFuelType>(
-                        value: cft,
-                        child: Text(cft.name),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                    enabled: settings.useSpecifiedCar,
+                    onChanged: (newVal) {
+                      settings.selectedCarFuelType = newVal!;
+                      settings.notifyListeners();
+                    },
+                    items: CarFuelType.values),
 
-                // "Use car for calculations"
-                Row(
-                  children: [
-                    Checkbox(
-                      value: settings.useCarForCalculations,
-                      onChanged: (bool? value) {
-                        if (value != null) {
-                          settings.toggleUseCarForCalculations(value);
-                        }
-                      },
-                    ),
-                    const Text('Use car for calculations'),
-                  ],
-                ),
+                _buildCheckbox(
+                    "Use car for calculations",
+                    settings.useCarForCalculations,
+                    settings.toggleUseCarForCalculations,
+                    ""),
 
                 const Divider(),
 
-                // ---------------- Motorcycle Settings ----------------
-                const Text(
-                  'Motorcycle',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                _buildSectionTitle('Motorcycle'),
 
-                // "Use specified motorcycle"
-                Row(
-                  children: [
-                    Checkbox(
-                      value: settings.useSpecifiedMotorcycle,
-                      onChanged: (bool? value) {
-                        if (value != null) {
-                          settings.toggleUseSpecifiedMotorcycle(value);
-                        }
-                      },
-                    ),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Use specified motorcycle'),
-                          Text(
-                            'Use the below settings for motorcycle mode',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                _buildCheckbox(
+                    "Use specified motorcycle",
+                    settings.useSpecifiedMotorcycle,
+                    settings.toggleUseSpecifiedMotorcycle,
+                    "Use the below settings for motorcycle mode"),
 
-                // Motorcycle size
-                ListTile(
-                  title: const Text('Motorcycle size'),
-                  subtitle: DropdownButton<MotorcycleSize>(
-                    isExpanded: true,
+                _buildDropdown<MotorcycleSize>(
+                    title: "Motorcycle size",
                     value: settings.selectedMotorcycleSize,
-                    onChanged: settings.useSpecifiedMotorcycle
-                        ? (MotorcycleSize? newVal) {
-                            if (newVal != null) {
-                              settings.selectedMotorcycleSize = newVal;
-                              settings.notifyListeners();
-                            }
-                          }
-                        : null, // disable if not "useSpecifiedMotorcycle"
-                    items: MotorcycleSize.values
-                        .where((e) => e != MotorcycleSize.label)
-                        .map<DropdownMenuItem<MotorcycleSize>>(
-                            (MotorcycleSize ms) {
-                      return DropdownMenuItem<MotorcycleSize>(
-                        value: ms,
-                        child: Text(ms.name),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                    enabled: settings.useSpecifiedMotorcycle,
+                    onChanged: (newVal) {
+                      settings.selectedMotorcycleSize = newVal!;
+                      settings.notifyListeners();
+                    },
+                    items: MotorcycleSize.values),
 
-                // "Use motorcycle for calculations"
-                Row(
-                  children: [
-                    Checkbox(
-                      value: settings.useMotorcycleForCalculations,
-                      onChanged: (bool? value) {
-                        if (value != null) {
-                          settings.toggleUseMotorcycleForCalculations(value);
-                        }
-                      },
-                    ),
-                    const Text('Use motorcycle for calculations'),
-                  ],
-                ),
+                _buildCheckbox(
+                    "Use motorcycle for calculations",
+                    settings.useMotorcycleForCalculations,
+                    settings.toggleUseMotorcycleForCalculations,
+                    ""),
 
-                // "Use specified motorcycle instead.."
-                SwitchListTile(
-                  title: const Text('Use specified motorcycle instead...'),
-                  subtitle: const Text(
-                    'If both a motorcycle and car are specified for use in calculations, '
-                    'use the specified motorcycle instead of the car, '
-                    'otherwise the car will be used',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  value: settings.useMotorcycleInsteadOfCar,
-                  onChanged: (bool val) {
-                    settings.toggleUseMotorcycleInsteadOfCar(val);
+                const Divider(),
+                _buildSectionTitle('Symbol Values'),
+
+                _buildNumberField(
+                  label: "Leaf",
+                  value: settings.leafValue,
+                  onChanged: (val) {
+                    settings.leafValue = int.tryParse(val) ?? 100;
+                    settings.notifyListeners();
                   },
                 ),
-
-                const Divider(),
-
-                // ------------------ Symbol Values --------------------
-                const Text(
-                  'Symbol values',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                _buildNumberField(
+                  label: "Leaf Bundle",
+                  value: settings.leafBundleValue,
+                  onChanged: (val) {
+                    settings.leafBundleValue = int.tryParse(val) ?? 1000;
+                    settings.notifyListeners();
+                  },
                 ),
-                const Text(
-                  'Set the values (in grams) for displaying symbols that represent carbon-saving',
-                  style: TextStyle(color: Colors.grey),
+                _buildNumberField(
+                  label: "Branch",
+                  value: settings.branchValue,
+                  onChanged: (val) {
+                    settings.branchValue = int.tryParse(val) ?? 5000;
+                    settings.notifyListeners();
+                  },
                 ),
-
-                // Leaf
-                ListTile(
-                  leading: const Text('Leaf'),
-                  trailing: SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      initialValue: settings.leafValue.toString(),
-                      keyboardType: TextInputType.number,
-                      onChanged: (val) {
-                        settings.leafValue = int.tryParse(val) ?? 100;
-                        settings.notifyListeners();
-                      },
-                    ),
-                  ),
-                ),
-                // Leaf bundle
-                ListTile(
-                  leading: const Text('Leaf bundle'),
-                  trailing: SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      initialValue: settings.leafBundleValue.toString(),
-                      keyboardType: TextInputType.number,
-                      onChanged: (val) {
-                        settings.leafBundleValue = int.tryParse(val) ?? 1000;
-                        settings.notifyListeners();
-                      },
-                    ),
-                  ),
-                ),
-                // Branch
-                ListTile(
-                  leading: const Text('Branch'),
-                  trailing: SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      initialValue: settings.branchValue.toString(),
-                      keyboardType: TextInputType.number,
-                      onChanged: (val) {
-                        settings.branchValue = int.tryParse(val) ?? 5000;
-                        settings.notifyListeners();
-                      },
-                    ),
-                  ),
-                ),
-                // Tree
-                ListTile(
-                  leading: const Text('Tree'),
-                  trailing: SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      initialValue: settings.treeValue.toString(),
-                      keyboardType: TextInputType.number,
-                      onChanged: (val) {
-                        settings.treeValue = int.tryParse(val) ?? 29000;
-                        settings.notifyListeners();
-                      },
-                    ),
-                  ),
+                _buildNumberField(
+                  label: "Tree",
+                  value: settings.treeValue,
+                  onChanged: (val) {
+                    settings.treeValue = int.tryParse(val) ?? 29000;
+                    settings.notifyListeners();
+                  },
                 ),
                 const SizedBox(height: 24),
               ],
@@ -296,6 +122,54 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSectionTitle(String title) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      );
+
+  Widget _buildCheckbox(String title, bool value, Function(bool) onChanged, String subtitle) {
+    return Row(children: [
+      Checkbox(value: value, onChanged: (bool? val) => onChanged(val!)),
+      Expanded(child: Text(title)),
+    ]);
+  }
+
+  Widget _buildDropdown<T>({required String title, required T value, required bool enabled, required Function(T?) onChanged, required List<T> items}) {
+    return ListTile(
+      title: Text(title),
+      subtitle: DropdownButton<T>(
+        isExpanded: true,
+        value: value,
+        onChanged: enabled ? onChanged : null,
+        items: items.map<DropdownMenuItem<T>>((T item) {
+          return DropdownMenuItem<T>(value: item, child: Text(item.toString().split('.').last));
+        }).toList(),
+      ),
+    );
+  }
+
+    Widget _buildNumberField({
+    required String label,
+    required int value,
+    required Function(String) onChanged,
+  }) {
+    return ListTile(
+      leading: Text(label, style: const TextStyle(fontSize: 16)),
+      trailing: SizedBox(
+        width: 80,
+        child: TextFormField(
+          initialValue: value.toString(),
+          keyboardType: TextInputType.number,
+          onChanged: onChanged,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          ),
+        ),
+      ),
     );
   }
 }

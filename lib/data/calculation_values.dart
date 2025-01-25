@@ -46,7 +46,25 @@ extension CarSizeExtension on CarSize {
     }
   }
 }
+String carFuelTypeToString(CarFuelType fuelType) => fuelType.toString();
 
+/// Convert back from string to CarFuelType, defaulting to CarFuelType.label if not found
+CarFuelType stringToCarFuelType(String fuelTypeStr) {
+  return CarFuelType.values.firstWhere(
+    (e) => e.toString() == fuelTypeStr,
+    orElse: () => CarFuelType.label,
+  );
+}
+/// Convert a MotorcycleSize to string, e.g., "MotorcycleSize.medium"
+String motorcycleSizeToString(MotorcycleSize size) => size.toString();
+
+/// Convert back from string to MotorcycleSize, defaulting to MotorcycleSize.label if not found
+MotorcycleSize stringToMotorcycleSize(String sizeStr) {
+  return MotorcycleSize.values.firstWhere(
+    (e) => e.toString() == sizeStr,
+    orElse: () => MotorcycleSize.label,
+  );
+}
 /// Convert a CarSize to string, e.g. "CarSize.smallCar"
 String carSizeToString(CarSize carSize) => carSize.toString();
 
