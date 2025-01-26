@@ -255,7 +255,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     polylineState.clearPolylines();
     //coordsState.clearCoordinates(); // if needed
     coordsState.clearRouteData();   // if needed
-    
+    // If coordinates are set, fetch new polyline
+                   
     if (fieldType == "start") {
       coordsState.clearCoordinatesDes();
       originController.text = item.fullText;
@@ -282,7 +283,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         destinationLatLng = destination?.latLng;
         _predictions = [];
       });
-
+      
       if (destinationLatLng != null) {
         LatLng destPosition = LatLng(destinationLatLng!.lat, destinationLatLng!.lng);
         _addDestinationMarker(destPosition);
@@ -291,7 +292,10 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         }
       }
     }
-
+     if (coordsState.coordinates.isNotEmpty) {
+                      polylineState.setActiveRoute(polylineState.getActiveRoute());
+                      polylineState.getPolyline(coordsState.coordinates);
+                    }
     // **Set default transport mode after both origin and destination are set**
     if (coordsState.originCoords != const LatLng(0, 0) &&
         coordsState.destinationCoords != const LatLng(0, 0)) {
@@ -413,6 +417,7 @@ void _addDestinationMarker(LatLng destinationLatLng) {
       }
 
       try {
+        
         // **Calculate Emissions for Car**
         final emissionsCalculator = PrivateCarEmissionsCalculator(
           polylinesState: polylineState,
