@@ -37,4 +37,21 @@ extension TreeIconName on TreeIconType {
         return "";
     }
   }
+  String get emoji {
+    switch (this) {
+      case TreeIconType.defaultOneLeafC02Gram:
+        return "🍃"; // One Leaf
+      case TreeIconType.defaultFourLeavesC02Gram:
+        return "🍀"; // Four Leaves
+      case TreeIconType.defaultTreeBranchC02Gram:
+        return "🌿"; // Tree Branch
+      case TreeIconType.defaultTreeCo2Gram:
+        return "🌳"; // Full Tree
+      default:
+        return "";
+    }
+  }
+
 }
+
+ 

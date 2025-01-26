@@ -66,7 +66,7 @@ We implement reasonable security measures to protect your data but cannot guaran
 We may update this Privacy Policy periodically. Changes will be reflected here.
 
 **Contact Us**
-For questions, contact us at support@tcctapp.com.
+For questions, contact us at the.carbon.conscious.traveller@gmail.com.
 
 **Consent**
 By using our app, you agree to this Privacy Policy.

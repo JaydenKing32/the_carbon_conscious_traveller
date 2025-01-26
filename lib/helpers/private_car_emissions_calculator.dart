@@ -13,32 +13,43 @@ class PrivateCarEmissionsCalculator {
     required this.polylinesState,
     required this.vehicleSize,
     required this.vehicleFuelType,
-  });
+  }) {
+    calculateFactor();
+  }
 
   void calculateFactor() {
     if (vehicleSize == CarSize.label || vehicleFuelType == CarFuelType.label) {
-      return; // Skip operation for enum 'label'
+      factor = 0.0; // Explicitly set to 0.0 for clarity
     } else {
       factor = carValuesMatrix[vehicleSize.index][vehicleFuelType.index];
     }
   }
 
-  double calculateEmissions(int index, CarSize size, CarFuelType fuelType) {
-    double emissionValue = 0.0;
-    calculateFactor();
-    for (var i = 0; i <= polylinesState.distances.length; i++) {
-      emissionValue = polylinesState.distances[index] * factor;
+  double calculateEmissions(int index, CarSize carSize, CarFuelType carFuelType) {
+    if (factor == 0.0) {
+      // Handle the case where factor is not set (i.e., label is selected)
+      // You can choose to return 0.0 or throw an exception based on your requirements
+      return 0.0;
     }
-    return emissionValue;
+
+    if (index < 0 || index >= polylinesState.distances.length) {
+      throw RangeError('Index out of range in calculateEmissions');
+    }
+
+    return polylinesState.distances[index] * factor;
   }
 
   double calculateMinEmission() {
-    calculateFactor();
+    if (factor == 0.0) {
+      return 0.0;
+    }
     return polylinesState.distances.reduce(min) * factor;
   }
 
   double calculateMaxEmission() {
-    calculateFactor();
+    if (factor == 0.0) {
+      return 0.0;
+    }
     return polylinesState.distances.reduce(max) * factor;
   }
 }
