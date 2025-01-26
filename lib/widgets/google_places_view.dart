@@ -253,10 +253,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     // Clear previous markers and polylines before adding new ones
     //markerState.clearMarkers();
     polylineState.clearPolylines();
-    coordsState.clearCoordinates(); // if needed
+    //coordsState.clearCoordinates(); // if needed
     coordsState.clearRouteData();   // if needed
     
     if (fieldType == "start") {
+      coordsState.clearCoordinatesDes();
       originController.text = item.fullText;
       setState(() {
         origin = result.place;
@@ -273,6 +274,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         }
       }
     } else if (fieldType == "destination") {
+      coordsState.clearCoordinatesOr();
       destinationController.text = item.fullText;
       setState(() {
         destination = result.place;

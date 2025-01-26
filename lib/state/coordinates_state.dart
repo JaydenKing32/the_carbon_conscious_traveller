@@ -44,6 +44,16 @@ class CoordinatesState with ChangeNotifier {
     notifyListeners();
   }
 
+  void clearCoordinatesOr() {
+    _coordinates.clear();
+    _coordinates.add(originCoords);
+    notifyListeners();
+  }
+  void clearCoordinatesDes() {
+    _coordinates.clear();
+    _coordinates.add(destinationCoords);
+    notifyListeners();
+  }
   void clearRouteData() {
     _routeData.clear();
     notifyListeners();
