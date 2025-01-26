@@ -200,10 +200,16 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 int? tripId = _routeToTripId[route];
                 bool isCompleted =
                     tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
-
+                   int selectedIndex = polylinesState.motorcycleActiveRouteIndex;
+              Color color = Colors.transparent;
+              if (selectedIndex == index) {
+                color = Colors.green;
+              } else {
+                color = Colors.transparent;
+              }
                 // Fetch tree icons based on emission
                 widget.vehicleState.getTreeIcons(index);
-
+               
                 return InkWell(
               onTap: () {
                 setState(() {
@@ -214,7 +220,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: isCompleted ? Colors.green : Colors.transparent,
+                      color: color,
                       width: 4.0,
                     ),
                   ),

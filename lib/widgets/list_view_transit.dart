@@ -143,9 +143,9 @@ class _TransitListViewState extends State<TransitListView> {
               List<double> stepEmissions =
                   transitEmissionsCalculator.calculateStepEmissions(steps);
 
-              //int selectedIndex = polylinesState.transitActiveRouteIndex;
+              int selectedIndex = polylinesState.transitActiveRouteIndex;
 
-              int? selectedIndex = _indexToTripId[index];
+              //int? selectedIndex = _indexToTripId[index];
               bool isCompleted = selectedIndex != null ? _tripCompletionStatus[selectedIndex] ?? false : false;
 
               Color color = selectedIndex == index ? Colors.green : Colors.transparent;
