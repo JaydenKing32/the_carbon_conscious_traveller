@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_directions_api/google_directions_api.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TransitSteps extends StatelessWidget {
-  const TransitSteps(
-      {super.key, required this.steps, required this.stepEmissions});
+  const TransitSteps({super.key, required this.steps, required this.stepEmissions});
 
   final List<dynamic> steps;
   final List<double> stepEmissions;
@@ -24,109 +24,75 @@ class TransitSteps extends StatelessWidget {
   }
 
   Widget _buildStepIcon(BuildContext context, dynamic step) {
-    // Display icon for walking steps
-    var shortNameText =
-        step.transit?.line?.shortName ?? step.transit?.line?.name;
-    if (step.transit?.line?.vehicle?.icon == null &&
-        step.travelMode == TravelMode.walking) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    var shortNameText = step.transit?.line?.shortName ?? step.transit?.line?.name;
+
+    if (step.transit?.line?.vehicle?.icon == null && step.travelMode == TravelMode.walking) {
       return Column(
         children: [
-          const Icon(Icons.directions_walk),
+          Icon(Icons.directions_walk, size: screenWidth * 0.05), // Smaller walk icon
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              formatNumber(
-                stepEmissions[steps.indexOf(step)],
-              ),
+            padding: EdgeInsets.only(top: screenHeight * 0.002),
+            child: AutoSizeText(
+              formatNumber(stepEmissions[steps.indexOf(step)]),
               style: Theme.of(context).textTheme.bodySmall,
+              minFontSize: 8, // Smaller text
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       );
-    } else if (step.transit?.line?.vehicle?.localIcon != null) {
-      return Padding(
-        // Display local icon for transit steps
-        padding: const EdgeInsets.only(right: 5),
-        child: Column(
-          children: [
-            Wrap(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Image.network(
-                      "https:${step.transit?.line?.vehicle?.localIcon}",
-                      width: 25),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: parseColor(step.transit?.line?.color, Colors.white),
-                  ),
-                  child: Text(
-                    shortNameText,
-                    style: TextStyle(
-                        color: step.transit?.line?.textColor != null
-                            ? parseColor(
-                                step.transit?.line?.textColor, Colors.black)
-                            : Colors.black,
-                        backgroundColor: parseColor(
-                          step.transit?.line?.color,
-                          Colors.white,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                formatNumber(stepEmissions[steps.indexOf(step)]),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-          ],
-        ),
-      );
     } else {
       return Padding(
-        // Display icon for transit steps if local icon doesn't exist
-        padding: const EdgeInsets.only(right: 5),
+        padding: EdgeInsets.only(right: screenWidth * 0.015),
         child: Column(
           children: [
             Wrap(
               children: [
+                // Transit Icon
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.005),
                   child: Image.network(
-                      "https:${step.transit?.line?.vehicle?.icon}",
-                      width: 25),
+                    "https:${step.transit?.line?.vehicle?.localIcon ?? step.transit?.line?.vehicle?.icon}",
+                    width: screenWidth * 0.05, // Smaller transit icon
+                    height: screenWidth * 0.05,
+                  ),
                 ),
+                // Bus Route Box
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.015, vertical: screenHeight * 0.002),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(3),
                     color: parseColor(step.transit?.line?.color, Colors.white),
                   ),
-                  child: Text(
+                  child: AutoSizeText(
                     shortNameText,
                     style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.025, // Smaller text
                       color: step.transit?.line?.textColor != null
-                          ? parseColor(
-                              step.transit?.line?.textColor, Colors.black)
+                          ? parseColor(step.transit?.line?.textColor, Colors.black)
                           : Colors.black,
-                      backgroundColor:
-                          parseColor(step.transit?.line?.color, Colors.white),
                     ),
+                    minFontSize: 8,
+                    maxLines: 1,
                   ),
                 ),
               ],
             ),
+            // Emission Text
             Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
+              padding: EdgeInsets.only(top: screenHeight * 0.002),
+              child: AutoSizeText(
                 formatNumber(stepEmissions[steps.indexOf(step)]),
                 style: Theme.of(context).textTheme.bodySmall,
+                minFontSize: 8, // Smaller text
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -137,20 +103,23 @@ class TransitSteps extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     List<Widget> stepIcons = [];
+
     for (var step in steps) {
       stepIcons.add(
         Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.start,
+          padding: EdgeInsets.only(bottom: screenHeight * 0.005),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Display arrow divider between steps
-              if (steps.indexOf(step) != 0 &&
-                  steps.indexOf(step) != steps.length)
-                const Padding(
-                  padding: EdgeInsets.only(top: 5),
-                  child: Icon(Icons.arrow_forward_ios, size: 15),
+              // Display arrow only if not the first step
+              if (steps.indexOf(step) != 0)
+                Padding(
+                  padding: EdgeInsets.only(top: screenHeight * 0.002),
+                  child: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.025), // Smaller arrow
                 ),
               _buildStepIcon(context, step),
             ],
@@ -158,10 +127,11 @@ class TransitSteps extends StatelessWidget {
         ),
       );
     }
+
     return Wrap(
-      children: [
-        ...stepIcons,
-      ],
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: screenWidth * 0.01,
+      children: stepIcons,
     );
   }
 }
