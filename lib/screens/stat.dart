@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -13,12 +14,19 @@ class StatisticsScreen extends StatefulWidget {
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   DateTime _selectedDate = DateTime.now();
+  DateTime _currentStartDate = DateTime.now(); // Track window start date
   List<Trip> _completedTrips = [];
 
   @override
   void initState() {
     super.initState();
+    _currentStartDate = _getInitialStartDate();
     _loadTrips();
+  }
+
+  DateTime _getInitialStartDate() {
+    final now = DateTime.now();
+    return now.subtract(const Duration(days: 1)); // Start from yesterday
   }
 
   Future<void> _loadTrips() async {
@@ -30,43 +38,39 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     });
   }
 
-
   bool _isSameMonthYear(String tripDate) {
     DateTime tripDateTime = DateTime.parse(tripDate);
     return tripDateTime.year == _selectedDate.year &&
         tripDateTime.month == _selectedDate.month;
   }
 
-  
   void _changeMonth(int delta) {
+  final newDate = DateTime(_selectedDate.year, _selectedDate.month + delta, 1);
+  final now = DateTime.now();
+  
+  setState(() {
+    _selectedDate = newDate;
+    
+    // Check if the new month is the current month
+    if (newDate.year == now.year && newDate.month == now.month) {
+      // For current month, start from yesterday
+      _currentStartDate = now.subtract(const Duration(days: 1));
+    } else {
+      // For other months, start from first day
+      _currentStartDate = DateTime(newDate.year, newDate.month, 1);
+    }
+    
+    _loadTrips();
+  });
+}
+
+  void _moveWindow(int delta) {
     setState(() {
-      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + delta, 1);
-      _loadTrips();
+      _currentStartDate = _currentStartDate.add(Duration(days: delta));
     });
   }
 
-
-  Map<int, Map<String, double>> _aggregateData() {
-    Map<int, Map<String, double>> dailyEmissions = {};
-
-    for (var trip in _completedTrips) {
-      DateTime tripDate = DateTime.parse(trip.date);
-      int day = tripDate.day;
-
-      if (!dailyEmissions.containsKey(day)) {
-        dailyEmissions[day] = {'emissions': 0.0, 'reduction': 0.0};
-      }
-
-      dailyEmissions[day]!['emissions'] =
-          (dailyEmissions[day]!['emissions'] ?? 0) + trip.emissions;
-      dailyEmissions[day]!['reduction'] =
-          (dailyEmissions[day]!['reduction'] ?? 0) + trip.reduction;
-    }
-
-    return dailyEmissions;
-  }
-
-  double _calculateTotalDistance() {
+    double _calculateTotalDistance() {
     return _completedTrips.fold(0, (sum, trip) {
       double distance = double.tryParse(trip.distance.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
       return sum + distance;
@@ -88,12 +92,46 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       return "You've traveled a distance beyond Earth's orbit! 🛰️";
     }
   }
-@override
+  
+  Map<int, Map<String, double>> _aggregateData() {
+    final Map<int, Map<String, double>> dailyEmissions = {};
+
+    for (final trip in _completedTrips) {
+      final tripDate = DateTime.parse(trip.date);
+      final day = tripDate.day;
+
+      dailyEmissions[day] ??= {'emissions': 0.0, 'reduction': 0.0};
+      dailyEmissions[day]!['emissions'] = (dailyEmissions[day]!['emissions'] ?? 0) + trip.emissions;
+      dailyEmissions[day]!['reduction'] = (dailyEmissions[day]!['reduction'] ?? 0) + trip.reduction;
+    }
+
+    return dailyEmissions;
+  }
+
+  String _getWindowLabel() {
+    final start = _currentStartDate;
+    final end = _currentStartDate.add(const Duration(days: 2));
+    return "${DateFormat('d MMM').format(start)} - ${DateFormat('d MMM').format(end)}";
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String formattedMonth = DateFormat('MMMM yyyy').format(_selectedDate);
-    Map<int, Map<String, double>> dailyData = _aggregateData();
+    final formattedMonth = DateFormat('MMMM yyyy').format(_selectedDate);
+    final formattedMonthName = DateFormat('MMMM').format(_selectedDate); 
+    final dailyData = _aggregateData();
     double totalDistance = _calculateTotalDistance();
     String funFact = _getFunFact(totalDistance);
+   
+    // Generate data for 3-day window (including days from next month if needed)
+    final Map<DateTime, Map<String, double>> filteredData = {};
+    for (int i = 0; i < 3; i++) {
+      final currentDay = _currentStartDate.add(Duration(days: i));
+      final isInSelectedMonth = currentDay.month == _selectedDate.month;
+
+      filteredData[currentDay] = isInSelectedMonth
+          ? dailyData[currentDay.day] ?? {'emissions': 0.0, 'reduction': 0.0}
+          : {'emissions': 0.0, 'reduction': 0.0};
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +142,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Facts Container with row-based text + emoji inline
+            // ... Keep your existing header widgets ...
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -120,19 +158,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          "You consciously traveled about "
-                          "${totalDistance.toStringAsFixed(1)} km!",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  "In $formattedMonthName \nYou have consciously travelled: " // Modified text
+                  "${totalDistance.toStringAsFixed(1)} km!",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                         ),
                       ),
                       // Earth emoji sized the same as the text
                       const Text(
                         "🌏",
                         style: TextStyle(
-                          fontSize: 14, // matches text style
+                          fontSize: 12, // matches text style
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -155,7 +193,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            
+            // Month navigation
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -178,44 +216,58 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Chart
+            // Window label with month/day
+            Text(
+              _getWindowLabel(),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Chart with swipe
             Expanded(
-              child: _completedTrips.isEmpty
-                  ? const Center(
-                      child: Text("No data available for this time period"),
-                    )
-                  : SfCartesianChart(
-                      primaryXAxis: const NumericAxis(
-                        title: AxisTitle(text: "Day"),
-                      ),
-                      primaryYAxis: const NumericAxis(
-                        title: AxisTitle(text: "kg CO₂e"),
-                      ),
-                      legend: const Legend(
-                        isVisible: true,
-                        position: LegendPosition.bottom,
-                      ),
-                      tooltipBehavior: TooltipBehavior(enable: true),
-                      series:
-                          <CartesianSeries<MapEntry<int, Map<String, double>>, int>>[
-                        ColumnSeries<MapEntry<int, Map<String, double>>, int>(
-                          name: "Emissions",
-                          dataSource: dailyData.entries.toList(),
-                          xValueMapper: (entry, _) => entry.key,
-                          yValueMapper: (entry, _) => entry.value['emissions'],
-                          color: Colors.yellow,
-                          width: 0.7,
-                        ),
-                        ColumnSeries<MapEntry<int, Map<String, double>>, int>(
-                          name: "Reduction",
-                          dataSource: dailyData.entries.toList(),
-                          xValueMapper: (entry, _) => entry.key,
-                          yValueMapper: (entry, _) => entry.value['reduction'],
-                          color: Colors.green,
-                          width: 0.7,
-                        ),
-                      ],
+              child: GestureDetector(
+                onHorizontalDragEnd: (details) {
+                  if (details.primaryVelocity! > 0) {
+                    _moveWindow(-1); // Swipe right
+                  } else if (details.primaryVelocity! < 0) {
+                    _moveWindow(1); // Swipe left
+                  }
+                },
+                child: SfCartesianChart(
+                  primaryXAxis: DateTimeAxis(
+                    intervalType: DateTimeIntervalType.days,
+                    dateFormat: DateFormat('d'),
+                    majorGridLines: const MajorGridLines(width: 0),
+                    minimum: _currentStartDate,
+                    maximum: _currentStartDate.add(const Duration(days: 2)),
+                  ),
+                  primaryYAxis: const NumericAxis(
+                    title: AxisTitle(text: "kg CO₂e"),
+                    majorGridLines: MajorGridLines(width: 0),
+                  ),
+                  legend: const Legend(isVisible: true, position: LegendPosition.bottom),
+                  tooltipBehavior: TooltipBehavior(enable: true),
+                  series: [
+                    ColumnSeries<MapEntry<DateTime, Map<String, double>>, DateTime>(
+                      name: "Emissions",
+                      dataSource: filteredData.entries.toList(),
+                      xValueMapper: (entry, _) => entry.key,
+                      yValueMapper: (entry, _) => entry.value['emissions'],
+                      color: Colors.yellow,
                     ),
+                    ColumnSeries<MapEntry<DateTime, Map<String, double>>, DateTime>(
+                      name: "Reduction",
+                      dataSource: filteredData.entries.toList(),
+                      xValueMapper: (entry, _) => entry.key,
+                      yValueMapper: (entry, _) => entry.value['reduction'],
+                      color: Colors.green,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -223,3 +275,4 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 }
+
