@@ -1,61 +1,66 @@
 import 'dart:math';
 import 'package:the_carbon_conscious_traveller/data/tree_icon_values.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
-List<String> upDateTreeIcons(List<int> emissionValues, index) {
+List<String> upDateTreeIcons(List<int> emissionValues, int index, Settings settings) {
   if (emissionValues.length <= 1) {
     return [];
   }
 
   int maxEmission = emissionValues.reduce(max);
-  int baseTreeIconValue = TreeIconType.defaultOneLeafC02Gram.value.toInt();
+  final currentValues = settings.emissionValues;
+  
+  // Get sorted icons by value in descending order
+  final sortedIcons = TreeIconType.values.toList()
+    ..sort((a, b) => currentValues[b]!.compareTo(currentValues[a]!));
+
+  int baseTreeIconValue = currentValues[sortedIcons.last]!.toInt();
   List<String> treeIconName = [];
 
   if (emissionValues.isEmpty) {
     return [];
   }
+  
   var dividend = maxEmission - emissionValues[index];
 
-  // Show nothing for no reduction in emissions
-  if (dividend == 0.0 || dividend < 0.0) {
+  if (dividend <= 0) {
     return [];
   }
 
+  // Check for smallest icon first using current values
   if (dividend < baseTreeIconValue) {
     treeIconName.add(TreeIconType.defaultOneLeafC02Gram.name);
-    //continue;
   }
 
-  List<TreeIconType> iconValues = TreeIconType.values;
-  iconValues = iconValues.reversed
-      .toList(); // for some reason the Android version has the icons in reverse order
+  // Use sorted icons based on current values
+  for (final icon in sortedIcons) {
+    final iconValue = currentValues[icon]!.toInt();
+    if (iconValue <= 0) continue;
 
-  int count;
-  for (int j = 0; j < TreeIconType.values.length; j++) {
-    count = (dividend ~/
-        iconValues[j].value.floor()); // ~/ is more efficient than /
+    final count = dividend ~/ iconValue;
     if (count >= 1) {
-      String imageRes;
-      switch (j) {
-        case 0:
-          imageRes = TreeIconType.defaultTreeCo2Gram.name;
-          break;
-        case 1:
-          imageRes = TreeIconType.defaultTreeBranchC02Gram.name;
-          break;
-        case 2:
-          imageRes = TreeIconType.defaultFourLeavesC02Gram.name;
-          break;
-        case 3:
-          imageRes = TreeIconType.defaultOneLeafC02Gram.name;
-          break;
-        default:
-          throw StateError("emissionIconValues add more checks");
-      }
-      for (int k = 0; k < count; k++) {
-        treeIconName.add(imageRes);
-      }
+      final imageRes = _getImageResource(icon);
+      treeIconName.addAll(List.filled(count, imageRes));
     }
-    dividend %= iconValues[j].value.toInt();
+    dividend %= iconValue;
+    
+    if (dividend == 0) break;
   }
+  
   return treeIconName;
+}
+
+String _getImageResource(TreeIconType icon) {
+  switch (icon) {
+    case TreeIconType.defaultTreeCo2Gram:
+      return TreeIconType.defaultTreeCo2Gram.name;
+    case TreeIconType.defaultTreeBranchC02Gram:
+      return TreeIconType.defaultTreeBranchC02Gram.name;
+    case TreeIconType.defaultFourLeavesC02Gram:
+      return TreeIconType.defaultFourLeavesC02Gram.name;
+    case TreeIconType.defaultOneLeafC02Gram:
+      return TreeIconType.defaultOneLeafC02Gram.name;
+    default:
+      throw StateError("Unknown TreeIconType: $icon");
+  }
 }

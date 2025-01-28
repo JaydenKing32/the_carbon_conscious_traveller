@@ -12,7 +12,13 @@ import 'package:the_carbon_conscious_traveller/widgets/google_map_view.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_places_view.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize settings first
+  final settings = Settings();
+  await settings.loadPreferences();
+
   runApp(
     MultiProvider(
       providers: [
@@ -22,7 +28,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => PrivateMotorcycleState()),
         ChangeNotifierProvider(create: (context) => PrivateCarState()),
         ChangeNotifierProvider(create: (context) => TransitState()),
-        ChangeNotifierProvider(create: (context) => SettingsState()),
+        ChangeNotifierProvider.value(value: settings), // Use pre-initialized settings
       ],
       child: const MyApp(),
     ),
@@ -35,10 +41,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'The Carbon Concious Traveller',
+      title: 'The Carbon Conscious Traveller',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 7, 179, 110)),
+          seedColor: const Color.fromARGB(255, 7, 179, 110)),
         primaryColor: const Color.fromARGB(255, 7, 179, 110),
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 24),
@@ -57,12 +63,17 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(
-        title: 'The Carbon Concious Traveller',
+      home: Consumer<Settings>(
+        builder: (context, settings, child) {
+          return const MyHomePage(
+            title: 'The Carbon Conscious Traveller',
+          );
+        }
       ),
     );
   }
 }
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

@@ -9,7 +9,7 @@ extension TreeIconTypeExtension on TreeIconType {
   double get value {
     switch (this) {
       case TreeIconType.defaultOneLeafC02Gram:
-        return 100;
+        return 10;
       case TreeIconType.defaultFourLeavesC02Gram:
         return 1000;
       case TreeIconType.defaultTreeBranchC02Gram:
@@ -37,21 +37,34 @@ extension TreeIconName on TreeIconType {
         return "";
     }
   }
+
   String get emoji {
     switch (this) {
       case TreeIconType.defaultOneLeafC02Gram:
-        return "🍃"; // One Leaf
+        return "🍃";
       case TreeIconType.defaultFourLeavesC02Gram:
-        return "🍀"; // Four Leaves
+        return "🍀";
       case TreeIconType.defaultTreeBranchC02Gram:
-        return "🌿"; // Tree Branch
+        return "🌿";
       case TreeIconType.defaultTreeCo2Gram:
-        return "🌳"; // Full Tree
+        return "🌳";
       default:
         return "";
     }
   }
 
+  String get description {
+    switch (this) {
+      case TreeIconType.defaultOneLeafC02Gram:
+        return "Single Leaf";
+      case TreeIconType.defaultFourLeavesC02Gram:
+        return "Leaf bundle";
+      case TreeIconType.defaultTreeBranchC02Gram:
+        return "Tree Branch";
+      case TreeIconType.defaultTreeCo2Gram:
+        return "Full Tree";
+      default:
+        return "";
+    }
+  }
 }
-
- 

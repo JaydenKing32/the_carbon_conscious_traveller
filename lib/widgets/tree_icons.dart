@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
 class TreeIcons extends StatelessWidget {
-  const TreeIcons({super.key, required this.treeIconName});
+  const TreeIcons({super.key, required this.treeIconName, required Settings settings});
 
   final List treeIconName;
 

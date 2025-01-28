@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/helpers/tree_icons_calculator.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
 class PrivateCarState extends ChangeNotifier {
   CarSize? _selectedSize;
@@ -56,9 +58,11 @@ class PrivateCarState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getTreeIcons(index) {
-    _treeIcons = upDateTreeIcons(_emissions, index);
-  }
+  void getTreeIcons(int index, BuildContext context) {
+  final settings = Provider.of<Settings>(context, listen: false);
+  _treeIcons = upDateTreeIcons(_emissions, index, settings);
+  notifyListeners();
+}
 
   int getEmission(int index) {
     if (index >= 0 && index < _emissions.length) {

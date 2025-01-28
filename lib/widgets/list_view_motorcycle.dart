@@ -5,6 +5,7 @@ import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class MotorcycleListView extends StatefulWidget {
@@ -165,8 +166,8 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PolylinesState>(
-      builder: (context, polylinesState, child) {
+    return Consumer2<PolylinesState, Settings>(
+      builder: (context, polylinesState, settings, child) {
         // Check if data is available
         if (polylinesState.resultForPrivateVehicle.isEmpty) {
           return const Center(
@@ -208,7 +209,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 color = Colors.transparent;
               }
                 // Fetch tree icons based on emission
-                widget.vehicleState.getTreeIcons(index);
+                widget.vehicleState.getTreeIcons(index, context);
                
                 return InkWell(
               onTap: () {
@@ -307,11 +308,9 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                   text: widget.polylinesState.distanceTexts[index].split(' ').first,
                                   style: Theme.of(context).textTheme.bodySmall,
                                 ),
-                                const TextSpan(
+                                TextSpan(
                                   text: ' km',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ],
                             ),
@@ -330,7 +329,8 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                           // Иконки Дерева
                           TreeIcons(
                             treeIconName: widget.vehicleState.treeIcons,
-                          ),
+                            settings: settings, 
+                          )
                         ],
                       ),
                     ),

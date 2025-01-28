@@ -7,6 +7,7 @@ import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calcula
 import 'package:the_carbon_conscious_traveller/helpers/tree_icons_calculator.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/transit_steps.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
@@ -130,8 +131,8 @@ class _TransitListViewState extends State<TransitListView> {
           Provider.of<TransitState>(context, listen: false);
       transitState.updateTransitEmissions(widget.emissions);
     });
-return Consumer<PolylinesState>(
-  builder: (context, polylinesState, child) {
+return Consumer2<PolylinesState, Settings>(
+      builder: (context, polylinesState, settings, child) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -244,8 +245,8 @@ return Consumer<PolylinesState>(
         TreeIcons(
           treeIconName: upDateTreeIcons(
             widget.emissions.map((e) => e.toInt()).toList(),
-            index,
-          ),
+            index,settings, 
+          ), settings: settings, 
         ),
       ],
     ),

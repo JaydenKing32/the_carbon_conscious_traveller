@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class CarListView extends StatefulWidget {
@@ -122,8 +123,8 @@ class _CarListViewState extends State<CarListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PolylinesState>(
-      builder: (context, polylinesState, child) {
+    return Consumer2<PolylinesState, Settings>(
+       builder: (context, polylinesState, settings, child) {
         return Column(
           children: [
             ListView.separated(
@@ -132,6 +133,7 @@ class _CarListViewState extends State<CarListView> {
               padding: const EdgeInsets.all(8),
               itemCount: widget.polylinesState.resultForPrivateVehicle.length,
               itemBuilder: (BuildContext context, int index) {
+                widget.vehicleState.getTreeIcons(index, context);
                 if (index >= widget.vehicleState.emissions.length ||
                     index >= widget.polylinesState.routeSummary.length ||
                     index >= widget.polylinesState.distanceTexts.length ||
@@ -147,7 +149,7 @@ class _CarListViewState extends State<CarListView> {
                         ),);
                 }
                  int selectedIndex;
-                widget.vehicleState.getTreeIcons(index);
+               widget.vehicleState.getTreeIcons(index, context);
 
                 int? tripId = _indexToTripId[index];
                 bool isCompleted = tripId != null
@@ -259,8 +261,9 @@ class _CarListViewState extends State<CarListView> {
                           ),
                           const SizedBox(height: 4),
                           TreeIcons(
-                            treeIconName: widget.vehicleState.treeIcons,
-                          ),
+                          treeIconName: widget.vehicleState.treeIcons,
+                          settings: settings, // Pass settings to TreeIcons if needed
+                        ),
                         ],
                       ),
                     ),
