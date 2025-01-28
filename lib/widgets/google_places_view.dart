@@ -35,6 +35,10 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
   final TextEditingController originController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
 
+  final FocusNode _originFocusNode = FocusNode();
+  final FocusNode _destinationFocusNode = FocusNode();
+  bool _isSettingControllerText = false; 
+
   PolylinePoints polylinePoints = PolylinePoints();
 
   places.Place? origin; //starting location
@@ -103,8 +107,9 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             children: [
               TextFormField(
                 controller: originController,
-               
+                focusNode: _originFocusNode, // Assign focus node
                 onTapOutside: (PointerDownEvent event) {
+                   _originFocusNode.unfocus();
                   setState(() {
                     //hide the keyboard when the user taps outside the textfield
                     FocusScope.of(context).unfocus();
@@ -120,8 +125,10 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
               ),
               TextFormField(
                 controller: destinationController,
+                focusNode: _destinationFocusNode,
                 onTapOutside: (PointerDownEvent event) {
                   setState(() {
+                    _destinationFocusNode.unfocus(); 
                     //hide the keyboard when the user taps outside the textfield
                     FocusScope.of(context).unfocus();
                   });
@@ -195,6 +202,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
   //Save the last text input and the field type
   void _onPredictTextChanged(String value, String field) async {
+    if (_isSettingControllerText) return; 
     _predictLastText = value;
     fieldType = field;
 
@@ -253,10 +261,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     // Clear previous markers and polylines before adding new ones
     //markerState.clearMarkers();
     polylineState.clearPolylines();
-    //coordsState.clearCoordinates(); // if needed
+    coordsState.clearCoordinates(); // if needed
     coordsState.clearRouteData();   // if needed
     // If coordinates are set, fetch new polyline
-                   
+    _isSettingControllerText = true;
+
     if (fieldType == "start") {
       coordsState.clearCoordinatesDes();
       originController.text = item.fullText;
@@ -302,7 +311,13 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       if (polylineState.mode.isEmpty) {
         polylineState.transportMode = "driving"; // Default mode
       }
+
+      _isSettingControllerText = false;
+_originFocusNode.unfocus();
+    _destinationFocusNode.unfocus();
+
       // Alternatively, set based on user selection
+      FocusScope.of(context).unfocus();
     }
   } catch (err) {
     setState(() {

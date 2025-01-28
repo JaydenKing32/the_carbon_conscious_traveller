@@ -13,63 +13,50 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  void _navigateWithUnfocus(Widget screen) {
+    // Dismiss keyboard first
+    FocusScope.of(context).unfocus();
+    // Then navigate
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(
+    child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           TextButton(
             child: const Row(
               children: [Icon(Icons.info_outline_rounded), Text(' About')],
             ),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const AboutScreen()),
-              );
-            },
+            onPressed: () => _navigateWithUnfocus(const AboutScreen()),
           ),
           TextButton(
             child: const Row(
               children: [Icon(Icons.history_outlined), Text(' Trips')],
             ),
-            onPressed: () {
-              Navigator.of(context).push(
-                 MaterialPageRoute(builder: (context) => const TripsScreen()),
-              );
-            },
+            onPressed: () => _navigateWithUnfocus(const TripsScreen()),
           ),
           TextButton(
             child: const Row(
               children: [Icon(Icons.show_chart_outlined), Text(' Statistics')],
             ),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const StatisticsScreen()),
-              );
-            },
+            onPressed: () => _navigateWithUnfocus(const StatisticsScreen()),
           ),
           TextButton(
             child: const Row(
               children: [Icon(Icons.privacy_tip_outlined), Text(' Privacy')],
             ),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const PrivacyPolicyScreen()),
-              );
-            },
+            onPressed: () => _navigateWithUnfocus(const PrivacyPolicyScreen()),
           ),
           TextButton(
             child: const Row(
               children: [Icon(Icons.settings_outlined), Text(' Settings')],
             ),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
-              );
-            },
+            onPressed: () => _navigateWithUnfocus(const SettingsScreen()),
           ),
         ],
       ),
