@@ -48,13 +48,7 @@ extension CarSizeExtension on CarSize {
 }
 String carFuelTypeToString(CarFuelType fuelType) => fuelType.toString();
 
-/// Convert back from string to CarFuelType, defaulting to CarFuelType.label if not found
-CarFuelType stringToCarFuelType(String fuelTypeStr) {
-  return CarFuelType.values.firstWhere(
-    (e) => e.toString() == fuelTypeStr,
-    orElse: () => CarFuelType.label,
-  );
-}
+
 /// Convert a MotorcycleSize to string, e.g., "MotorcycleSize.medium"
 String motorcycleSizeToString(MotorcycleSize size) => size.toString();
 
@@ -65,17 +59,20 @@ MotorcycleSize stringToMotorcycleSize(String sizeStr) {
     orElse: () => MotorcycleSize.label,
   );
 }
-/// Convert a CarSize to string, e.g. "CarSize.smallCar"
-String carSizeToString(CarSize carSize) => carSize.toString();
 
-/// Convert back from string to CarSize, defaulting to CarSize.label if not found
 CarSize stringToCarSize(String carSizeStr) {
   return CarSize.values.firstWhere(
     (e) => e.toString() == carSizeStr,
-    orElse: () => CarSize.label,
+    orElse: () => CarSize.smallCar, // Default to first valid value
   );
 }
 
+CarFuelType stringToCarFuelType(String fuelTypeStr) {
+  return CarFuelType.values.firstWhere(
+    (e) => e.toString() == fuelTypeStr,
+    orElse: () => CarFuelType.petrol, // Default to first valid value
+  );
+}
 enum CarFuelType {
   diesel,
   petrol,

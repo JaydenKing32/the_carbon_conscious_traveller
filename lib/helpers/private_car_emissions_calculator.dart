@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
 class PrivateCarEmissionsCalculator {
   final PolylinesState polylinesState;
@@ -9,6 +10,14 @@ class PrivateCarEmissionsCalculator {
   final CarFuelType vehicleFuelType;
   double factor = 0.0;
 
+   PrivateCarEmissionsCalculator.fromSettings({
+    required this.polylinesState,
+    required Settings settings,
+  }) : vehicleSize = settings.selectedCarSize,
+       vehicleFuelType = settings.selectedCarFuelType {
+    calculateFactor();
+  }
+  
   PrivateCarEmissionsCalculator({
     required this.polylinesState,
     required this.vehicleSize,
@@ -17,13 +26,13 @@ class PrivateCarEmissionsCalculator {
     calculateFactor();
   }
 
-  void calculateFactor() {
+   void calculateFactor() {
     if (vehicleSize == CarSize.label || vehicleFuelType == CarFuelType.label) {
-      factor = 0.0; // Explicitly set to 0.0 for clarity
+      factor = 0.0;
     } else {
       factor = carValuesMatrix[vehicleSize.index][vehicleFuelType.index];
     }
-  }
+   }
 
   double calculateEmissions(int index, CarSize carSize, CarFuelType carFuelType) {
     if (factor == 0.0) {

@@ -4,6 +4,7 @@ import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/helpers/private_car_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/list_view_car.dart';
 
 class CarSettings extends StatefulWidget {
@@ -29,25 +30,106 @@ class _CarSettingsState extends State<CarSettings> {
     _isDropDownEnabled = false;
     super.initState();
   }
+    bool _autoCalculated = false;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final settings = Provider.of<Settings>(context);
+    
+    if (settings.useSpecifiedCar && !_autoCalculated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final carState = Provider.of<PrivateCarState>(context, listen: false);
+        final polylinesState = Provider.of<PolylinesState>(context, listen: false);
+        
+        // Set selections from settings
+        carState.updateSelectedSize(settings.selectedCarSize);
+        carState.updateSelectedFuelType(settings.selectedCarFuelType);
+        
+        // Initialize calculator with settings
+        final calculator = PrivateCarEmissionsCalculator.fromSettings(
+          polylinesState: polylinesState,
+          settings: settings,
+        );
+        
+        // Calculate emissions
+        final emissions = List<int>.generate(
+          polylinesState.result.length,
+          (i) => calculator.calculateEmissions(i, 
+            settings.selectedCarSize, 
+            settings.selectedCarFuelType
+          ).round()
+        );
+        
+        // Update state
+        carState.saveEmissions(emissions);
+        carState.updateVisibility(true);
+        carState.updateMinEmission(calculator.calculateMinEmission().round());
+        carState.updateMaxEmission(calculator.calculateMaxEmission().round());
+
+        setState(() {
+          _autoCalculated = true;
+        });
+      });
+    }
+  }
+  @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<Settings>(context);
     PolylinesState polylinesState = Provider.of<PolylinesState>(context);
-    emissionCalculator = PrivateCarEmissionsCalculator(
-      polylinesState: polylinesState,
-      vehicleSize: selectedSize ?? CarSize.label,
-      vehicleFuelType: selectedFuelType ?? CarFuelType.label,
-    );
+
+    // Initialize emission calculator based on settings
+    if (settings.useSpecifiedCar) {
+      emissionCalculator = PrivateCarEmissionsCalculator.fromSettings(
+        polylinesState: polylinesState,
+        settings: settings,
+      );
+    } else {
+      emissionCalculator = PrivateCarEmissionsCalculator(
+        polylinesState: polylinesState,
+        vehicleSize: selectedSize ?? CarSize.label,
+        vehicleFuelType: selectedFuelType ?? CarFuelType.label,
+      );
+    }
 
     return Consumer<PrivateCarState>(
       builder: (context, carState, child) {
-        int minEmission = 0;
-        int maxEmission = 0;
+        // Sync carState with settings when 'useSpecifiedCar' is enabled
+          void setFuelTypeItems(int selectedSizeIndex) {
+          List<CarFuelType> availOptions = [];
+          availableFuelTypes = [];
+          for (double matrixValue in carValuesMatrix[selectedSizeIndex]) {
+            int index = carValuesMatrix[selectedSizeIndex]
+                .indexWhere((value) => value == matrixValue);
+            if (matrixValue != 0) {
+              availOptions.add(CarFuelType.values[index]);
+            }
+          }
+          availableFuelTypes.addAll(availOptions);
+        }
 
+
+        if (settings.useSpecifiedCar) {
+          return Visibility(
+            visible: carState.isVisible,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: Column(
+                children: [
+                  CarListView(
+                    polylinesState: Provider.of<PolylinesState>(context),
+                    vehicleState: carState,
+                    icon: Icons.directions_car_outlined,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         void getMinMaxEmissions() {
-          minEmission = emissionCalculator.calculateMinEmission().round();
+          final minEmission = emissionCalculator.calculateMinEmission().round();
           carState.updateMinEmission(minEmission);
-          maxEmission = emissionCalculator.calculateMaxEmission().round();
+          final maxEmission = emissionCalculator.calculateMaxEmission().round();
           carState.updateMaxEmission(maxEmission);
         }
 
@@ -63,20 +145,6 @@ class _CarSettingsState extends State<CarSettings> {
 
         void changeVisibility(bool isVisible) {
           carState.updateVisibility(isVisible);
-        }
-
-        void setFuelTypeItems(int selectedSizeIndex) {
-          List<CarFuelType> availOptions = [];
-          availableFuelTypes = []; //reset the fuel types
-          for (double matrixValue in carValuesMatrix[selectedSizeIndex]) {
-            int index = carValuesMatrix[selectedSizeIndex].indexWhere((value) =>
-                value == matrixValue); //get the indices for the matrix columns
-            if (matrixValue != 0) {
-              availOptions.add(CarFuelType
-                  .values[index]); //use the index to get the fuel types
-            }
-          }
-          availableFuelTypes.addAll(availOptions);
         }
 
         return Column(
@@ -101,8 +169,11 @@ class _CarSettingsState extends State<CarSettings> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         DropdownMenu<CarSize>(
+                          enabled: !settings.useSpecifiedCar,
                           width: 300,
-                          initialSelection: carState.selectedSize,
+                          initialSelection: settings.useSpecifiedCar
+                              ? settings.selectedCarSize
+                              : carState.selectedSize,
                           requestFocusOnTap: false,
                           label: const Text('Car Size'),
                           onSelected: (CarSize? size) {
@@ -135,9 +206,11 @@ class _CarSettingsState extends State<CarSettings> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         DropdownMenu<CarFuelType>(
+                          enabled: !settings.useSpecifiedCar && _isDropDownEnabled,
                           width: 300,
-                          enabled: _isDropDownEnabled,
-                          initialSelection: carState.selectedFuelType,
+                          initialSelection: settings.useSpecifiedCar
+                              ? settings.selectedCarFuelType
+                              : carState.selectedFuelType,
                           requestFocusOnTap: false,
                           label: const Text('Fuel Type'),
                           onSelected: (CarFuelType? fuelType) {
@@ -164,18 +237,20 @@ class _CarSettingsState extends State<CarSettings> {
                     ),
                   ),
                   FilledButton(
-                    onPressed: _isBtnDisabled
-                        ? null
-                        : () {
-                            if (selectedSize == null ||
-                                selectedFuelType == null) {
-                              return;
-                            } else {
-                              changeVisibility(true);
-                              getMinMaxEmissions();
-                              getCarEmissions();
+                    onPressed: (settings.useSpecifiedCar || (!_isBtnDisabled && selectedSize != null && selectedFuelType != null))
+                        ? () {
+                            if (settings.useSpecifiedCar) {
+                              selectedSize = settings.selectedCarSize;
+                              selectedFuelType = settings.selectedCarFuelType;
                             }
-                          },
+                            if (selectedSize == null || selectedFuelType == null) {
+                              return;
+                            }
+                            changeVisibility(true);
+                            getMinMaxEmissions();
+                            getCarEmissions();
+                          }
+                        : null,
                     child: const Text("Calculate Emissions"),
                   ),
                 ],

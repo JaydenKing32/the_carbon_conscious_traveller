@@ -27,7 +27,6 @@ List<String> upDateTreeIcons(List<int> emissionValues, int index, Settings setti
     return [];
   }
 
-  // Check for smallest icon first using current values
   if (dividend < baseTreeIconValue) {
     treeIconName.add(TreeIconType.defaultOneLeafC02Gram.name);
   }
@@ -60,7 +59,5 @@ String _getImageResource(TreeIconType icon) {
       return TreeIconType.defaultFourLeavesC02Gram.name;
     case TreeIconType.defaultOneLeafC02Gram:
       return TreeIconType.defaultOneLeafC02Gram.name;
-    default:
-      throw StateError("Unknown TreeIconType: $icon");
-  }
+    }
 }
