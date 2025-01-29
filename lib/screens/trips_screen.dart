@@ -187,23 +187,10 @@ class _TripsScreenState extends State<TripsScreen> {
       ),
       builder: (context) {
         return FractionallySizedBox(
-          heightFactor: 0.6, 
+          heightFactor: 0.6, // 80% of the screen height
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              
-              Container(
-                height: 30,
-                alignment: Alignment.center,
-                child: Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2.5),
-                  ),
-                ),
-              ),
               Expanded(
                 child: TripDetailsWidget(trip: trip),
               ),

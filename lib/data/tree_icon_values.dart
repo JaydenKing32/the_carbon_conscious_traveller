@@ -9,7 +9,7 @@ extension TreeIconTypeExtension on TreeIconType {
   double get value {
     switch (this) {
       case TreeIconType.defaultOneLeafC02Gram:
-        return 10;
+        return 100;
       case TreeIconType.defaultFourLeavesC02Gram:
         return 1000;
       case TreeIconType.defaultTreeBranchC02Gram:
