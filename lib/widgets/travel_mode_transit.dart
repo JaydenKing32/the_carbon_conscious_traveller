@@ -18,65 +18,72 @@ class Transit extends StatefulWidget {
 
 class _TransitState extends State<Transit> {
   final _transitEmissionsCalculator = TransitEmissionsCalculator();
-  // Keep a local cache of the last origin/destination to avoid refetching if unchanged.
+
   LatLng? _lastOrigin;
   LatLng? _lastDestination;
-  Future<List<DirectionsRoute>>? _transitFuture; // store the current future
+
+  /// We store the current future so the FutureBuilder doesn't re-run constantly.
+  Future<List<DirectionsRoute>>? _transitFuture;
+
+  /// This flag ensures we only start one request at a time.
+  bool _isFetching = false;
 
   @override
   Widget build(BuildContext context) {
     return Consumer2<CoordinatesState, PolylinesState>(
       builder: (context, coordsState, polylinesState, _) {
-        // 1. If user hasn’t chosen valid coords yet, show placeholder.
+        // 1. If no valid coords yet, show a placeholder
         if (coordsState.originCoords == const LatLng(0, 0) ||
             coordsState.destinationCoords == const LatLng(0, 0)) {
           return const Center(child: Text("Please select origin and destination"));
         }
 
-        // 2. If the origin/destination changed, build a new future.
-        bool coordsChanged = (coordsState.originCoords != _lastOrigin) ||
+        // 2. Check if origin/destination changed from last time
+        bool coordsChanged =
+            (coordsState.originCoords != _lastOrigin) ||
             (coordsState.destinationCoords != _lastDestination);
 
-        if (coordsChanged) {
+        // If user changed coords AND we’re not already fetching, start a new request
+        if (coordsChanged && !_isFetching) {
           _lastOrigin = coordsState.originCoords;
           _lastDestination = coordsState.destinationCoords;
 
-          // Build a new future for transit routes
-          _transitFuture = _handleTransitMode(
-            coordsState,
-            polylinesState,
-          );
+          // Mark that a request is in progress so we don't double-fetch
+          _isFetching = true;
+
+          // Create a new future, but clear _isFetching once it completes
+          _transitFuture = _handleTransitMode(coordsState, polylinesState)
+              .then((routes) {
+            // The future is done, so we can reset _isFetching
+            _isFetching = false;
+            return routes; // Pass routes on to the FutureBuilder
+          });
         }
 
-        // 3. If we have a valid future, show it in a FutureBuilder
+        // 3. If we never built a future yet, show a small placeholder
         if (_transitFuture == null) {
-          // Means we haven't built one yet
           return const Text("No Transit data yet.");
         }
 
+        // 4. Build the UI from the future
         return FutureBuilder<List<DirectionsRoute>>(
           future: _transitFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Text('No transit routes found.');
             } else {
-              // 4. Calculate emissions with the final route data
+              // We have fresh route data
               final routes = snapshot.data!;
-              // Save the route data to coordsState if you want to
-              coordsState.saveRouteData(routes);
-
               final emissions = _transitEmissionsCalculator.calculateEmissions(context);
+
               if (emissions.isEmpty) {
                 return const Text("No emissions data available");
               }
 
-              // 5. Display your list with the new routes
               return TransitListView(
                 snapshot: snapshot,
                 emissions: emissions,
@@ -88,13 +95,12 @@ class _TransitState extends State<Transit> {
     );
   }
 
-  /// Actually fetch the route from Google Directions, but do NOT notify
-  /// listeners in PolylinesState while it’s still building, to avoid loops.
+  /// Actually fetch the route from Google Directions, but do NOT 
+  /// call notifyListeners() in the middle of the build. 
   Future<List<DirectionsRoute>> _handleTransitMode(
     CoordinatesState coordsState,
     PolylinesState polylinesState,
   ) async {
-    // 1) Build a route model from the current coords
     final routesModel = RoutesModel(
       origin: GeoCoord(
         coordsState.originCoords.latitude,
@@ -107,10 +113,12 @@ class _TransitState extends State<Transit> {
       travelMode: TravelMode.transit,
     );
 
-    // 2) Fetch the transit routes from Google
     final fetchedRoutes = await routesModel.getRouteInfo() ?? [];
 
-    // 3) Update polylines, but using `listen: false` so we don’t cause an immediate rebuild
+    // Save data in CoordinatesState outside the build
+    coordsState.saveRouteData(fetchedRoutes);
+
+    // Update polylines (listen: false => doesn't trigger immediate rebuild)
     polylinesState.transportMode = 'transit';
     await Provider.of<PolylinesState>(context, listen: false)
         .getPolyline(coordsState.coordinates);

@@ -167,11 +167,14 @@ class SettingsScreen extends StatelessWidget {
           ),
           value: settings.selectedMotorcycleSize,
           items: MotorcycleSize.values.map((MotorcycleSize size) {
+            final isSelectOption = "Size" == size.name;
+
             return DropdownMenuItem<MotorcycleSize>(
               value: size,
+              enabled: !isSelectOption,
               child: Text(
                 size.name,
-                style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+                style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04, fontWeight: FontWeight.w500, color: isSelectOption ? Colors.grey : Colors.black, ),
               ),
             );
           }).toList(),
