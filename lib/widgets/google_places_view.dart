@@ -377,8 +377,9 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
           // Calculate Motorcycle Emissions
           final motoEmissionsCalc = PrivateVehicleEmissionsCalculator(
-            polylinesState: polylineState,
-            vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
+           polylinesState: polylineState,
+            settings: settings,
+            routeBikeSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
           );
           final List<int> calculatedMotoEmissions = [];
           for (int i = 0; i < polylineState.distances.length; i++) {
@@ -429,6 +430,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         try {
           // Calculate Car Emissions
           final settings = Provider.of<Settings>(context, listen: false);
+
           final emissionsCalculator = PrivateCarEmissionsCalculator(
             polylinesState: polylineState,
             settings: settings,
@@ -454,7 +456,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           // Calculate Motorcycle Emissions
           final motoEmissionsCalc = PrivateVehicleEmissionsCalculator(
             polylinesState: polylineState,
-            vehicleSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
+            settings: settings,
+            routeBikeSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
           );
           final List<int> calculatedMotoEmissions = [];
           for (int i = 0; i < polylineState.distances.length; i++) {

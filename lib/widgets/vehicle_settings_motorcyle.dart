@@ -36,7 +36,8 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
         // 2) Initialize a calculator with that size
         final calculator = PrivateVehicleEmissionsCalculator(
           polylinesState: polylinesState,
-          vehicleSize: settings.selectedMotorcycleSize,
+          settings: settings,
+          routeBikeSize: settings.selectedMotorcycleSize,
         );
 
         // 3) Generate emissions for each route
@@ -66,7 +67,8 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
     // For manual selection, we fall back to `selectedSize ?? label`
     emissionCalculator = PrivateVehicleEmissionsCalculator(
       polylinesState: polylinesState,
-      vehicleSize: selectedSize ?? MotorcycleSize.label,
+      settings: settings,
+      routeBikeSize: selectedSize ?? MotorcycleSize.label,
     );
 
     return Consumer<PrivateMotorcycleState>(
