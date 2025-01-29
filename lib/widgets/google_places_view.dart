@@ -20,6 +20,7 @@ import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 
@@ -352,10 +353,12 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
         try {
           // Calculate Car Emissions
+          final settings = Provider.of<Settings>(context, listen: false);
           final emissionsCalculator = PrivateCarEmissionsCalculator(
             polylinesState: polylineState,
-            vehicleSize: carState.selectedSize ?? CarSize.label,
-            vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
+            settings: settings,
+            routeCarSize: carState.selectedSize ?? CarSize.label,
+            routeCarFuel: carState.selectedFuelType ?? CarFuelType.label,
           );
           final List<int> calculatedCarEmissions = [];
           for (int i = 0; i < polylineState.distances.length; i++) {
@@ -425,11 +428,14 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
         try {
           // Calculate Car Emissions
+          final settings = Provider.of<Settings>(context, listen: false);
           final emissionsCalculator = PrivateCarEmissionsCalculator(
             polylinesState: polylineState,
-            vehicleSize: carState.selectedSize ?? CarSize.label,
-            vehicleFuelType: carState.selectedFuelType ?? CarFuelType.label,
+            settings: settings,
+            routeCarSize: carState.selectedSize ?? CarSize.label,
+            routeCarFuel: carState.selectedFuelType ?? CarFuelType.label,
           );
+
           final List<int> calculatedCarEmissions = [];
           for (int i = 0; i < polylineState.distances.length; i++) {
             double emission = emissionsCalculator.calculateEmissions(

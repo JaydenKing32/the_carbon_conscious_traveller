@@ -47,9 +47,11 @@ class _CarSettingsState extends State<CarSettings> {
         carState.updateSelectedFuelType(settings.selectedCarFuelType);
         
         // Initialize calculator with settings
-        final calculator = PrivateCarEmissionsCalculator.fromSettings(
+        final calculator = PrivateCarEmissionsCalculator(
           polylinesState: polylinesState,
           settings: settings,
+          routeCarSize: selectedSize ?? CarSize.label,
+          routeCarFuel: selectedFuelType ?? CarFuelType.label,
         );
         
         // Calculate emissions
@@ -80,15 +82,18 @@ class _CarSettingsState extends State<CarSettings> {
 
     // Initialize emission calculator based on settings
     if (settings.useSpecifiedCar) {
-      emissionCalculator = PrivateCarEmissionsCalculator.fromSettings(
+      emissionCalculator = PrivateCarEmissionsCalculator(
+        routeCarSize: selectedSize ?? CarSize.label,
+        routeCarFuel: selectedFuelType ?? CarFuelType.label,
         polylinesState: polylinesState,
         settings: settings,
       );
     } else {
       emissionCalculator = PrivateCarEmissionsCalculator(
         polylinesState: polylinesState,
-        vehicleSize: selectedSize ?? CarSize.label,
-        vehicleFuelType: selectedFuelType ?? CarFuelType.label,
+        routeCarSize: selectedSize ?? CarSize.label,
+        routeCarFuel: selectedFuelType ?? CarFuelType.label,
+        settings: settings,
       );
     }
 

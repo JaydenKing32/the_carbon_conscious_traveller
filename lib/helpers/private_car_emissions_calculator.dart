@@ -1,64 +1,74 @@
 import 'dart:math';
-
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
 class PrivateCarEmissionsCalculator {
   final PolylinesState polylinesState;
-  final CarSize vehicleSize;
-  final CarFuelType vehicleFuelType;
+  final Settings settings;
+
+  /// The car chosen for *this route*, e.g. from your UI.
+  final CarSize routeCarSize;
+  final CarFuelType routeCarFuel;
+
   double factor = 0.0;
 
-   PrivateCarEmissionsCalculator.fromSettings({
-    required this.polylinesState,
-    required Settings settings,
-  }) : vehicleSize = settings.selectedCarSize,
-       vehicleFuelType = settings.selectedCarFuelType {
-    calculateFactor();
-  }
-  
   PrivateCarEmissionsCalculator({
     required this.polylinesState,
-    required this.vehicleSize,
-    required this.vehicleFuelType,
+    required this.settings,
+    required this.routeCarSize,
+    required this.routeCarFuel,
   }) {
     calculateFactor();
   }
 
-   void calculateFactor() {
-    if (vehicleSize == CarSize.label || vehicleFuelType == CarFuelType.label) {
+  /// Build factor either as:
+  /// - The normal “routeCar” factor, OR
+  /// - That minus the user's “specified car” factor, if useCarForCalculations is true.
+  void calculateFactor() {
+    // 1) If routeCar is "Select", set factor=0
+    if (routeCarSize == CarSize.label || routeCarFuel == CarFuelType.label) {
       factor = 0.0;
-    } else {
-      factor = carValuesMatrix[vehicleSize.index][vehicleFuelType.index];
+      return;
     }
-   }
+
+    // 2) The "standard" factor from the matrix for this route's chosen car
+    final standardFactor =
+        carValuesMatrix[routeCarSize.index][routeCarFuel.index];
+
+    // 3) If user wants “useCarForCalculations”, we subtract the user's specified car factor
+    if (settings.useCarForCalculations) {
+      final userCarSize = settings.selectedCarSize; 
+      final userFuelType = settings.selectedCarFuelType;
+
+      double userCarFactor = 0.0;
+      if (userCarSize != CarSize.label && userFuelType != CarFuelType.label) {
+        userCarFactor = carValuesMatrix[userCarSize.index][userFuelType.index];
+      }
+
+      // For instance: difference approach
+      factor = (standardFactor - userCarFactor).abs();
+    } else {
+      factor = standardFactor;
+    }
+  }
 
   double calculateEmissions(int index, CarSize carSize, CarFuelType carFuelType) {
-    if (factor == 0.0) {
-      // Handle the case where factor is not set (i.e., label is selected)
-      // You can choose to return 0.0 or throw an exception based on your requirements
-      return 0.0;
-    }
-
     if (index < 0 || index >= polylinesState.distances.length) {
       throw RangeError('Index out of range in calculateEmissions');
     }
-
-    return polylinesState.distances[index] * factor;
+    return factor * polylinesState.distances[index];
   }
 
   double calculateMinEmission() {
-    if (factor == 0.0) {
-      return 0.0;
-    }
-    return polylinesState.distances.reduce(min) * factor;
+    if (factor == 0.0 || polylinesState.distances.isEmpty) return 0.0;
+    final minDist = polylinesState.distances.reduce(min);
+    return minDist * factor;
   }
 
   double calculateMaxEmission() {
-    if (factor == 0.0) {
-      return 0.0;
-    }
-    return polylinesState.distances.reduce(max) * factor;
+    if (factor == 0.0 || polylinesState.distances.isEmpty) return 0.0;
+    final maxDist = polylinesState.distances.reduce(max);
+    return maxDist * factor;
   }
 }
