@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -146,6 +147,44 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     }
   }
 
+  Future<void> _attemptGeolocCompletion(int index) async {
+    String route = widget.polylinesState.routeSummary[index];
+    int tripId = _routeToTripId[route]!;
+    Trip? trip = await TripDatabase.instance.getTripById(tripId);
+
+    if (trip!.complete) return;
+    
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.best,
+    );
+
+    double distanceInMeters = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      trip.destLat,
+      trip.destLng,
+    );
+
+    const double thresholdMeters = 50;
+    if (distanceInMeters <= thresholdMeters) {
+      if (trip.id != null) {
+        await TripDatabase.instance.updateTripCompletion(trip.id!, true);
+        setState(() {
+          _tripCompletionStatus[trip.id!] = true;
+        });
+      }
+    } else {
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("You have not reached the destination."),
+          ),
+        );
+      }
+    }
+  }
+  
   /// Formats the emission value for display.
   String formatEmission(int emission) {
     if (emission >= 1000) {
@@ -364,7 +403,11 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 color: isCompleted ? Colors.green : Colors.black,
                                 size: 28,
                               ),
-                              onPressed: () => _toggleTripCompletion(index),
+                              onPressed: settings.enableGeolocationVerification
+                                  // If geolocation is ON => attempt location-based completion
+                                  ? () => _attemptGeolocCompletion(index)
+                                  // Otherwise => old behavior, just toggle completion
+                                  : () => _toggleTripCompletion(index),
                             ),
                             
                       

@@ -28,6 +28,15 @@ class Settings extends ChangeNotifier {
   bool get useSpecifiedMotorcycle => _useSpecifiedMotorcycle;
   bool get useMotorcycleForCalculations => _useMotorcycleForCalculations;
 
+  bool _enableGeolocationVerification = false;
+
+  bool get enableGeolocationVerification => _enableGeolocationVerification;
+
+  void toggleGeolocationVerification(bool value) {
+    _enableGeolocationVerification = value;
+    notifyListeners();
+  }
+
   // Add state management methods
   void toggleUseSpecifiedMotorcycle(bool value) async {
     _useSpecifiedMotorcycle = value;

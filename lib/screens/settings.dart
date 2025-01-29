@@ -24,9 +24,34 @@ class SettingsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: [
-
+          Card(
+              elevation: 2,
+              margin: const EdgeInsets.only(bottom: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Geolocation Settings',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+                   SwitchListTile(
+                      title: Text('Enable Geolocation Verification',  style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04)),
+                      subtitle: Text('Verify your trips with geolocation service',  style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.035)),
+                      value: settings.enableGeolocationVerification,
+                      onChanged: (bool value) {
+                      settings.toggleGeolocationVerification(value);
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
       
- Card(
+          Card(
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

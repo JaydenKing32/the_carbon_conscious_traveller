@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -109,6 +110,43 @@ class _CarListViewState extends State<CarListView> {
         setState(() {
           _tripCompletionStatus[tripId] = newStatus;
         });
+      }
+    }
+  }
+
+  Future<void> _attemptGeolocCompletion(int index) async {
+    int? tripId = _indexToTripId[index];
+    Trip? trip = await TripDatabase.instance.getTripById(tripId!);
+
+    if (trip!.complete) return;
+    
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.best,
+    );
+
+    double distanceInMeters = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      trip.destLat,
+      trip.destLng,
+    );
+
+    const double thresholdMeters = 50;
+    if (distanceInMeters <= thresholdMeters) {
+      if (trip.id != null) {
+        await TripDatabase.instance.updateTripCompletion(trip.id!, true);
+        setState(() {
+          _tripCompletionStatus[trip.id!] = true;
+        });
+      }
+    } else {
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("You have not reached the destination."),
+          ),
+        );
       }
     }
   }
@@ -295,7 +333,11 @@ class _CarListViewState extends State<CarListView> {
                             color: isCompleted ? Colors.green : Colors.black,
                             size: 28,
                           ),
-                          onPressed: () => _toggleTripCompletion(index),
+                           onPressed: settings.enableGeolocationVerification
+                                  // If geolocation is ON => attempt location-based completion
+                                  ? () => _attemptGeolocCompletion(index)
+                                  // Otherwise => old behavior, just toggle completion
+                                  : () => _toggleTripCompletion(index),
                           tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
                         ),
                         

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/trip_details_widget.dart';
 
 class TripsScreen extends StatefulWidget {
@@ -36,6 +39,38 @@ class _TripsScreenState extends State<TripsScreen> {
     _loadTrips();
   }
 
+  Future<void> _attemptGeolocCompletion(Trip trip) async {
+    // If already complete, do nothing
+    if (trip.complete) return;
+
+    // Get user's current location (make sure you have permission logic in place)
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.best,
+    );
+
+    // Compare distance to trip's destination lat/lng
+    double distanceInMeters = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      trip.destLat,
+      trip.destLng,
+    );
+
+    const double thresholdMeters = 50.0;
+    if (distanceInMeters <= thresholdMeters) {
+      // Mark trip as complete
+      await TripDatabase.instance.updateTripCompletion(trip.id!, true);
+      _loadTrips();
+    } else {
+      // Show message if not close enough
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("You have not reached the destination."),
+        ),
+      );
+    }
+  }
   IconData _getTransportIcon(String mode) {
     switch (mode.toLowerCase()) {
       case 'car':
@@ -62,6 +97,9 @@ class _TripsScreenState extends State<TripsScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final settings = Provider.of<Settings>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Trips"),
@@ -117,7 +155,9 @@ class _TripsScreenState extends State<TripsScreen> {
                         trip.complete ? Icons.check_circle : Icons.cancel_outlined,
                         color: trip.complete ? Colors.green : Colors.black,
                       ),
-                      onPressed: () => _toggleTripCompletion(trip.id!, trip.complete),
+                     onPressed: settings.enableGeolocationVerification
+                                  ? () => _attemptGeolocCompletion(trip)
+                                  : () => _toggleTripCompletion(trip.id!, trip.complete),
                     ),
 
                     IconButton(
@@ -138,13 +178,39 @@ class _TripsScreenState extends State<TripsScreen> {
   void _showTripDetails(BuildContext context, Trip trip) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // Allows more flexible height usage
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
       ),
-      builder: (context) => TripDetailsWidget(trip: trip),
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.6, 
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              
+              Container(
+                height: 30,
+                alignment: Alignment.center,
+                child: Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TripDetailsWidget(trip: trip),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
