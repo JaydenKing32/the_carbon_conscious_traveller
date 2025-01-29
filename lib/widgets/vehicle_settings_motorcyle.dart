@@ -16,89 +16,54 @@ class MotorcyleSettings extends StatefulWidget {
 
 class _MotorcyleSettingsState extends State<MotorcyleSettings> {
   MotorcycleSize? selectedSize;
-  bool isVisible = false;
   late PrivateVehicleEmissionsCalculator emissionCalculator;
-  List<int> emissions = [];
-  List<String> treeIconName = [];
-  bool _isBtnDisabled = false;
-  bool _autoCalculated = false;
-  VoidCallback? _polylinesListener;
-
-  @override
-  void initState() {
-    _isBtnDisabled = true;
-    super.initState();
-  }
+  bool _autoCalculated = false; // Flag to prevent repeated auto-calcs
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final settings = Provider.of<Settings>(context);
-    final polylinesState = Provider.of<PolylinesState>(context, listen: false);
 
-    if (settings.useMotorcycleForCalculations) {
-      // Remove existing listener to avoid duplicates
-      if (_polylinesListener != null) {
-        polylinesState.removeListener(_polylinesListener!);
-        _polylinesListener = null;
-      }
+    // If "Use Specified Motorcycle" is on, automatically calculate
+    if (settings.useSpecifiedMotorcycle && !_autoCalculated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final polylinesState = Provider.of<PolylinesState>(context, listen: false);
+        final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
 
-      _polylinesListener = () {
-        if (polylinesState.result.isNotEmpty) {
-          _performAutoCalculation();
-          // Remove listener after successful calculation
-          polylinesState.removeListener(_polylinesListener!);
-          _polylinesListener = null;
-        }
-      };
+        // 1) Update MotorcycleState with the user’s saved motorcycle size
+        motorcycleState.updateSelectedValue(settings.selectedMotorcycleSize);
 
-      if (polylinesState.result.isNotEmpty) {
-        _performAutoCalculation();
-      } else {
-        polylinesState.addListener(_polylinesListener!);
-      }
+        // 2) Initialize a calculator with that size
+        final calculator = PrivateVehicleEmissionsCalculator(
+          polylinesState: polylinesState,
+          vehicleSize: settings.selectedMotorcycleSize,
+        );
+
+        // 3) Generate emissions for each route
+        final computedEmissions = List<int>.generate(
+          polylinesState.result.length,
+          (i) => calculator.calculateEmission(i).round(),
+        );
+
+        // 4) Populate PrivateMotorcycleState and show the list
+        motorcycleState.saveEmissions(computedEmissions);
+        motorcycleState.updateVisibility(true);
+        motorcycleState.updateMinEmission(calculator.calculateMinEmission().round());
+        motorcycleState.updateMaxEmission(calculator.calculateMaxEmission().round());
+
+        setState(() {
+          _autoCalculated = true;
+        });
+      });
     }
-  }
-
-  void _performAutoCalculation() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final settings = Provider.of<Settings>(context, listen: false);
-      final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
-      final polylinesState = Provider.of<PolylinesState>(context, listen: false);
-
-      motorcycleState.updateSelectedValue(settings.selectedMotorcycleSize);
-      
-      final calculator = PrivateVehicleEmissionsCalculator(
-        polylinesState: polylinesState,
-        vehicleSize: settings.selectedMotorcycleSize,
-      );
-      
-      final emissions = List<int>.generate(
-        polylinesState.result.length,
-        (i) => calculator.calculateEmission(i).round()
-      );
-      
-      motorcycleState.saveEmissions(emissions);
-      motorcycleState.updateVisibility(true);
-      motorcycleState.updateMinEmission(calculator.calculateMinEmission().round());
-      motorcycleState.updateMaxEmission(calculator.calculateMaxEmission().round());
-
-      setState(() { _autoCalculated = true; });
-    });
-  }
-
-  @override
-  void dispose() {
-    final polylinesState = Provider.of<PolylinesState>(context, listen: false);
-    if (_polylinesListener != null) {
-      polylinesState.removeListener(_polylinesListener!);
-    }
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    PolylinesState polylinesState = Provider.of<PolylinesState>(context);
+    final settings = Provider.of<Settings>(context);
+    final polylinesState = Provider.of<PolylinesState>(context);
+
+    // For manual selection, we fall back to `selectedSize ?? label`
     emissionCalculator = PrivateVehicleEmissionsCalculator(
       polylinesState: polylinesState,
       vehicleSize: selectedSize ?? MotorcycleSize.label,
@@ -106,37 +71,8 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
 
     return Consumer<PrivateMotorcycleState>(
       builder: (context, motorcycleState, child) {
-        void changeVisibility(bool isVisible) {
-          motorcycleState.updateVisibility(isVisible);
-        }
-
-        int minEmission = 0;
-        int maxEmission = 0;
-
-        void getMinMaxEmissions() {
-          minEmission = emissionCalculator.calculateMinEmission().round();
-          motorcycleState.updateMinEmission(minEmission);
-          maxEmission = emissionCalculator.calculateMaxEmission().round();
-          motorcycleState.updateMaxEmission(maxEmission);
-        }
-
-        void getEmissions() {
-          for (int i = 0; i < polylinesState.result.length; i++) {
-            emissions.add(emissionCalculator.calculateEmission(i).round());
-          }
-          motorcycleState.saveEmissions(emissions);
-        }
-
-        final settings = Provider.of<Settings>(context);
-
-        emissionCalculator = PrivateVehicleEmissionsCalculator(
-        polylinesState: polylinesState,
-        vehicleSize: settings.useMotorcycleForCalculations
-            ? settings.selectedMotorcycleSize
-            : selectedSize ?? MotorcycleSize.label,
-      );
-
-        if (settings.useSpecifiedCar) {
+        // If "Use Specified Motorcycle" is on, just display the emissions list
+        if (settings.useSpecifiedMotorcycle) {
           return Visibility(
             visible: motorcycleState.isVisible,
             child: Padding(
@@ -144,9 +80,9 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
               child: Column(
                 children: [
                   MotorcycleListView(
-                    polylinesState: Provider.of<PolylinesState>(context),
+                    polylinesState: polylinesState,
                     vehicleState: motorcycleState,
-                    icon: Icons.directions_car_outlined,
+                    icon: Icons.sports_motorsports_outlined,
                   ),
                 ],
               ),
@@ -154,6 +90,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
           );
         }
 
+        // Otherwise, show the manual “dropdown + calculate” UI
         return Column(
           children: [
             Visibility(
@@ -161,7 +98,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Title(
                       color: Colors.black,
                       child: Text(
@@ -182,10 +119,10 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                           label: const Text('Motorcycle Size'),
                           onSelected: (MotorcycleSize? size) {
                             motorcycleState.updateSelectedValue(
-                                size ?? MotorcycleSize.label);
+                              size ?? MotorcycleSize.label,
+                            );
                             setState(() {
                               selectedSize = motorcycleState.selectedValue;
-                              _isBtnDisabled = false;
                             });
                           },
                           dropdownMenuEntries: MotorcycleSize.values
@@ -194,9 +131,10 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                             return DropdownMenuEntry<MotorcycleSize>(
                               value: size,
                               label: size.name,
-                              enabled: size.name != MotorcycleSize.label.name,
+                              enabled: size != MotorcycleSize.label,
                               style: MenuItemButton.styleFrom(
-                                  foregroundColor: Colors.black),
+                                foregroundColor: Colors.black,
+                              ),
                             );
                           }).toList(),
                         ),
@@ -204,13 +142,24 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                     ),
                   ),
                   FilledButton(
-                    onPressed: _isBtnDisabled
-                        ? null
-                        : () {
-                            changeVisibility(true);
-                            getEmissions();
-                            getMinMaxEmissions();
-                          },
+                    onPressed: () {
+                      motorcycleState.updateVisibility(true);
+
+                      // Manual calculation logic:
+                      final computedEmissions = <int>[];
+                      for (int i = 0; i < polylinesState.result.length; i++) {
+                        computedEmissions.add(
+                          emissionCalculator.calculateEmission(i).round(),
+                        );
+                      }
+                      motorcycleState.saveEmissions(computedEmissions);
+                      motorcycleState.updateMinEmission(
+                        emissionCalculator.calculateMinEmission().round(),
+                      );
+                      motorcycleState.updateMaxEmission(
+                        emissionCalculator.calculateMaxEmission().round(),
+                      );
+                    },
                     child: const Text('Calculate Emissions'),
                   ),
                 ],
