@@ -84,9 +84,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       return "That's about the length of the Golden Gate Bridge 🌉";
     } else if (distance < 42) {
       return "You've traveled more than a marathon! 🏃‍♂️";
-    } else if (distance < 500) {
+    } else if (distance < 892) {
       return "That's almost the distance from Sydney to Melbourne! 🏙️🚆";
-    } else if (distance < 384400) {
+    } else if (distance < 384400 ) {
       return "That's almost the distance to the Moon! 🌙🚀";
     } else {
       return "You've traveled a distance beyond Earth's orbit! 🛰️";

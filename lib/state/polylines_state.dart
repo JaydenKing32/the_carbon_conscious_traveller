@@ -61,7 +61,7 @@ class PolylinesState extends ChangeNotifier {
   }
 
 Future<void> getPolyline(List<LatLng> coordinates) async {
-  resetPolyline();
+  clearPolylines();
 
   Future<List<DirectionsRoute>> fetchRouteInfo() async {
     routesModel = RoutesModel(
