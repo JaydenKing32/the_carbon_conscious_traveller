@@ -36,7 +36,6 @@ class TripDetailsWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -55,19 +54,12 @@ class TripDetailsWidget extends StatelessWidget {
           ),
           const Divider(),
           _tripDetailRow("Date", trip.date.substring(0, 10)),
-
           _tripDetailRow("Origin", trip.origin),
-
           _tripDetailRow("Destination", trip.destination),
-
           _tripDetailRow("Mode", trip.mode),
-
           _tripDetailRow("Type", trip.model),
-
           _tripDetailRow("Distance", trip.distance),
-
           _tripDetailRow("Emissions", formatGrams(trip.emissions), isBold: true),
-
           _tripDetailRow("Reduction", formatGrams(trip.reduction), isBold: true, color: Colors.green),
         ],
       ),
@@ -78,32 +70,30 @@ class TripDetailsWidget extends StatelessWidget {
     return grams >= 1000 ? '${(grams / 1000).toStringAsFixed(2)} kg' : '${grams.round()} g';
   }
 
- Widget _tripDetailRow(String title, String value, {bool isBold = false, Color? color}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start, 
-      children: [
-        Text(
-          "$title: ",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: 14,
-              color: color ?? Colors.black, 
-            ),
-            softWrap: true, 
-            overflow: TextOverflow.visible,
+  Widget _tripDetailRow(String title, String value, {bool isBold = false, Color? color}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "$title: ",
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-        ),
-      ],
-    ),
-  );
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+                color: color ?? Colors.black,
+              ),
+              softWrap: true,
+              overflow: TextOverflow.visible,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
-
-}
-

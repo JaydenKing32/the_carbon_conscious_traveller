@@ -25,8 +25,8 @@ class CarListView extends StatefulWidget {
 }
 
 class _CarListViewState extends State<CarListView> {
-  final Set<int> _savedTripIds = {}; 
-  final Map<int, int> _indexToTripId = {}; 
+  final Set<int> _savedTripIds = {};
+  final Map<int, int> _indexToTripId = {};
   final Map<int, bool> _tripCompletionStatus = {};
 
   @override
@@ -56,28 +56,25 @@ class _CarListViewState extends State<CarListView> {
       return;
     }
 
-    int maxEmission = widget.vehicleState.emissions.isNotEmpty
-        ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce((a, b) => a > b ? a : b)
-        : 0;
+    int maxEmission = widget.vehicleState.emissions.isNotEmpty ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce((a, b) => a > b ? a : b) : 0;
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
     double reduction = max(0, maxEmission - selectedEmission);
     String carModel = "${widget.vehicleState.selectedSize?.toString().split('.').last} - ${widget.vehicleState.selectedFuelType?.toString().split('.').last}";
 
     final trip = Trip(
-      date: DateTime.now().toIso8601String(),
-      origin: widget.polylinesState.routeSummary[index],
-      origLat: 0.0,
-      origLng: 0.0,
-      destination: widget.polylinesState.routeSummary[index],
-      destLat: 0.0,
-      destLng: 0.0,
-      distance: widget.polylinesState.distanceTexts[index],
-      emissions: widget.vehicleState.getEmission(index).toDouble(),
-      mode: "Car",
-      reduction: reduction,
-      complete: false,
-      model: carModel
-    );
+        date: DateTime.now().toIso8601String(),
+        origin: widget.polylinesState.routeSummary[index],
+        origLat: 0.0,
+        origLng: 0.0,
+        destination: widget.polylinesState.routeSummary[index],
+        destLat: 0.0,
+        destLng: 0.0,
+        distance: widget.polylinesState.distanceTexts[index],
+        emissions: widget.vehicleState.getEmission(index).toDouble(),
+        mode: "Car",
+        reduction: reduction,
+        complete: false,
+        model: carModel);
 
     int id = await TripDatabase.instance.insertTrip(trip);
 
@@ -119,7 +116,7 @@ class _CarListViewState extends State<CarListView> {
     Trip? trip = await TripDatabase.instance.getTripById(tripId!);
 
     if (trip!.complete) return;
-    
+
     final position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.best,
     );
@@ -140,7 +137,6 @@ class _CarListViewState extends State<CarListView> {
         });
       }
     } else {
-      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -162,7 +158,7 @@ class _CarListViewState extends State<CarListView> {
   @override
   Widget build(BuildContext context) {
     return Consumer2<PolylinesState, Settings>(
-       builder: (context, polylinesState, settings, child) {
+      builder: (context, polylinesState, settings, child) {
         return Column(
           children: [
             ListView.separated(
@@ -176,180 +172,172 @@ class _CarListViewState extends State<CarListView> {
                     index >= widget.polylinesState.routeSummary.length ||
                     index >= widget.polylinesState.distanceTexts.length ||
                     index >= widget.polylinesState.durationTexts.length) {
-                    _loadSavedTrips();
+                  _loadSavedTrips();
                   return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 10),
-                          ],
-                        ),);
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 10),
+                      ],
+                    ),
+                  );
                 }
-                 int selectedIndex;
-               widget.vehicleState.getTreeIcons(index, context);
+                int selectedIndex;
+                widget.vehicleState.getTreeIcons(index, context);
 
                 int? tripId = _indexToTripId[index];
-                bool isCompleted = tripId != null
-                    ? _tripCompletionStatus[tripId] ?? false
-                    : false;
-                  //Change the border color of the active route
+                bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
+                //Change the border color of the active route
 
-              selectedIndex = polylinesState.carActiveRouteIndex;
-              Color color = Colors.transparent;
-              if (selectedIndex == index) {
-                color = Colors.green;
-              } else {
-                color = Colors.transparent;
-              }
-   return InkWell(
-              onTap: () {
-                setState(() {
-                  polylinesState.setActiveRoute(index);
-                });
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: color,
-                      width: 4.0,
-                    ),
-                  ),
-                ),
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start, 
-                  children: [
-                    Expanded(
-                      flex: 1, 
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Icon(
-                              widget.icon,
-                              color: Colors.green,
-                              size: 25,
-                            ),
-                          ),
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 10), 
-                              child: Text(
-                                'via ${widget.polylinesState.routeSummary[index]}',
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                softWrap: true, 
-                              ),
-                            ),
-                          ),
-                        ],
+                selectedIndex = polylinesState.carActiveRouteIndex;
+                Color color = Colors.transparent;
+                if (selectedIndex == index) {
+                  color = Colors.green;
+                } else {
+                  color = Colors.transparent;
+                }
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      polylinesState.setActiveRoute(index);
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        left: BorderSide(
+                          color: color,
+                          width: 4.0,
+                        ),
                       ),
                     ),
-                    Expanded(
-                      flex: 1, 
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: formatEmission(widget.vehicleState.getEmission(index)),
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: Icon(
+                                  widget.icon,
+                                  color: Colors.green,
+                                  size: 25,
                                 ),
-                                const WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,
-                                  child: SizedBox(width: 5),
-                                ),
-                                WidgetSpan(
-                                  child: Image.asset(
-                                    'assets/icons/co2e.png',
-                                    width: 20, 
-                                    height: 20,
-                                    fit: BoxFit.contain,
+                              ),
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Text(
+                                    'via ${widget.polylinesState.routeSummary[index]}',
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    softWrap: true,
                                   ),
                                 ),
-                              ],
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4), 
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: widget.polylinesState.distanceTexts[index].split(' ').first,
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                                TextSpan(
-                                  text: ' km',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.polylinesState.durationTexts[index],
-                            style: Theme.of(context).textTheme.bodySmall,
-                            softWrap: true, 
-                          ),
-                          const SizedBox(height: 4),
-                          TreeIcons(
-                          treeIconName: widget.vehicleState.treeIcons,
-                          settings: settings, // Pass settings to TreeIcons if needed
                         ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            _savedTripIds.contains(_indexToTripId[index] ?? -1)
-                                ? Icons.remove_circle_outline
-                                : Icons.add_circle_outline,
-                            color: Colors.green,
-                            size: 28,
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: formatEmission(widget.vehicleState.getEmission(index)),
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                    const WidgetSpan(
+                                      alignment: PlaceholderAlignment.middle,
+                                      child: SizedBox(width: 5),
+                                    ),
+                                    WidgetSpan(
+                                      child: Image.asset(
+                                        'assets/icons/co2e.png',
+                                        width: 20,
+                                        height: 20,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: widget.polylinesState.distanceTexts[index].split(' ').first,
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    TextSpan(
+                                      text: ' km',
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                                softWrap: false,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                widget.polylinesState.durationTexts[index],
+                                style: Theme.of(context).textTheme.bodySmall,
+                                softWrap: true,
+                              ),
+                              const SizedBox(height: 4),
+                              TreeIcons(
+                                treeIconName: widget.vehicleState.treeIcons,
+                                settings: settings, // Pass settings to TreeIcons if needed
+                              ),
+                            ],
                           ),
-                          onPressed: () {
-                            if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
-                              _deleteTrip(index);
-                            } else {
-                              _saveTrip(index);
-                            }
-                          },
-                          tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1)
-                              ? 'Удалить поездку'
-                              : 'Сохранить поездку',
                         ),
-                        IconButton(
-                          icon: Icon(
-                            isCompleted ? Icons.check_circle : Icons.cancel_outlined,
-                            color: isCompleted ? Colors.green : Colors.black,
-                            size: 28,
-                          ),
-                           onPressed: settings.enableGeolocationVerification
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                _savedTripIds.contains(_indexToTripId[index] ?? -1) ? Icons.remove_circle_outline : Icons.add_circle_outline,
+                                color: Colors.green,
+                                size: 28,
+                              ),
+                              onPressed: () {
+                                if (_savedTripIds.contains(_indexToTripId[index] ?? -1)) {
+                                  _deleteTrip(index);
+                                } else {
+                                  _saveTrip(index);
+                                }
+                              },
+                              tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1) ? 'Удалить поездку' : 'Сохранить поездку',
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                isCompleted ? Icons.check_circle : Icons.cancel_outlined,
+                                color: isCompleted ? Colors.green : Colors.black,
+                                size: 28,
+                              ),
+                              onPressed: settings.enableGeolocationVerification
                                   // If geolocation is ON => attempt location-based completion
                                   ? () => _attemptGeolocCompletion(index)
                                   // Otherwise => old behavior, just toggle completion
                                   : () => _toggleTripCompletion(index),
-                          tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
+                              tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
+                            ),
+                            const SizedBox(height: 5),
+                          ],
                         ),
-                        
-                        const SizedBox(height: 5), 
                       ],
                     ),
-                  ],
-                ),
-              ),
-            );
-    
-
+                  ),
+                );
               },
               separatorBuilder: (BuildContext context, int index) => const Divider(),
             ),

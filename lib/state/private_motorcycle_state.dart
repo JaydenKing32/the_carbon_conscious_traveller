@@ -26,7 +26,7 @@ class PrivateMotorcycleState extends ChangeNotifier {
     _treeIcons = [];
     notifyListeners();
   }
-  
+
   void updateSelectedValue(MotorcycleSize newValue) {
     _selectedValue = newValue;
     notifyListeners();
@@ -52,11 +52,11 @@ class PrivateMotorcycleState extends ChangeNotifier {
     notifyListeners();
   }
 
-    void getTreeIcons(int index, BuildContext context) {
-  final settings = Provider.of<Settings>(context, listen: false);
-  _treeIcons = upDateTreeIcons(_emissions, index, settings);
-  notifyListeners();
-}
+  void getTreeIcons(int index, BuildContext context) {
+    final settings = Provider.of<Settings>(context, listen: false);
+    _treeIcons = upDateTreeIcons(_emissions, index, settings);
+    notifyListeners();
+  }
 
   int getEmission(int index) {
     if (index >= 0 && index < _emissions.length) {

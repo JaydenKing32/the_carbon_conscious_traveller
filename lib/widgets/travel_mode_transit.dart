@@ -33,15 +33,12 @@ class _TransitState extends State<Transit> {
     return Consumer2<CoordinatesState, PolylinesState>(
       builder: (context, coordsState, polylinesState, _) {
         // 1. If no valid coords yet, show a placeholder
-        if (coordsState.originCoords == const LatLng(0, 0) ||
-            coordsState.destinationCoords == const LatLng(0, 0)) {
+        if (coordsState.originCoords == const LatLng(0, 0) || coordsState.destinationCoords == const LatLng(0, 0)) {
           return const Center(child: Text("Please select origin and destination"));
         }
 
         // 2. Check if origin/destination changed from last time
-        bool coordsChanged =
-            (coordsState.originCoords != _lastOrigin) ||
-            (coordsState.destinationCoords != _lastDestination);
+        bool coordsChanged = (coordsState.originCoords != _lastOrigin) || (coordsState.destinationCoords != _lastDestination);
 
         // If user changed coords AND we’re not already fetching, start a new request
         if (coordsChanged && !_isFetching) {
@@ -52,8 +49,7 @@ class _TransitState extends State<Transit> {
           _isFetching = true;
 
           // Create a new future, but clear _isFetching once it completes
-          _transitFuture = _handleTransitMode(coordsState, polylinesState)
-              .then((routes) {
+          _transitFuture = _handleTransitMode(coordsState, polylinesState).then((routes) {
             // The future is done, so we can reset _isFetching
             _isFetching = false;
             return routes; // Pass routes on to the FutureBuilder
@@ -95,8 +91,8 @@ class _TransitState extends State<Transit> {
     );
   }
 
-  /// Actually fetch the route from Google Directions, but do NOT 
-  /// call notifyListeners() in the middle of the build. 
+  /// Actually fetch the route from Google Directions, but do NOT
+  /// call notifyListeners() in the middle of the build.
   Future<List<DirectionsRoute>> _handleTransitMode(
     CoordinatesState coordsState,
     PolylinesState polylinesState,
@@ -120,8 +116,7 @@ class _TransitState extends State<Transit> {
 
     // Update polylines (listen: false => doesn't trigger immediate rebuild)
     polylinesState.transportMode = 'transit';
-    await Provider.of<PolylinesState>(context, listen: false)
-        .getPolyline(coordsState.coordinates);
+    await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
 
     return fetchedRoutes;
   }

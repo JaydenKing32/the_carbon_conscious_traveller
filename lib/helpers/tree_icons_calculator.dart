@@ -2,14 +2,15 @@ import 'dart:math';
 import 'package:the_carbon_conscious_traveller/data/tree_icon_values.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
-List<String> upDateTreeIcons(List<int> emissionValues, int index, Settings settings) {
+List<String> upDateTreeIcons(
+    List<int> emissionValues, int index, Settings settings) {
   if (emissionValues.length <= 1) {
     return [];
   }
 
   int maxEmission = emissionValues.reduce(max);
   final currentValues = settings.emissionValues;
-  
+
   // Get sorted icons by value in descending order
   final sortedIcons = TreeIconType.values.toList()
     ..sort((a, b) => currentValues[b]!.compareTo(currentValues[a]!));
@@ -20,7 +21,7 @@ List<String> upDateTreeIcons(List<int> emissionValues, int index, Settings setti
   if (emissionValues.isEmpty) {
     return [];
   }
-  
+
   var dividend = maxEmission - emissionValues[index];
 
   if (dividend <= 0) {
@@ -42,10 +43,10 @@ List<String> upDateTreeIcons(List<int> emissionValues, int index, Settings setti
       treeIconName.addAll(List.filled(count, imageRes));
     }
     dividend %= iconValue;
-    
+
     if (dividend == 0) break;
   }
-  
+
   return treeIconName;
 }
 
@@ -59,5 +60,5 @@ String _getImageResource(TreeIconType icon) {
       return TreeIconType.defaultFourLeavesC02Gram.name;
     case TreeIconType.defaultOneLeafC02Gram:
       return TreeIconType.defaultOneLeafC02Gram.name;
-    }
+  }
 }

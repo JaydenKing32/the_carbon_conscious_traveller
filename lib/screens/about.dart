@@ -5,7 +5,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   Future<void> _launchGitHub() async {
-    final Uri url = Uri.parse("https://github.com/svtsv01/the_carbon_conscious_traveller.git"); 
+    final Uri url = Uri.parse("https://github.com/svtsv01/the_carbon_conscious_traveller.git");
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
@@ -14,7 +14,7 @@ class AboutScreen extends StatelessWidget {
   Future<void> _launchSupportEmail() async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'the.carbon.conscious.traveller@gmail.com', 
+      path: 'the.carbon.conscious.traveller@gmail.com',
       query: 'subject=Support Request',
     );
     if (!await launchUrl(emailUri)) {
@@ -50,7 +50,6 @@ class AboutScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    
                     const Text(
                       "TCCT helps travellers track and reduce their carbon footprint. "
                       "It calculates carbon emissions based on vehicle type, size, and fuel, "
@@ -59,7 +58,6 @@ class AboutScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 20),
-
                     const Text(
                       "Key Features",
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -71,7 +69,6 @@ class AboutScreen extends StatelessWidget {
                     _featureItem(context, "🚗 Custom Vehicle Settings", "Set car type, size & fuel type."),
                     _featureItem(context, "📊 Visual Carbon Stats", "Track emissions with charts & fun facts."),
                     const SizedBox(height: 20),
-
                     ElevatedButton.icon(
                       icon: const Icon(Icons.favorite),
                       label: const Text("Support Us"),
@@ -86,7 +83,6 @@ class AboutScreen extends StatelessWidget {
                       onPressed: _launchDonationPage,
                     ),
                     const SizedBox(height: 10),
-
                     ElevatedButton.icon(
                       icon: const Icon(Icons.support_agent),
                       label: const Text("Contact Support"),
@@ -101,7 +97,6 @@ class AboutScreen extends StatelessWidget {
                       onPressed: _launchSupportEmail,
                     ),
                     const SizedBox(height: 10),
-
                     OutlinedButton.icon(
                       icon: const Icon(Icons.code),
                       label: const Text("View on GitHub"),

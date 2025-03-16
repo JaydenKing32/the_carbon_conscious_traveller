@@ -89,13 +89,8 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
   @override
   Widget build(BuildContext context) {
     return Consumer5<CoordinatesState, PrivateMotorcycleState, PrivateCarState, TransitState, PolylinesState>(
-      builder: (BuildContext context,
-          CoordinatesState coordinatesState,
-          PrivateMotorcycleState motorcycleState,
-          PrivateCarState carState,
-          TransitState transitState,
-          PolylinesState polylineState,
-          child) {
+      builder:
+          (BuildContext context, CoordinatesState coordinatesState, PrivateMotorcycleState motorcycleState, PrivateCarState carState, TransitState transitState, PolylinesState polylineState, child) {
         // Get emissions for each mode
         String drivingEmission = getCurrentMinMaxEmissions(
           'driving',

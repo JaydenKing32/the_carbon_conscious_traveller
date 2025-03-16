@@ -21,26 +21,26 @@ class PrivateVehicleEmissionsCalculator {
   }
 
   void calculateFactor() {
-
     final double standardFactor = routeBikeSize.value;
 
     if (settings.useCarForCalculations && !settings.useSpecifiedCar) {
-      final userCarSize = settings.selectedCarSize; 
+      final userCarSize = settings.selectedCarSize;
       final userFuelType = settings.selectedCarFuelType;
 
       double userCarFactor = 0.0;
-      
+
       if (userCarSize != CarSize.label && userFuelType != CarFuelType.label) {
         userCarFactor = carValuesMatrix[userCarSize.index][userFuelType.index];
       }
 
-      factor = (standardFactor - userCarFactor)  > 0 ? (standardFactor - userCarFactor) : 0;
+      factor = (standardFactor - userCarFactor) > 0
+          ? (standardFactor - userCarFactor)
+          : 0;
     } else {
       factor = standardFactor;
     }
   }
 
- 
   double calculateEmission(int index) {
     if (index < 0 || index >= polylinesState.distances.length) {
       return 0.0;

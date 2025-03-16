@@ -25,7 +25,7 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-    child: Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           TextButton(
@@ -63,4 +63,3 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 }
-

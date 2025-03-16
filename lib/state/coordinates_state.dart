@@ -38,8 +38,8 @@ class CoordinatesState with ChangeNotifier {
     }
     notifyListeners();
   }
-  
-    void clearCoordinates() {
+
+  void clearCoordinates() {
     _coordinates.clear();
     notifyListeners();
   }
@@ -49,11 +49,13 @@ class CoordinatesState with ChangeNotifier {
     _coordinates.add(originCoords);
     notifyListeners();
   }
+
   void clearCoordinatesDes() {
     _coordinates.clear();
     _coordinates.add(destinationCoords);
     notifyListeners();
   }
+
   void clearRouteData() {
     _routeData.clear();
     notifyListeners();

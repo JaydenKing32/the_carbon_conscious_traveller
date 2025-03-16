@@ -16,7 +16,7 @@ extension TreeIconTypeExtension on TreeIconType {
         return 5000;
       case TreeIconType.defaultTreeCo2Gram:
         return 29000;
-      }
+    }
   }
 }
 
@@ -31,7 +31,7 @@ extension TreeIconName on TreeIconType {
         return "tree_branch3.png";
       case TreeIconType.defaultTreeCo2Gram:
         return "tree2.png";
-      }
+    }
   }
 
   String get emoji {
@@ -44,7 +44,7 @@ extension TreeIconName on TreeIconType {
         return "🌿";
       case TreeIconType.defaultTreeCo2Gram:
         return "🌳";
-      }
+    }
   }
 
   String get description {
@@ -57,6 +57,6 @@ extension TreeIconName on TreeIconType {
         return "Tree Branch";
       case TreeIconType.defaultTreeCo2Gram:
         return "Full Tree";
-      }
+    }
   }
 }

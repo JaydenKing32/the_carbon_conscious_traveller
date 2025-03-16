@@ -7,7 +7,7 @@ import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
 class PolylinesState extends ChangeNotifier {
   final bool _isLoading = false;
   bool get isLoading => _isLoading;
-  
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
@@ -60,61 +60,54 @@ class PolylinesState extends ChangeNotifier {
     notifyListeners();
   }
 
-Future<void> getPolyline(List<LatLng> coordinates) async {
-  clearPolylines();
+  Future<void> getPolyline(List<LatLng> coordinates) async {
+    clearPolylines();
 
-  Future<List<DirectionsRoute>> fetchRouteInfo() async {
-    routesModel = RoutesModel(
-      origin: GeoCoord(coordinates[0].latitude, coordinates[0].longitude),
-      destination: GeoCoord(coordinates[1].latitude, coordinates[1].longitude),
-      travelMode: _transportMode,
-    );
-    routes = await routesModel?.getRouteInfo();
-    return routes ?? [];
-  }
-
-  // Fetch route info for general use and for driving mode specifically.
-  result = await fetchRouteInfo();
-  if (_transportMode == TravelMode.driving) {
-    resultForPrivateVehicle = await fetchRouteInfo();
-  }
-
-  // Clear and update distances for new routes.
-  _distances.clear();
-
-  if (result.isNotEmpty) {
-    for (int i = 0; i < result.length; i++) {
-      List<LatLng> routeCoordinate = [];
-
-      // Skip route if overview polyline is empty.
-      if (result[i].overviewPolyline?.points == null ||
-          result[i].overviewPolyline!.points!.isEmpty) {
-        continue;
-      }
-
-      // Decode polyline points for the route.
-      List<LatLng> decodedPoints = _polylinePoints
-          .decodePolyline(result[i].overviewPolyline!.points!)
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
-      routeCoordinate.addAll(decodedPoints);
-      routeCoordinates.add(routeCoordinate);
-
-      // Extract distance for the route.
-      double routeDistance = 0.0;
-      if (result[i].legs != null &&
-          result[i].legs!.isNotEmpty &&
-          result[i].legs!.first.distance != null) {
-        routeDistance = result[i].legs!.first.distance!.value?.toDouble() ?? 0.0;
-      }
-      _distances.add(routeDistance);
+    Future<List<DirectionsRoute>> fetchRouteInfo() async {
+      routesModel = RoutesModel(
+        origin: GeoCoord(coordinates[0].latitude, coordinates[0].longitude),
+        destination: GeoCoord(coordinates[1].latitude, coordinates[1].longitude),
+        travelMode: _transportMode,
+      );
+      routes = await routesModel?.getRouteInfo();
+      return routes ?? [];
     }
+
+    // Fetch route info for general use and for driving mode specifically.
+    result = await fetchRouteInfo();
+    if (_transportMode == TravelMode.driving) {
+      resultForPrivateVehicle = await fetchRouteInfo();
+    }
+
+    // Clear and update distances for new routes.
+    _distances.clear();
+
+    if (result.isNotEmpty) {
+      for (int i = 0; i < result.length; i++) {
+        List<LatLng> routeCoordinate = [];
+
+        // Skip route if overview polyline is empty.
+        if (result[i].overviewPolyline?.points == null || result[i].overviewPolyline!.points!.isEmpty) {
+          continue;
+        }
+
+        // Decode polyline points for the route.
+        List<LatLng> decodedPoints = _polylinePoints.decodePolyline(result[i].overviewPolyline!.points!).map((point) => LatLng(point.latitude, point.longitude)).toList();
+        routeCoordinate.addAll(decodedPoints);
+        routeCoordinates.add(routeCoordinate);
+
+        // Extract distance for the route.
+        double routeDistance = 0.0;
+        if (result[i].legs != null && result[i].legs!.isNotEmpty && result[i].legs!.first.distance != null) {
+          routeDistance = result[i].legs!.first.distance!.value?.toDouble() ?? 0.0;
+        }
+        _distances.add(routeDistance);
+      }
+    }
+
+    _updateActiveRoute(_activeRouteIndex);
+    notifyListeners();
   }
-
-  _updateActiveRoute(_activeRouteIndex);
-  notifyListeners();
-}
-
 
   void _updateActiveRoute(int index) {
     _activeRouteIndex = index;
@@ -124,9 +117,7 @@ Future<void> getPolyline(List<LatLng> coordinates) async {
       PolylineId id = PolylineId('poly$i');
       Polyline polyline = Polyline(
         polylineId: id,
-        color: i == _activeRouteIndex
-            ? const Color.fromARGB(255, 40, 33, 243)
-            : const Color.fromARGB(255, 136, 136, 136),
+        color: i == _activeRouteIndex ? const Color.fromARGB(255, 40, 33, 243) : const Color.fromARGB(255, 136, 136, 136),
         points: routeCoordinates[i],
         width: i == _activeRouteIndex ? 7 : 5,
         zIndex: i == _activeRouteIndex ? 1 : 0, // Put active route on top
@@ -237,7 +228,7 @@ Future<void> getPolyline(List<LatLng> coordinates) async {
     _distanceTexts.clear();
     _durationTexts.clear();
     _routeSummary.clear();
-    
+
     notifyListeners();
   }
 }

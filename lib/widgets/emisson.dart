@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:the_carbon_conscious_traveller/data/flight.dart';
 
-
- String formatEmissionWithCO2(double grams, bool showUnit) {
+String formatEmissionWithCO2(double grams, bool showUnit) {
   String formatted = "${grams.toStringAsFixed(2)} grams";
   if (showUnit) {
     formatted += " CO₂";

@@ -46,8 +46,8 @@ extension CarSizeExtension on CarSize {
     }
   }
 }
-String carFuelTypeToString(CarFuelType fuelType) => fuelType.toString();
 
+String carFuelTypeToString(CarFuelType fuelType) => fuelType.toString();
 
 /// Convert a MotorcycleSize to string, e.g., "MotorcycleSize.medium"
 String motorcycleSizeToString(MotorcycleSize size) => size.toString();
@@ -73,6 +73,7 @@ CarFuelType stringToCarFuelType(String fuelTypeStr) {
     orElse: () => CarFuelType.petrol, // Default to first valid value
   );
 }
+
 enum CarFuelType {
   diesel,
   petrol,

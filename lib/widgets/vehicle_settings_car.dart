@@ -30,22 +30,23 @@ class _CarSettingsState extends State<CarSettings> {
     _isDropDownEnabled = false;
     super.initState();
   }
-    bool _autoCalculated = false;
+
+  bool _autoCalculated = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final settings = Provider.of<Settings>(context);
-    
+
     if (settings.useSpecifiedCar && !_autoCalculated) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final carState = Provider.of<PrivateCarState>(context, listen: false);
         final polylinesState = Provider.of<PolylinesState>(context, listen: false);
-        
+
         // Set selections from settings
         carState.updateSelectedSize(settings.selectedCarSize);
         carState.updateSelectedFuelType(settings.selectedCarFuelType);
-        
+
         // Initialize calculator with settings
         final calculator = PrivateCarEmissionsCalculator(
           polylinesState: polylinesState,
@@ -53,16 +54,10 @@ class _CarSettingsState extends State<CarSettings> {
           routeCarSize: selectedSize ?? CarSize.label,
           routeCarFuel: selectedFuelType ?? CarFuelType.label,
         );
-        
+
         // Calculate emissions
-        final emissions = List<int>.generate(
-          polylinesState.result.length,
-          (i) => calculator.calculateEmissions(i, 
-            settings.selectedCarSize, 
-            settings.selectedCarFuelType
-          ).round()
-        );
-        
+        final emissions = List<int>.generate(polylinesState.result.length, (i) => calculator.calculateEmissions(i, settings.selectedCarSize, settings.selectedCarFuelType).round());
+
         // Update state
         carState.saveEmissions(emissions);
         carState.updateVisibility(true);
@@ -75,6 +70,7 @@ class _CarSettingsState extends State<CarSettings> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final settings = Provider.of<Settings>(context);
@@ -100,19 +96,17 @@ class _CarSettingsState extends State<CarSettings> {
     return Consumer<PrivateCarState>(
       builder: (context, carState, child) {
         // Sync carState with settings when 'useSpecifiedCar' is enabled
-          void setFuelTypeItems(int selectedSizeIndex) {
+        void setFuelTypeItems(int selectedSizeIndex) {
           List<CarFuelType> availOptions = [];
           availableFuelTypes = [];
           for (double matrixValue in carValuesMatrix[selectedSizeIndex]) {
-            int index = carValuesMatrix[selectedSizeIndex]
-                .indexWhere((value) => value == matrixValue);
+            int index = carValuesMatrix[selectedSizeIndex].indexWhere((value) => value == matrixValue);
             if (matrixValue != 0) {
               availOptions.add(CarFuelType.values[index]);
             }
           }
           availableFuelTypes.addAll(availOptions);
         }
-
 
         if (settings.useSpecifiedCar) {
           return Visibility(
@@ -141,9 +135,7 @@ class _CarSettingsState extends State<CarSettings> {
         void getCarEmissions() {
           List<int> emissions = [];
           for (int i = 0; i < polylinesState.result.length; i++) {
-            emissions.add(emissionCalculator
-                .calculateEmissions(i, selectedSize!, selectedFuelType!)
-                .round());
+            emissions.add(emissionCalculator.calculateEmissions(i, selectedSize!, selectedFuelType!).round());
           }
           carState.saveEmissions(emissions);
         }
@@ -176,9 +168,7 @@ class _CarSettingsState extends State<CarSettings> {
                         DropdownMenu<CarSize>(
                           enabled: !settings.useSpecifiedCar,
                           width: 300,
-                          initialSelection: settings.useSpecifiedCar
-                              ? settings.selectedCarSize
-                              : carState.selectedSize,
+                          initialSelection: settings.useSpecifiedCar ? settings.selectedCarSize : carState.selectedSize,
                           requestFocusOnTap: false,
                           label: const Text('Car Size'),
                           onSelected: (CarSize? size) {
@@ -191,14 +181,12 @@ class _CarSettingsState extends State<CarSettings> {
                               _isDropDownEnabled = true;
                             });
                           },
-                          dropdownMenuEntries: CarSize.values
-                              .map<DropdownMenuEntry<CarSize>>((CarSize size) {
+                          dropdownMenuEntries: CarSize.values.map<DropdownMenuEntry<CarSize>>((CarSize size) {
                             return DropdownMenuEntry<CarSize>(
                               value: size,
                               label: size.name,
                               enabled: size.name != 'Select',
-                              style: MenuItemButton.styleFrom(
-                                  foregroundColor: Colors.black),
+                              style: MenuItemButton.styleFrom(foregroundColor: Colors.black),
                             );
                           }).toList(),
                         ),
@@ -213,28 +201,22 @@ class _CarSettingsState extends State<CarSettings> {
                         DropdownMenu<CarFuelType>(
                           enabled: !settings.useSpecifiedCar && _isDropDownEnabled,
                           width: 300,
-                          initialSelection: settings.useSpecifiedCar
-                              ? settings.selectedCarFuelType
-                              : carState.selectedFuelType,
+                          initialSelection: settings.useSpecifiedCar ? settings.selectedCarFuelType : carState.selectedFuelType,
                           requestFocusOnTap: false,
                           label: const Text('Fuel Type'),
                           onSelected: (CarFuelType? fuelType) {
-                            carState.updateSelectedFuelType(
-                                fuelType ?? CarFuelType.label);
+                            carState.updateSelectedFuelType(fuelType ?? CarFuelType.label);
                             setState(() {
                               selectedFuelType = fuelType;
                               _isBtnDisabled = false;
                             });
                           },
-                          dropdownMenuEntries: availableFuelTypes
-                              .map<DropdownMenuEntry<CarFuelType>>(
-                                  (CarFuelType type) {
+                          dropdownMenuEntries: availableFuelTypes.map<DropdownMenuEntry<CarFuelType>>((CarFuelType type) {
                             return DropdownMenuEntry<CarFuelType>(
                               value: type,
                               label: type.name,
                               enabled: type.name != 'Select',
-                              style: MenuItemButton.styleFrom(
-                                  foregroundColor: Colors.black),
+                              style: MenuItemButton.styleFrom(foregroundColor: Colors.black),
                             );
                           }).toList(),
                         ),

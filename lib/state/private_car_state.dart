@@ -25,8 +25,8 @@ class PrivateCarState extends ChangeNotifier {
     _selectedSize = newValue;
     notifyListeners();
   }
-  
-   void resetEmissions() {
+
+  void resetEmissions() {
     _emissions = [];
     _minEmission = 0;
     _maxEmission = 0;
@@ -59,10 +59,10 @@ class PrivateCarState extends ChangeNotifier {
   }
 
   void getTreeIcons(int index, BuildContext context) {
-  final settings = Provider.of<Settings>(context, listen: false);
-  _treeIcons = upDateTreeIcons(_emissions, index, settings);
-  notifyListeners();
-}
+    final settings = Provider.of<Settings>(context, listen: false);
+    _treeIcons = upDateTreeIcons(_emissions, index, settings);
+    notifyListeners();
+  }
 
   int getEmission(int index) {
     if (index >= 0 && index < _emissions.length) {

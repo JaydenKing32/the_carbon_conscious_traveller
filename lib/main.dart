@@ -14,7 +14,7 @@ import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize settings first
   final settings = Settings();
   await settings.loadPreferences();
@@ -43,8 +43,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'The Carbon Conscious Traveller',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 7, 179, 110)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 7, 179, 110)),
         primaryColor: const Color.fromARGB(255, 7, 179, 110),
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 24),
@@ -63,17 +62,14 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: Consumer<Settings>(
-        builder: (context, settings, child) {
-          return const MyHomePage(
-            title: 'The Carbon Conscious Traveller',
-          );
-        }
-      ),
+      home: Consumer<Settings>(builder: (context, settings, child) {
+        return const MyHomePage(
+          title: 'The Carbon Conscious Traveller',
+        );
+      }),
     );
   }
 }
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

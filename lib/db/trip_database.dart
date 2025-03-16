@@ -40,18 +40,21 @@ class TripDatabase {
         distance TEXT NOT NULL,
         emissions REAL NOT NULL,
         mode TEXT NOT NULL,
-        reduction REAL NOT NULL DEFAULT 0,  
-        complete INTEGER NOT NULL DEFAULT 0, 
-        model TEXT NOT NULL DEFAULT ""     
+        reduction REAL NOT NULL DEFAULT 0,
+        complete INTEGER NOT NULL DEFAULT 0,
+        model TEXT NOT NULL DEFAULT ""
       )
     ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE trips ADD COLUMN reduction REAL NOT NULL DEFAULT 0');
-      await db.execute('ALTER TABLE trips ADD COLUMN complete INTEGER NOT NULL DEFAULT 0');
-      await db.execute('ALTER TABLE trips ADD COLUMN model TEXT NOT NULL DEFAULT ""');
+      await db.execute(
+          'ALTER TABLE trips ADD COLUMN reduction REAL NOT NULL DEFAULT 0');
+      await db.execute(
+          'ALTER TABLE trips ADD COLUMN complete INTEGER NOT NULL DEFAULT 0');
+      await db.execute(
+          'ALTER TABLE trips ADD COLUMN model TEXT NOT NULL DEFAULT ""');
     }
   }
 
@@ -80,18 +83,18 @@ class TripDatabase {
     final db = await instance.database;
     return await db.delete('trips', where: 'id = ?', whereArgs: [id]);
   }
+
   Future<Trip?> getTripById(int id) async {
-  final db = await database;
-  final maps = await db.query(
-    'trips',
-    where: 'id = ?',
-    whereArgs: [id],
-  );
+    final db = await database;
+    final maps = await db.query(
+      'trips',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
 
-  if (maps.isNotEmpty) {
-    return Trip.fromMap(maps.first);
+    if (maps.isNotEmpty) {
+      return Trip.fromMap(maps.first);
+    }
+    return null;
   }
-  return null;
 }
-}
-

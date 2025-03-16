@@ -1,5 +1,3 @@
-
-
 class DateModel {
   final int year;
   final int month;

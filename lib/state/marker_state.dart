@@ -6,7 +6,7 @@ class MarkerState with ChangeNotifier {
   final Set<Marker> _markers = {};
 
   Set<Marker> get markers => _markers;
-  
+
   void clearMarkers() {
     _markers.clear();
     notifyListeners();

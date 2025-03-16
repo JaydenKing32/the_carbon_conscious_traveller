@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -32,37 +31,34 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Future<void> _loadTrips() async {
     List<Trip> allTrips = await TripDatabase.instance.getAllTrips();
     setState(() {
-      _completedTrips = allTrips
-          .where((trip) => trip.complete && _isSameMonthYear(trip.date))
-          .toList();
+      _completedTrips = allTrips.where((trip) => trip.complete && _isSameMonthYear(trip.date)).toList();
     });
   }
 
   bool _isSameMonthYear(String tripDate) {
     DateTime tripDateTime = DateTime.parse(tripDate);
-    return tripDateTime.year == _selectedDate.year &&
-        tripDateTime.month == _selectedDate.month;
+    return tripDateTime.year == _selectedDate.year && tripDateTime.month == _selectedDate.month;
   }
 
   void _changeMonth(int delta) {
-  final newDate = DateTime(_selectedDate.year, _selectedDate.month + delta, 1);
-  final now = DateTime.now();
-  
-  setState(() {
-    _selectedDate = newDate;
-    
-    // Check if the new month is the current month
-    if (newDate.year == now.year && newDate.month == now.month) {
-      // For current month, start from yesterday
-      _currentStartDate = now.subtract(const Duration(days: 1));
-    } else {
-      // For other months, start from first day
-      _currentStartDate = DateTime(newDate.year, newDate.month, 1);
-    }
-    
-    _loadTrips();
-  });
-}
+    final newDate = DateTime(_selectedDate.year, _selectedDate.month + delta, 1);
+    final now = DateTime.now();
+
+    setState(() {
+      _selectedDate = newDate;
+
+      // Check if the new month is the current month
+      if (newDate.year == now.year && newDate.month == now.month) {
+        // For current month, start from yesterday
+        _currentStartDate = now.subtract(const Duration(days: 1));
+      } else {
+        // For other months, start from first day
+        _currentStartDate = DateTime(newDate.year, newDate.month, 1);
+      }
+
+      _loadTrips();
+    });
+  }
 
   void _moveWindow(int delta) {
     setState(() {
@@ -70,7 +66,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     });
   }
 
-    double _calculateTotalDistance() {
+  double _calculateTotalDistance() {
     return _completedTrips.fold(0, (sum, trip) {
       double distance = double.tryParse(trip.distance.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
       return sum + distance;
@@ -86,13 +82,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       return "You've traveled more than a marathon! 🏃‍♂️";
     } else if (distance < 892) {
       return "That's almost the distance from Sydney to Melbourne! 🏙️🚆";
-    } else if (distance < 384400 ) {
+    } else if (distance < 384400) {
       return "That's almost the distance to the Moon! 🌙🚀";
     } else {
       return "You've traveled a distance beyond Earth's orbit! 🛰️";
     }
   }
-  
+
   Map<int, Map<String, double>> _aggregateData() {
     final Map<int, Map<String, double>> dailyEmissions = {};
 
@@ -117,20 +113,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     final formattedMonth = DateFormat('MMMM yyyy').format(_selectedDate);
-    final formattedMonthName = DateFormat('MMMM').format(_selectedDate); 
+    final formattedMonthName = DateFormat('MMMM').format(_selectedDate);
     final dailyData = _aggregateData();
     double totalDistance = _calculateTotalDistance();
     String funFact = _getFunFact(totalDistance);
-   
+
     // Generate data for 3-day window (including days from next month if needed)
     final Map<DateTime, Map<String, double>> filteredData = {};
     for (int i = 0; i < 3; i++) {
       final currentDay = _currentStartDate.add(Duration(days: i));
       final isInSelectedMonth = currentDay.month == _selectedDate.month;
 
-      filteredData[currentDay] = isInSelectedMonth
-          ? dailyData[currentDay.day] ?? {'emissions': 0.0, 'reduction': 0.0}
-          : {'emissions': 0.0, 'reduction': 0.0};
+      filteredData[currentDay] = isInSelectedMonth ? dailyData[currentDay.day] ?? {'emissions': 0.0, 'reduction': 0.0} : {'emissions': 0.0, 'reduction': 0.0};
     }
 
     return Scaffold(
@@ -158,12 +152,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                  "In $formattedMonthName \nYou have consciously travelled: " // Modified text
-                  "${totalDistance.toStringAsFixed(1)} km!",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                          "In $formattedMonthName \nYou have consciously travelled: " // Modified text
+                          "${totalDistance.toStringAsFixed(1)} km!",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       // Earth emoji sized the same as the text
@@ -275,4 +269,3 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 }
-

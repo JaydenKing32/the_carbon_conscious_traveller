@@ -63,8 +63,7 @@ class TransitSteps extends StatelessWidget {
                 ),
                 // Bus Route Box
                 Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.015, vertical: screenHeight * 0.002),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.015, vertical: screenHeight * 0.002),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
                     color: parseColor(step.transit?.line?.color, Colors.white),
@@ -74,9 +73,7 @@ class TransitSteps extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: screenWidth * 0.025, // Smaller text
-                      color: step.transit?.line?.textColor != null
-                          ? parseColor(step.transit?.line?.textColor, Colors.black)
-                          : Colors.black,
+                      color: step.transit?.line?.textColor != null ? parseColor(step.transit?.line?.textColor, Colors.black) : Colors.black,
                     ),
                     minFontSize: 8,
                     maxLines: 1,

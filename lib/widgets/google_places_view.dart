@@ -3,8 +3,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart'
-    as places;
+import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart' as places;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_directions_api/google_directions_api.dart' as dir;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -130,12 +129,10 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                     FocusScope.of(context).unfocus();
                   });
                 },
-                onChanged: (value) =>
-                    _onPredictTextChanged(value, "destination"),
+                onChanged: (value) => _onPredictTextChanged(value, "destination"),
                 decoration: const InputDecoration(
                   label: Text("Enter a destination"),
-                  icon: Icon(Icons.location_searching_outlined,
-                      color: Colors.grey),
+                  icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
                 ),
               ),
             ],
@@ -146,8 +143,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         color: Colors.white,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children:
-              (_predictions ?? []).map(_buildPredictionItem).toList(growable: false),
+          children: (_predictions ?? []).map(_buildPredictionItem).toList(growable: false),
         ),
       ),
       const Padding(
@@ -301,8 +297,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         }
       }
 
-      if (coordsState.originCoords != const LatLng(0, 0) &&
-          coordsState.destinationCoords != const LatLng(0, 0)) {
+      if (coordsState.originCoords != const LatLng(0, 0) && coordsState.destinationCoords != const LatLng(0, 0)) {
         if (polylineState.mode.isEmpty) {
           polylineState.transportMode = "driving"; // Default
         }
@@ -341,12 +336,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       carState.resetEmissions();
       motorcycleState.resetEmissions();
 
-      polylineState
-          .getPolyline([
-            coordinatesModel.originCoords,
-            coordinatesModel.destinationCoords
-          ])
-          .then((_) {
+      polylineState.getPolyline([coordinatesModel.originCoords, coordinatesModel.destinationCoords]).then((_) {
         if (polylineState.distances.isEmpty) {
           return;
         }
@@ -377,7 +367,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
           // Calculate Motorcycle Emissions
           final motoEmissionsCalc = PrivateVehicleEmissionsCalculator(
-           polylinesState: polylineState,
+            polylinesState: polylineState,
             settings: settings,
             routeBikeSize: motorcycleState.selectedValue ?? MotorcycleSize.label,
           );
@@ -417,12 +407,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       carState.resetEmissions();
       motorcycleState.resetEmissions();
 
-      polylineState
-          .getPolyline([
-            coordinatesModel.originCoords,
-            coordinatesModel.destinationCoords
-          ])
-          .then((_) {
+      polylineState.getPolyline([coordinatesModel.originCoords, coordinatesModel.destinationCoords]).then((_) {
         if (polylineState.distances.isEmpty) {
           return;
         }
@@ -485,8 +470,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     final place = MapService().getAddressFromLatLng();
     place.then((placemark) {
       if (placemark != null) {
-        final currentAddress =
-            "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
+        final currentAddress = "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
         setState(() {
           originController.text = currentAddress;
         });

@@ -10,9 +10,9 @@ class Trip {
   String distance;
   double emissions;
   String mode;
-  double reduction;  
-  bool complete;    
-  String model;      
+  double reduction;
+  bool complete;
+  String model;
 
   Trip({
     this.id,
@@ -26,9 +26,9 @@ class Trip {
     required this.distance,
     required this.emissions,
     required this.mode,
-    required this.reduction,  
-    required this.complete,   
-    required this.model,      
+    required this.reduction,
+    required this.complete,
+    required this.model,
   });
 
   Map<String, dynamic> toMap() {
@@ -44,9 +44,9 @@ class Trip {
       'distance': distance,
       'emissions': emissions,
       'mode': mode,
-      'reduction': reduction, 
-      'complete': complete ? 1 : 0, 
-      'model': model,           
+      'reduction': reduction,
+      'complete': complete ? 1 : 0,
+      'model': model,
     };
   }
 
@@ -63,9 +63,9 @@ class Trip {
       distance: map['distance'],
       emissions: map['emissions'],
       mode: map['mode'],
-      reduction: map['reduction'] ?? 0.0,   
-      complete: (map['complete'] ?? 0) == 1, 
-      model: map['model'] ?? "",      
+      reduction: map['reduction'] ?? 0.0,
+      complete: (map['complete'] ?? 0) == 1,
+      model: map['model'] ?? "",
     );
   }
 }

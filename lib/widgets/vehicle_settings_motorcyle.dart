@@ -127,9 +127,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                               selectedSize = motorcycleState.selectedValue;
                             });
                           },
-                          dropdownMenuEntries: MotorcycleSize.values
-                              .map<DropdownMenuEntry<MotorcycleSize>>(
-                                  (MotorcycleSize size) {
+                          dropdownMenuEntries: MotorcycleSize.values.map<DropdownMenuEntry<MotorcycleSize>>((MotorcycleSize size) {
                             return DropdownMenuEntry<MotorcycleSize>(
                               value: size,
                               label: size.name,

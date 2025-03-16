@@ -103,8 +103,7 @@ class _FlyingState extends State<Flying> {
       ),
     ]);
 
-    final String requestURL =
-        "https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions?key=$_apiKey";
+    final String requestURL = "https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions?key=$_apiKey";
 
     try {
       final response = await http.post(
@@ -121,8 +120,7 @@ class _FlyingState extends State<Flying> {
           _responseBody = ResponseBody.fromJson(responseData);
         });
 
-        if (_responseBody?.flightEmissions != null &&
-            _responseBody!.flightEmissions!.isNotEmpty) {
+        if (_responseBody?.flightEmissions != null && _responseBody!.flightEmissions!.isNotEmpty) {
           // Assuming you're displaying emissions for the first flight
           final emissions = _responseBody!.flightEmissions![0].emissionsGramsPerPax;
           _showEmissionsDialog(emissions);
@@ -239,9 +237,7 @@ class _FlyingState extends State<Flying> {
                         ),
                         textCapitalization: TextCapitalization.characters,
                         validator: (value) {
-                          if (value == null ||
-                              !_regexes[0]
-                                  .hasMatch(value.toUpperCase().replaceAll(':', '').trim())) {
+                          if (value == null || !_regexes[0].hasMatch(value.toUpperCase().replaceAll(':', '').trim())) {
                             return _errorMessages[0];
                           }
                           return null;
@@ -257,9 +253,7 @@ class _FlyingState extends State<Flying> {
                         ),
                         textCapitalization: TextCapitalization.characters,
                         validator: (value) {
-                          if (value == null ||
-                              !_regexes[1]
-                                  .hasMatch(value.toUpperCase().replaceAll(':', '').trim())) {
+                          if (value == null || !_regexes[1].hasMatch(value.toUpperCase().replaceAll(':', '').trim())) {
                             return _errorMessages[1];
                           }
                           return null;
@@ -275,8 +269,7 @@ class _FlyingState extends State<Flying> {
                         ),
                         textCapitalization: TextCapitalization.characters,
                         validator: (value) {
-                          if (value == null ||
-                              !_regexes[2].hasMatch(value.toUpperCase().trim())) {
+                          if (value == null || !_regexes[2].hasMatch(value.toUpperCase().trim())) {
                             return _errorMessages[2];
                           }
                           return null;

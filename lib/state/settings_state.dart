@@ -17,7 +17,7 @@ class Settings extends ChangeNotifier {
   CarSize get selectedCarSize => _selectedCarSize;
   CarFuelType get selectedCarFuelType => _selectedCarFuelType;
   bool get useCarForCalculations => _useCarForCalculations;
- 
+
   // Add motorcycle-specific properties
   MotorcycleSize _selectedMotorcycleSize = MotorcycleSize.small;
   bool _useSpecifiedMotorcycle = false;
@@ -85,11 +85,12 @@ class Settings extends ChangeNotifier {
 
   Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     _useSpecifiedCar = prefs.getBool('useSpecifiedCar') ?? false;
     _useCarForCalculations = prefs.getBool('useCarForCalculations') ?? false;
     _useSpecifiedMotorcycle = prefs.getBool('useSpecifiedMotorcycle') ?? false;
-    _useMotorcycleForCalculations = prefs.getBool('useMotorcycleForCalculations') ?? false;
+    _useMotorcycleForCalculations =
+        prefs.getBool('useMotorcycleForCalculations') ?? false;
 
     for (final type in TreeIconType.values) {
       final key = _getStorageKey(type);
@@ -98,9 +99,9 @@ class Settings extends ChangeNotifier {
         _emissionValues[type] = savedValue;
       }
     }
-    
-     final carSizeString = prefs.getString('selectedCarSize');
-    _selectedCarSize = carSizeString != null 
+
+    final carSizeString = prefs.getString('selectedCarSize');
+    _selectedCarSize = carSizeString != null
         ? stringToCarSize(carSizeString)
         : CarSize.smallCar;
 
@@ -110,13 +111,13 @@ class Settings extends ChangeNotifier {
         : CarFuelType.petrol;
     notifyListeners();
 
-     final motorcycleSizeString = prefs.getString('selectedMotorcycleSize');
-    _selectedMotorcycleSize = motorcycleSizeString != null 
+    final motorcycleSizeString = prefs.getString('selectedMotorcycleSize');
+    _selectedMotorcycleSize = motorcycleSizeString != null
         ? stringToMotorcycleSize(motorcycleSizeString)
         : MotorcycleSize.small;
   }
 
-   // Add new methods
+  // Add new methods
   void toggleUseSpecifiedCar(bool value) async {
     _useSpecifiedCar = value;
     notifyListeners();
@@ -148,7 +149,7 @@ class Settings extends ChangeNotifier {
   Future<void> updateEmissionValue(TreeIconType type, double value) async {
     _emissionValues[type] = value;
     notifyListeners();
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_getStorageKey(type), value);
   }

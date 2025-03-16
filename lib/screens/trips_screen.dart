@@ -71,6 +71,7 @@ class _TripsScreenState extends State<TripsScreen> {
       );
     }
   }
+
   IconData _getTransportIcon(String mode) {
     switch (mode.toLowerCase()) {
       case 'car':
@@ -85,9 +86,7 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   String _formatEmissions(double emissions) {
-    return emissions >= 1000
-        ? '${(emissions / 1000).toStringAsFixed(2)} kg'
-        : '${emissions.round()} g';
+    return emissions >= 1000 ? '${(emissions / 1000).toStringAsFixed(2)} kg' : '${emissions.round()} g';
   }
 
   String _formatDate(String isoDate) {
@@ -97,7 +96,6 @@ class _TripsScreenState extends State<TripsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final settings = Provider.of<Settings>(context);
 
     return Scaffold(
@@ -149,17 +147,13 @@ class _TripsScreenState extends State<TripsScreen> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    
                     IconButton(
                       icon: Icon(
                         trip.complete ? Icons.check_circle : Icons.cancel_outlined,
                         color: trip.complete ? Colors.green : Colors.black,
                       ),
-                     onPressed: settings.enableGeolocationVerification
-                                  ? () => _attemptGeolocCompletion(trip)
-                                  : () => _toggleTripCompletion(trip.id!, trip.complete),
+                      onPressed: settings.enableGeolocationVerification ? () => _attemptGeolocCompletion(trip) : () => _toggleTripCompletion(trip.id!, trip.complete),
                     ),
-
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.black),
                       onPressed: () => _deleteTrip(trip.id!),
