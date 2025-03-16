@@ -316,7 +316,7 @@ class _CarListViewState extends State<CarListView> {
                                   _saveTrip(index);
                                 }
                               },
-                              tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1) ? 'Удалить поездку' : 'Сохранить поездку',
+                              tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1) ? 'Delete Trip' : 'Save Trip',
                             ),
                             IconButton(
                               icon: Icon(
@@ -329,7 +329,7 @@ class _CarListViewState extends State<CarListView> {
                                   ? () => _attemptGeolocCompletion(index)
                                   // Otherwise => old behavior, just toggle completion
                                   : () => _toggleTripCompletion(index),
-                              tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
+                              tooltip: isCompleted ? 'Mark Incomplete' : 'Mark Complete',
                             ),
                             const SizedBox(height: 5),
                           ],

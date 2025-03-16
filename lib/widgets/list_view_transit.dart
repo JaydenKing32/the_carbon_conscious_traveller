@@ -294,7 +294,7 @@ class _TransitListViewState extends State<TransitListView> {
                                   _saveTrip(index);
                                 }
                               },
-                              tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1) ? 'Удалить поездку' : 'Сохранить поездку',
+                              tooltip: _savedTripIds.contains(_indexToTripId[index] ?? -1) ? 'Delete Trip' : 'Save Trip',
                             ),
                             IconButton(
                               icon: Icon(
@@ -303,7 +303,7 @@ class _TransitListViewState extends State<TransitListView> {
                                 size: screenWidth * 0.07, // Scaled size
                               ),
                               onPressed: settings.enableGeolocationVerification ? () => _attemptGeolocCompletion(index) : () => _toggleTripCompletion(index),
-                              tooltip: isCompleted ? 'Отметить как незавершённое' : 'Отметить как завершённое',
+                              tooltip: isCompleted ? 'Mark Incomplete' : 'Mark Complete',
                             ),
                             SizedBox(height: screenHeight * 0.005),
                           ],

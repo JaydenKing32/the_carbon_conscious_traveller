@@ -346,7 +346,6 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
-
                               Text(
                                 widget.polylinesState.durationTexts[index],
                                 style: Theme.of(context).textTheme.bodySmall,
@@ -354,7 +353,6 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 overflow: TextOverflow.visible,
                               ),
                               const SizedBox(height: 4),
-                              // Иконки Дерева
                               TreeIcons(
                                 treeIconName: widget.vehicleState.treeIcons,
                                 settings: settings,
@@ -391,8 +389,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                   // Otherwise => old behavior, just toggle completion
                                   : () => _toggleTripCompletion(index),
                             ),
-
-                            const SizedBox(height: 5), // Вертикальный отступ
+                            const SizedBox(height: 5),
                           ],
                         ),
                       ],
