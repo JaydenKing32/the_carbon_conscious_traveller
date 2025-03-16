@@ -5,7 +5,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   Future<void> _launchGitHub() async {
-    final Uri url = Uri.parse("https://github.com/svtsv01/the_carbon_conscious_traveller.git");
+    final Uri url = Uri.parse("https://github.com/JaydenKing32/the_carbon_conscious_traveller.git");
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
@@ -19,13 +19,6 @@ class AboutScreen extends StatelessWidget {
     );
     if (!await launchUrl(emailUri)) {
       throw Exception('Could not launch email client');
-    }
-  }
-
-  Future<void> _launchDonationPage() async {
-    final Uri donationUrl = Uri.parse("https://your-donation-page.com"); // Замените на реальный URL
-    if (!await launchUrl(donationUrl, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $donationUrl');
     }
   }
 
@@ -70,20 +63,6 @@ class AboutScreen extends StatelessWidget {
                     _featureItem(context, "📊 Visual Carbon Stats", "Track emissions with charts & fun facts."),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.favorite),
-                      label: const Text("Support Us"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: _launchDonationPage,
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
                       icon: const Icon(Icons.support_agent),
                       label: const Text("Contact Support"),
                       style: ElevatedButton.styleFrom(
@@ -114,21 +93,20 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              color: Colors.grey[200],
-              width: double.infinity,
-              child: const Center(
-                child: Text(
-                  "Proudly made by Svyatoslav Kushnarev",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 245, 61, 48),
-                  ),
-                ),
-              ),
+            const Text(
+              "Developers",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            Container(
+                padding: const EdgeInsets.symmetric(horizontal: 60),
+                child: const Row(spacing: 30, children: [
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Jayden King"), Text("Isac Kim"), Text("Ngoc Nguyen")]),
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text("Paola Reategui"),
+                    Text("Svyatoslav Kushnarev"),
+                    Text("Young Choon Lee"),
+                  ])
+                ]))
           ],
         ),
       ),
@@ -141,7 +119,6 @@ class AboutScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Используем Icon вместо Emoji для консистентности
           const Icon(Icons.check_circle, color: Colors.green, size: 20),
           const SizedBox(width: 8),
           Expanded(
