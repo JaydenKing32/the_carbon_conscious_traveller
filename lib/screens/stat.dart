@@ -68,21 +68,20 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   double _calculateTotalDistance() {
     return _completedTrips.fold(0, (sum, trip) {
-      double distance = double.tryParse(trip.distance.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
-      return sum + distance;
+      return sum + trip.distance;
     });
   }
 
   String _getFunFact(double distance) {
     if (distance < 1) {
       return "You're just getting started! 🏁";
-    } else if (distance < 5) {
+    } else if (distance < 5000) {
       return "That's about the length of the Golden Gate Bridge 🌉";
-    } else if (distance < 42) {
+    } else if (distance < 42000) {
       return "You've traveled more than a marathon! 🏃‍♂️";
-    } else if (distance < 892) {
+    } else if (distance < 892000) {
       return "That's almost the distance from Sydney to Melbourne! 🏙️🚆";
-    } else if (distance < 384400) {
+    } else if (distance < 384400000) {
       return "That's almost the distance to the Moon! 🌙🚀";
     } else {
       return "You've traveled a distance beyond Earth's orbit! 🛰️";

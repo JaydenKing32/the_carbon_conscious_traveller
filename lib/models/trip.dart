@@ -7,7 +7,7 @@ class Trip {
   String destination;
   double destLat;
   double destLng;
-  String distance;
+  int distance;
   double emissions;
   String mode;
   double reduction;
@@ -60,12 +60,20 @@ class Trip {
       destination: map['destination'],
       destLat: map['destLat'] ?? 0.0,
       destLng: map['destLng'] ?? 0.0,
-      distance: map['distance'],
+      distance: map['distance'] ?? 0,
       emissions: map['emissions'],
       mode: map['mode'],
       reduction: map['reduction'] ?? 0.0,
       complete: (map['complete'] ?? 0) == 1,
       model: map['model'] ?? "",
     );
+  }
+
+  String distanceString() {
+    if (distance >= 1000) {
+      return "${(distance / 1000.0).toStringAsFixed(2)} km";
+    } else {
+      return "$distance m";
+    }
   }
 }

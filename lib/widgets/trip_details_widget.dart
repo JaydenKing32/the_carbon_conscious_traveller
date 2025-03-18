@@ -58,7 +58,7 @@ class TripDetailsWidget extends StatelessWidget {
           _tripDetailRow("Destination", trip.destination),
           _tripDetailRow("Mode", trip.mode),
           _tripDetailRow("Type", trip.model),
-          _tripDetailRow("Distance", trip.distance),
+          _tripDetailRow("Distance", trip.distanceString()),
           _tripDetailRow("Emissions", formatGrams(trip.emissions), isBold: true),
           _tripDetailRow("Reduction", formatGrams(trip.reduction), isBold: true, color: Colors.green),
         ],

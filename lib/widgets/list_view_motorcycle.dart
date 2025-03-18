@@ -83,7 +83,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
       destination: legs?.last.endAddress ?? "Unknown",
       destLat: end?.latitude ?? 0.0,
       destLng: end?.longitude ?? 0.0,
-      distance: widget.polylinesState.distanceTexts[index],
+      distance: legs?.map((l) => l.distance?.value?.toInt()).reduce((a, b) => (a ?? 0) + (b ?? 0)) ?? 0,
       emissions: widget.vehicleState.getEmission(index).toDouble(),
       mode: "Motorcycle",
       reduction: reduction,

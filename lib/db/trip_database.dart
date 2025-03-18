@@ -20,7 +20,7 @@ class TripDatabase {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -37,7 +37,7 @@ class TripDatabase {
         destination TEXT NOT NULL,
         destLat REAL NOT NULL,
         destLng REAL NOT NULL,
-        distance TEXT NOT NULL,
+        distance INTEGER NOT NULL DEFAULT 0,
         emissions REAL NOT NULL,
         mode TEXT NOT NULL,
         reduction REAL NOT NULL DEFAULT 0,
@@ -49,12 +49,16 @@ class TripDatabase {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute(
-          'ALTER TABLE trips ADD COLUMN reduction REAL NOT NULL DEFAULT 0');
-      await db.execute(
-          'ALTER TABLE trips ADD COLUMN complete INTEGER NOT NULL DEFAULT 0');
-      await db.execute(
-          'ALTER TABLE trips ADD COLUMN model TEXT NOT NULL DEFAULT ""');
+      await db.execute('ALTER TABLE trips ADD COLUMN reduction REAL NOT NULL DEFAULT 0');
+      await db.execute('ALTER TABLE trips ADD COLUMN complete INTEGER NOT NULL DEFAULT 0');
+      await db.execute('ALTER TABLE trips ADD COLUMN model TEXT NOT NULL DEFAULT ""');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE trips ADD COLUMN temp INTEGER NOT NULL DEFAULT 0');
+      // Cut off " km", convert to meters
+      await db.execute('UPDATE trips SET temp = SUBSTR(distance, 0, LENGTH(distance) - 2) * 1000');
+      await db.execute('ALTER TABLE trips DROP distance');
+      await db.execute('ALTER TABLE trips RENAME COLUMN temp TO distance');
     }
   }
 

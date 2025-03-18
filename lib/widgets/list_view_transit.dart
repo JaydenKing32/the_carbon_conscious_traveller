@@ -68,7 +68,7 @@ class _TransitListViewState extends State<TransitListView> {
       destination: legs?.last.endAddress ?? "Unknown",
       destLat: end?.latitude ?? 0.0,
       destLng: end?.longitude ?? 0.0,
-      distance: widget.snapshot.data![index].legs.first.distance?.text ?? "0 km",
+      distance: legs?.map((l) => l.distance?.value?.toInt()).reduce((a, b) => (a ?? 0) + (b ?? 0)) ?? 0,
       emissions: widget.emissions[index],
       mode: "Transit",
       reduction: reduction,
