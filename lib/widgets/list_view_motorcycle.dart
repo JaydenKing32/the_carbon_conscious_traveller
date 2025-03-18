@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -70,15 +71,18 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     if (motoModel.isNotEmpty) {
       motoModel = motoModel[0].toUpperCase() + motoModel.substring(1);
     }
+    List<Leg>? legs = widget.polylinesState.routes?[index].legs;
+    GeoCoord? start = legs?.first.steps?.first.startLocation;
+    GeoCoord? end = legs?.last.steps?.last.endLocation;
 
     final trip = Trip(
       date: DateTime.now().toIso8601String(),
-      origin: route,
-      origLat: 0.0, // Replace with actual origin latitude
-      origLng: 0.0, // Replace with actual origin longitude
-      destination: route, // Assuming route uniquely defines origin and destination
-      destLat: 0.0, // Replace with actual destination latitude
-      destLng: 0.0, // Replace with actual destination longitude
+      origin: legs?.first.startAddress ?? "Unknown",
+      origLat: start?.latitude ?? 0.0,
+      origLng: start?.longitude ?? 0.0,
+      destination: legs?.last.endAddress ?? "Unknown",
+      destLat: end?.latitude ?? 0.0,
+      destLng: end?.longitude ?? 0.0,
       distance: widget.polylinesState.distanceTexts[index],
       emissions: widget.vehicleState.getEmission(index).toDouble(),
       mode: "Motorcycle",

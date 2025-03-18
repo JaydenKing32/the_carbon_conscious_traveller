@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -60,15 +61,18 @@ class _CarListViewState extends State<CarListView> {
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
     double reduction = max(0, maxEmission - selectedEmission);
     String carModel = "${widget.vehicleState.selectedSize?.toString().split('.').last} - ${widget.vehicleState.selectedFuelType?.toString().split('.').last}";
+    List<Leg>? legs = widget.polylinesState.routes?[index].legs;
+    GeoCoord? start = legs?.first.steps?.first.startLocation;
+    GeoCoord? end = legs?.last.steps?.last.endLocation;
 
     final trip = Trip(
         date: DateTime.now().toIso8601String(),
-        origin: widget.polylinesState.routeSummary[index],
-        origLat: 0.0,
-        origLng: 0.0,
-        destination: widget.polylinesState.routeSummary[index],
-        destLat: 0.0,
-        destLng: 0.0,
+        origin: legs?.first.startAddress ?? "Unknown",
+        origLat: start?.latitude ?? 0.0,
+        origLng: start?.longitude ?? 0.0,
+        destination: legs?.last.endAddress ?? "Unknown",
+        destLat: end?.latitude ?? 0.0,
+        destLng: end?.longitude ?? 0.0,
         distance: widget.polylinesState.distanceTexts[index],
         emissions: widget.vehicleState.getEmission(index).toDouble(),
         mode: "Car",
