@@ -22,6 +22,8 @@ import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.da
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
+import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng_bounds.dart' as LLBounds;
+import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng.dart' as LL;
 
 class GooglePlacesView extends StatefulWidget {
   const GooglePlacesView({super.key});
@@ -223,11 +225,12 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     if (!hasContent) return;
 
     try {
-      final result = await _places.findAutocompletePredictions(
-        _predictLastText!,
-        countries: _countries,
-        newSessionToken: false,
-      );
+      final ll = MapService().getUserLatLng()!;
+      const biasRadius = 0.1;
+      LLBounds.LatLngBounds? bounds = LLBounds.LatLngBounds(
+          southwest: LL.LatLng(lat: ll.latitude - biasRadius, lng: ll.longitude - biasRadius), northeast: LL.LatLng(lat: ll.latitude + biasRadius, lng: ll.longitude + biasRadius));
+
+      final result = await _places.findAutocompletePredictions(_predictLastText!, countries: _countries, newSessionToken: false, locationBias: bounds);
       setState(() {
         _predictions = result.predictions;
         _predicting = false;
