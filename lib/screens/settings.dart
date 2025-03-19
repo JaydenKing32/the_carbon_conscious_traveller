@@ -233,7 +233,7 @@ class SettingsScreen extends StatelessWidget {
                               'Use your specified motorcycle for emissions calculations',
                               style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.035, color: Colors.grey),
                             ),
-                            value: settings.x,
+                            value: settings.useMotorcycleForCalculations,
                             onChanged: (bool value) => settings.toggleUseMotorcycleForCalculations(value),
                           ),
 
@@ -246,8 +246,8 @@ class SettingsScreen extends StatelessWidget {
                               'If both a motorcycle and car are specified for use in calculations, use the specified motorcycle instead of the car, otherwise the car will be used',
                               style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.035, color: Colors.grey), // Responsive subtitle
                             ),
-                            value: settings.y,
-                            onChanged: (bool value) => settings.toggleUseMotorcycle1(value),
+                            value: settings.useMotorcycleInsteadOfCar,
+                            onChanged: (bool value) => settings.toggleUseMotorcycleInsteadOfCar(value),
                           ),
                         ],
                       ),
