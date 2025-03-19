@@ -46,9 +46,7 @@ class TransitEmissionsCalculator {
         for (var step in leg.steps!) {
           var distance = step.distance?.value ?? 0;
           if (step.travelMode.toString() == 'TRANSIT') {
-            emissions += (getPublicFactor(
-                    (step.transit?.line?.vehicle?.type.toString() ?? ''))) *
-                distance.round();
+            emissions += (getPublicFactor((step.transit?.line?.vehicle?.type.toString() ?? ''))) * distance.round();
           }
         }
       }
@@ -63,9 +61,7 @@ class TransitEmissionsCalculator {
       var stepEmissions = 0.0;
       var distance = step.distance?.value ?? 0;
       if (step.travelMode.toString() == 'TRANSIT') {
-        stepEmissions = (getPublicFactor(
-                (step.transit?.line?.vehicle?.type.toString() ?? ''))) *
-            distance.round();
+        stepEmissions = (getPublicFactor((step.transit?.line?.vehicle?.type.toString() ?? ''))) * distance.round();
       }
       // Return the calculated emissions for each step
       return stepEmissions;

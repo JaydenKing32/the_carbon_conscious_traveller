@@ -19,47 +19,10 @@ class PrivateCarEmissionsCalculator {
     required this.routeCarSize,
     required this.routeCarFuel,
   }) {
-    calculateFactor();
-  }
-
-  /// Build factor either as:
-  /// - The normal “routeCar” factor, OR
-  /// - That minus the user's “specified car” factor, if useCarForCalculations is true.
-  void calculateFactor() {
-    if (settings.useSpecifiedCar && !settings.useCarForCalculations) {
-      final userCarSize = settings.selectedCarSize;
-      final userFuelType = settings.selectedCarFuelType;
-
-      double userCarFactor = 0.0;
-      if (userCarSize != CarSize.label && userFuelType != CarFuelType.label) {
-        userCarFactor = carValuesMatrix[userCarSize.index][userFuelType.index];
-      }
-      factor = userCarFactor;
+    if (routeCarSize == CarSize.label || routeCarFuel == CarFuelType.label) {
+      factor = 0.0;
     } else {
-      // 1) If routeCar is "Select", set factor=0
-      if (routeCarSize == CarSize.label || routeCarFuel == CarFuelType.label) {
-        factor = 0.0;
-        return;
-      }
-
-      // 2) The "standard" factor from the matrix for this route's chosen car
-      final standardFactor = carValuesMatrix[routeCarSize.index][routeCarFuel.index];
-
-      // 3) If user wants “useCarForCalculations”, we subtract the user's specified car factor
-      if (settings.useCarForCalculations) {
-        final userCarSize = settings.selectedCarSize;
-        final userFuelType = settings.selectedCarFuelType;
-
-        double userCarFactor = 0.0;
-        if (userCarSize != CarSize.label && userFuelType != CarFuelType.label) {
-          userCarFactor = carValuesMatrix[userCarSize.index][userFuelType.index];
-        }
-
-        // For instance: difference approach
-        factor = standardFactor - userCarFactor > 0 ? standardFactor - userCarFactor : 0;
-      } else {
-        factor = standardFactor;
-      }
+      factor = carValuesMatrix[routeCarSize.index][routeCarFuel.index];
     }
   }
 

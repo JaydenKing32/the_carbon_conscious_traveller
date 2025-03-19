@@ -20,7 +20,7 @@ class _TravelModeViewState extends State<TravelModeView> {
       return Builder(builder: (context) {
         if (polylinesState.result.isNotEmpty) {
           if (polylinesState.mode == "motorcycling") {
-            return const MotorcyleSettings();
+            return const MotorcycleSettings();
           } else if (polylinesState.mode == "transit") {
             return const Transit();
           } else if (polylinesState.mode == "flying") {

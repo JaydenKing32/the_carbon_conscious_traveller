@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
@@ -11,16 +12,12 @@ import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class MotorcycleListView extends StatefulWidget {
-  const MotorcycleListView({
-    super.key,
-    required this.vehicleState,
-    required this.polylinesState,
-    required this.icon,
-  });
+  const MotorcycleListView({super.key, required this.vehicleState, required this.polylinesState, required this.icon, required this.settings});
 
   final PrivateMotorcycleState vehicleState; // Specific type instead of dynamic
   final PolylinesState polylinesState;
   final IconData icon;
+  final Settings settings;
 
   @override
   State<MotorcycleListView> createState() => _MotorcycleListViewState();
@@ -66,6 +63,12 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     int maxEmission = widget.vehicleState.emissions.isNotEmpty ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce(max) : 0;
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
     double reduction = max(0, maxEmission - selectedEmission);
+
+    if (widget.settings.useMotorcycleForCalculations && (widget.settings.useMotorcycleInsteadOfCar || !widget.settings.useCarForCalculations)) {
+      double configuredFactor = widget.settings.selectedMotorcycleSize.value;
+      double maxConfiguredEmission = configuredFactor * widget.polylinesState.distances.reduce(max);
+      reduction = max(0, maxConfiguredEmission - selectedEmission);
+    }
 
     String motoModel = widget.vehicleState.selectedValue.toString().split('.').last;
     if (motoModel.isNotEmpty) {

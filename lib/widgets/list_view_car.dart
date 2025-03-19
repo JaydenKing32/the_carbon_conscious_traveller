@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
@@ -10,16 +11,12 @@ import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class CarListView extends StatefulWidget {
-  const CarListView({
-    super.key,
-    required this.vehicleState,
-    required this.polylinesState,
-    required this.icon,
-  });
+  const CarListView({super.key, required this.vehicleState, required this.polylinesState, required this.icon, required this.settings});
 
   final dynamic vehicleState;
   final PolylinesState polylinesState;
   final IconData icon;
+  final Settings settings;
 
   @override
   State<CarListView> createState() => _CarListViewState();
@@ -60,6 +57,13 @@ class _CarListViewState extends State<CarListView> {
     int maxEmission = widget.vehicleState.emissions.isNotEmpty ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce((a, b) => a > b ? a : b) : 0;
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
     double reduction = max(0, maxEmission - selectedEmission);
+
+    if (widget.settings.useCarForCalculations && !widget.settings.useMotorcycleInsteadOfCar) {
+      double configuredFactor = carValuesMatrix[widget.settings.selectedCarSize.index][widget.settings.selectedCarFuelType.index];
+      double maxConfiguredEmission = configuredFactor * widget.polylinesState.distances.reduce(max);
+      reduction = max(0, maxConfiguredEmission - selectedEmission);
+    }
+
     String carModel = "${widget.vehicleState.selectedSize?.toString().split('.').last} - ${widget.vehicleState.selectedFuelType?.toString().split('.').last}";
     List<Leg>? legs = widget.polylinesState.routes?[index].legs;
     GeoCoord? start = legs?.first.steps?.first.startLocation;

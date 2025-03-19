@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
@@ -7,14 +9,14 @@ import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.da
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/list_view_motorcycle.dart';
 
-class MotorcyleSettings extends StatefulWidget {
-  const MotorcyleSettings({super.key});
+class MotorcycleSettings extends StatefulWidget {
+  const MotorcycleSettings({super.key});
 
   @override
-  State<MotorcyleSettings> createState() => _MotorcyleSettingsState();
+  State<MotorcycleSettings> createState() => _MotorcycleSettingsState();
 }
 
-class _MotorcyleSettingsState extends State<MotorcyleSettings> {
+class _MotorcycleSettingsState extends State<MotorcycleSettings> {
   MotorcycleSize? selectedSize;
   late PrivateVehicleEmissionsCalculator emissionCalculator;
   bool _autoCalculated = false; // Flag to prevent repeated auto-calcs
@@ -51,6 +53,8 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
         motorcycleState.updateVisibility(true);
         motorcycleState.updateMinEmission(calculator.calculateMinEmission().round());
         motorcycleState.updateMaxEmission(calculator.calculateMaxEmission().round());
+        double configuredFactor = settings.selectedMotorcycleSize.value;
+        motorcycleState.updateMaxConfiguredEmission((configuredFactor * polylinesState.distances.reduce(max)).toInt());
 
         setState(() {
           _autoCalculated = true;
@@ -81,11 +85,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
               padding: const EdgeInsets.only(bottom: 40),
               child: Column(
                 children: [
-                  MotorcycleListView(
-                    polylinesState: polylinesState,
-                    vehicleState: motorcycleState,
-                    icon: Icons.sports_motorsports_outlined,
-                  ),
+                  MotorcycleListView(polylinesState: polylinesState, vehicleState: motorcycleState, icon: Icons.sports_motorsports_outlined, settings: settings),
                 ],
               ),
             ),
@@ -171,11 +171,7 @@ class _MotorcyleSettingsState extends State<MotorcyleSettings> {
                 padding: const EdgeInsets.only(bottom: 40),
                 child: Column(
                   children: [
-                    MotorcycleListView(
-                      polylinesState: polylinesState,
-                      vehicleState: motorcycleState,
-                      icon: Icons.sports_motorsports_outlined,
-                    ),
+                    MotorcycleListView(polylinesState: polylinesState, vehicleState: motorcycleState, icon: Icons.sports_motorsports_outlined, settings: settings),
                   ],
                 ),
               ),

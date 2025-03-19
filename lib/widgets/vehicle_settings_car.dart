@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
@@ -63,6 +65,8 @@ class _CarSettingsState extends State<CarSettings> {
         carState.updateVisibility(true);
         carState.updateMinEmission(calculator.calculateMinEmission().round());
         carState.updateMaxEmission(calculator.calculateMaxEmission().round());
+        double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
+        carState.updateMaxConfiguredEmission((configuredFactor * polylinesState.distances.reduce(max)).toInt());
 
         setState(() {
           _autoCalculated = true;
@@ -115,11 +119,7 @@ class _CarSettingsState extends State<CarSettings> {
               padding: const EdgeInsets.only(bottom: 40),
               child: Column(
                 children: [
-                  CarListView(
-                    polylinesState: Provider.of<PolylinesState>(context),
-                    vehicleState: carState,
-                    icon: Icons.directions_car_outlined,
-                  ),
+                  CarListView(polylinesState: Provider.of<PolylinesState>(context), vehicleState: carState, icon: Icons.directions_car_outlined, settings: settings),
                 ],
               ),
             ),
@@ -253,6 +253,7 @@ class _CarSettingsState extends State<CarSettings> {
                       polylinesState: polylinesState,
                       vehicleState: carState,
                       icon: Icons.directions_car_outlined,
+                      settings: settings,
                     ),
                   ],
                 ),

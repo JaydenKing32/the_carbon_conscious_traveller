@@ -366,6 +366,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           if (calculatedCarEmissions.isNotEmpty) {
             carState.updateMinEmission(calculatedCarEmissions.reduce(min));
             carState.updateMaxEmission(calculatedCarEmissions.reduce(max));
+            double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
+            carState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
           }
 
           // Calculate Motorcycle Emissions
@@ -383,6 +385,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           if (calculatedMotoEmissions.isNotEmpty) {
             motorcycleState.updateMinEmission(calculatedMotoEmissions.reduce(min));
             motorcycleState.updateMaxEmission(calculatedMotoEmissions.reduce(max));
+            double configuredFactor = settings.selectedMotorcycleSize.value;
+            motorcycleState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
           }
         } catch (e) {
           debugPrint("Error calculating emissions: $e");
@@ -439,6 +443,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           if (calculatedCarEmissions.isNotEmpty) {
             carState.updateMinEmission(calculatedCarEmissions.reduce(min));
             carState.updateMaxEmission(calculatedCarEmissions.reduce(max));
+            double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
+            carState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
           }
 
           // Calculate Motorcycle Emissions
@@ -456,6 +462,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           if (calculatedMotoEmissions.isNotEmpty) {
             motorcycleState.updateMinEmission(calculatedMotoEmissions.reduce(min));
             motorcycleState.updateMaxEmission(calculatedMotoEmissions.reduce(max));
+            double configuredFactor = settings.selectedMotorcycleSize.value;
+            motorcycleState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
           }
         } catch (e) {
           debugPrint("Error calculating emissions: $e");

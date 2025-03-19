@@ -2,8 +2,7 @@ import 'dart:math';
 import 'package:the_carbon_conscious_traveller/data/tree_icon_values.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 
-List<String> upDateTreeIcons(
-    List<int> emissionValues, int index, Settings settings) {
+List<String> upDateTreeIcons(List<int> emissionValues, int maxConfiguredEmission, int index, Settings settings) {
   if (emissionValues.length <= 1) {
     return [];
   }
@@ -12,8 +11,7 @@ List<String> upDateTreeIcons(
   final currentValues = settings.emissionValues;
 
   // Get sorted icons by value in descending order
-  final sortedIcons = TreeIconType.values.toList()
-    ..sort((a, b) => currentValues[b]!.compareTo(currentValues[a]!));
+  final sortedIcons = TreeIconType.values.toList()..sort((a, b) => currentValues[b]!.compareTo(currentValues[a]!));
 
   int baseTreeIconValue = currentValues[sortedIcons.last]!.toInt();
   List<String> treeIconName = [];
@@ -23,6 +21,10 @@ List<String> upDateTreeIcons(
   }
 
   var dividend = maxEmission - emissionValues[index];
+
+  if ((settings.useCarForCalculations || settings.useMotorcycleForCalculations) && maxConfiguredEmission > 0) {
+    dividend = maxConfiguredEmission - emissionValues[index];
+  }
 
   if (dividend <= 0) {
     return [];

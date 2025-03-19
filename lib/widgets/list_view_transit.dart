@@ -273,6 +273,7 @@ class _TransitListViewState extends State<TransitListView> {
                                 TreeIcons(
                                   treeIconName: upDateTreeIcons(
                                     widget.emissions.map((e) => e.toInt()).toList(),
+                                    0,
                                     index,
                                     settings,
                                   ),
