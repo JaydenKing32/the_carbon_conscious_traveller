@@ -7,10 +7,11 @@ import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
 import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/list_view_transit.dart';
 
 class Transit extends StatefulWidget {
-  const Transit({Key? key}) : super(key: key);
+  const Transit({super.key});
 
   @override
   State<Transit> createState() => _TransitState();
@@ -72,18 +73,13 @@ class _TransitState extends State<Transit> {
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Text('No transit routes found.');
             } else {
-              // We have fresh route data
-              final routes = snapshot.data!;
               final emissions = _transitEmissionsCalculator.calculateEmissions(context);
 
               if (emissions.isEmpty) {
                 return const Text("No emissions data available");
               }
 
-              return TransitListView(
-                snapshot: snapshot,
-                emissions: emissions,
-              );
+              return TransitListView(snapshot: snapshot, emissions: emissions, settings: Provider.of<Settings>(context));
             }
           },
         );

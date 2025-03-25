@@ -74,7 +74,7 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
           carState.minEmissionValue,
         );
       case transit:
-        if (transitState.transitEmissions.isEmpty) {
+        if (transitState.emissions.isEmpty) {
           return '';
         }
         return getEmissions(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/helpers/tree_icons_calculator.dart';
@@ -12,18 +13,16 @@ import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/transit_steps.dart';
+import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 class TransitListView extends StatefulWidget {
-  const TransitListView({
-    super.key,
-    required this.snapshot,
-    required this.emissions,
-  });
+  const TransitListView({super.key, required this.snapshot, required this.emissions, required this.settings});
 
   final dynamic snapshot;
   final List<double> emissions;
+  final Settings settings;
 
   @override
   State<TransitListView> createState() => _TransitListViewState();
@@ -51,6 +50,10 @@ class _TransitListViewState extends State<TransitListView> {
     });
   }
 
+  int getMaxDistance(List<DirectionsRoute> routes) {
+    return routes.map((DirectionsRoute route) => route.legs?.fold(0, (a, leg) => a + leg.steps!.fold(0, (b, step) => b + (step.distance!.value!).toInt()))).reduce((a, b) => a! > b! ? a : b)!;
+  }
+
   Future<void> _saveTrip(int index) async {
     int maxEmission = widget.emissions.isNotEmpty ? widget.emissions.map((e) => e.toInt()).reduce(max) : 0;
 
@@ -59,6 +62,19 @@ class _TransitListViewState extends State<TransitListView> {
     List<Leg>? legs = widget.snapshot.data![index].legs;
     GeoCoord? start = legs?.first.steps?.first.startLocation;
     GeoCoord? end = legs?.last.steps?.last.endLocation;
+
+    double configuredFactor = -1;
+    if (widget.settings.useCarForCalculations && !widget.settings.useMotorcycleInsteadOfCar) {
+      configuredFactor = carValuesMatrix[widget.settings.selectedCarSize.index][widget.settings.selectedCarFuelType.index];
+    } else if (widget.settings.useMotorcycleForCalculations && (widget.settings.useMotorcycleInsteadOfCar || !widget.settings.useCarForCalculations)) {
+      configuredFactor = widget.settings.selectedMotorcycleSize.value;
+    }
+
+    if (configuredFactor != -1) {
+      int maxDistance = getMaxDistance(widget.snapshot.data);
+      double maxConfiguredEmission = configuredFactor * maxDistance;
+      reduction = max(0, maxConfiguredEmission - selectedEmission);
+    }
 
     final trip = Trip(
       date: DateTime.now().toIso8601String(),
@@ -158,10 +174,12 @@ class _TransitListViewState extends State<TransitListView> {
   @override
   Widget build(BuildContext context) {
     TransitEmissionsCalculator? transitEmissionsCalculator = TransitEmissionsCalculator();
+    TransitState transitState = Provider.of<TransitState>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      TransitState transitState = Provider.of<TransitState>(context, listen: false);
-      transitState.updateTransitEmissions(widget.emissions);
+      transitState.saveEmissions(widget.emissions.map((e) => e.toInt()).toList());
+      transitState.updateMinEmission(widget.emissions.reduce(min).round());
+      transitState.updateMaxEmission(widget.emissions.reduce(max).round());
     });
     return Consumer2<PolylinesState, Settings>(
       builder: (context, polylinesState, settings, child) {
@@ -182,6 +200,13 @@ class _TransitListViewState extends State<TransitListView> {
                 int selectedIndex = polylinesState.transitActiveRouteIndex;
                 int? sIndex = _indexToTripId[index];
                 bool isCompleted = sIndex != null ? _tripCompletionStatus[sIndex] ?? false : false;
+
+                transitState.getTreeIcons(index, context);
+                double carFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
+                double motorcycleFactor = settings.selectedMotorcycleSize.value;
+                int maxDistance = getMaxDistance(widget.snapshot.data);
+                transitState.updateMaxConfiguredEmissions(driving, carFactor * maxDistance);
+                transitState.updateMaxConfiguredEmissions(motorcycling, motorcycleFactor * maxDistance);
 
                 Color color = selectedIndex == index ? Colors.green : Colors.transparent;
 
@@ -271,12 +296,7 @@ class _TransitListViewState extends State<TransitListView> {
                                 ),
                                 SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                 TreeIcons(
-                                  treeIconName: upDateTreeIcons(
-                                    widget.emissions.map((e) => e.toInt()).toList(),
-                                    0,
-                                    index,
-                                    settings,
-                                  ),
+                                  treeIconName: transitState.treeIcons,
                                   settings: settings,
                                 ),
                               ],

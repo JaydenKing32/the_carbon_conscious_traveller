@@ -20,6 +20,7 @@ import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng_bounds.dart' as LLBounds;
@@ -328,6 +329,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     final polylineState = Provider.of<PolylinesState>(context, listen: false);
     final carState = Provider.of<PrivateCarState>(context, listen: false);
     final motorcycleState = Provider.of<PrivateMotorcycleState>(context, listen: false);
+    final transitState = Provider.of<TransitState>(context, listen: false);
 
     // Place the origin marker
     markerModel.addOriginMarker(originLatLng);
@@ -369,6 +371,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
             carState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
             motorcycleState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
+            transitState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
           }
 
           // Calculate Motorcycle Emissions
@@ -389,6 +392,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             double configuredFactor = settings.selectedMotorcycleSize.value;
             carState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
             motorcycleState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
+            transitState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
           }
         } catch (e) {
           debugPrint("Error calculating emissions: $e");
