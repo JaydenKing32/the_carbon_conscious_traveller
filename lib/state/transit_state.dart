@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:the_carbon_conscious_traveller/state/mode_state.dart';
 
-class TransitState extends ChangeNotifier {
+class TransitState extends ModeState {
   List<double> _transitEmissions = [];
   int _minEmissions = 0;
   int _maxEmissions = 0;

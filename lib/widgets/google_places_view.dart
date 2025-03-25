@@ -367,7 +367,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             carState.updateMinEmission(calculatedCarEmissions.reduce(min));
             carState.updateMaxEmission(calculatedCarEmissions.reduce(max));
             double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
-            carState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
+            carState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
+            motorcycleState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
           }
 
           // Calculate Motorcycle Emissions
@@ -386,7 +387,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             motorcycleState.updateMinEmission(calculatedMotoEmissions.reduce(min));
             motorcycleState.updateMaxEmission(calculatedMotoEmissions.reduce(max));
             double configuredFactor = settings.selectedMotorcycleSize.value;
-            motorcycleState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
+            carState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
+            motorcycleState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
           }
         } catch (e) {
           debugPrint("Error calculating emissions: $e");
@@ -444,7 +446,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             carState.updateMinEmission(calculatedCarEmissions.reduce(min));
             carState.updateMaxEmission(calculatedCarEmissions.reduce(max));
             double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
-            carState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
+            carState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
+            motorcycleState.updateMaxConfiguredEmissions(driving, configuredFactor * polylineState.distances.reduce(max));
           }
 
           // Calculate Motorcycle Emissions
@@ -463,7 +466,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
             motorcycleState.updateMinEmission(calculatedMotoEmissions.reduce(min));
             motorcycleState.updateMaxEmission(calculatedMotoEmissions.reduce(max));
             double configuredFactor = settings.selectedMotorcycleSize.value;
-            motorcycleState.updateMaxConfiguredEmission((configuredFactor * polylineState.distances.reduce(max)).toInt());
+            carState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
+            motorcycleState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylineState.distances.reduce(max));
           }
         } catch (e) {
           debugPrint("Error calculating emissions: $e");

@@ -8,6 +8,7 @@ import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/list_view_motorcycle.dart';
+import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 
 class MotorcycleSettings extends StatefulWidget {
   const MotorcycleSettings({super.key});
@@ -54,7 +55,7 @@ class _MotorcycleSettingsState extends State<MotorcycleSettings> {
         motorcycleState.updateMinEmission(calculator.calculateMinEmission().round());
         motorcycleState.updateMaxEmission(calculator.calculateMaxEmission().round());
         double configuredFactor = settings.selectedMotorcycleSize.value;
-        motorcycleState.updateMaxConfiguredEmission((configuredFactor * polylinesState.distances.reduce(max)).toInt());
+        motorcycleState.updateMaxConfiguredEmissions(motorcycling, configuredFactor * polylinesState.distances.reduce(max));
 
         setState(() {
           _autoCalculated = true;

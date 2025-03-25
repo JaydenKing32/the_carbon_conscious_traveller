@@ -8,6 +8,7 @@ import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/list_view_car.dart';
+import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 
 class CarSettings extends StatefulWidget {
   const CarSettings({super.key});
@@ -66,7 +67,7 @@ class _CarSettingsState extends State<CarSettings> {
         carState.updateMinEmission(calculator.calculateMinEmission().round());
         carState.updateMaxEmission(calculator.calculateMaxEmission().round());
         double configuredFactor = carValuesMatrix[settings.selectedCarSize.index][settings.selectedCarFuelType.index];
-        carState.updateMaxConfiguredEmission((configuredFactor * polylinesState.distances.reduce(max)).toInt());
+        carState.updateMaxConfiguredEmissions(driving, configuredFactor * polylinesState.distances.reduce(max));
 
         setState(() {
           _autoCalculated = true;

@@ -64,8 +64,14 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
     double reduction = max(0, maxEmission - selectedEmission);
 
-    if (widget.settings.useMotorcycleForCalculations && (widget.settings.useMotorcycleInsteadOfCar || !widget.settings.useCarForCalculations)) {
-      double configuredFactor = widget.settings.selectedMotorcycleSize.value;
+    double configuredFactor = -1;
+    if (widget.settings.useCarForCalculations && !widget.settings.useMotorcycleInsteadOfCar) {
+      configuredFactor = carValuesMatrix[widget.settings.selectedCarSize.index][widget.settings.selectedCarFuelType.index];
+    } else if (widget.settings.useMotorcycleForCalculations && (widget.settings.useMotorcycleInsteadOfCar || !widget.settings.useCarForCalculations)) {
+      configuredFactor = widget.settings.selectedMotorcycleSize.value;
+    }
+
+    if (configuredFactor != -1) {
       double maxConfiguredEmission = configuredFactor * widget.polylinesState.distances.reduce(max);
       reduction = max(0, maxConfiguredEmission - selectedEmission);
     }
