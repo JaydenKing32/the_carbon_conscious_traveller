@@ -143,24 +143,26 @@ class _MotorcycleSettingsState extends State<MotorcycleSettings> {
                     ),
                   ),
                   FilledButton(
-                    onPressed: () {
-                      motorcycleState.updateVisibility(true);
+                    onPressed: (selectedSize != null)
+                        ? () {
+                            motorcycleState.updateVisibility(true);
 
-                      // Manual calculation logic:
-                      final computedEmissions = <int>[];
-                      for (int i = 0; i < polylinesState.result.length; i++) {
-                        computedEmissions.add(
-                          emissionCalculator.calculateEmission(i).round(),
-                        );
-                      }
-                      motorcycleState.saveEmissions(computedEmissions);
-                      motorcycleState.updateMinEmission(
-                        emissionCalculator.calculateMinEmission().round(),
-                      );
-                      motorcycleState.updateMaxEmission(
-                        emissionCalculator.calculateMaxEmission().round(),
-                      );
-                    },
+                            // Manual calculation logic:
+                            final computedEmissions = <int>[];
+                            for (int i = 0; i < polylinesState.result.length; i++) {
+                              computedEmissions.add(
+                                emissionCalculator.calculateEmission(i).round(),
+                              );
+                            }
+                            motorcycleState.saveEmissions(computedEmissions);
+                            motorcycleState.updateMinEmission(
+                              emissionCalculator.calculateMinEmission().round(),
+                            );
+                            motorcycleState.updateMaxEmission(
+                              emissionCalculator.calculateMaxEmission().round(),
+                            );
+                          }
+                        : null,
                     child: const Text('Calculate Emissions'),
                   ),
                 ],
