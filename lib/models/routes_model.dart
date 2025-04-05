@@ -9,7 +9,6 @@ class RoutesModel {
   final GeoCoord destination;
   final TravelMode travelMode;
   final String googleApiKey = Constants.googleApiKey;
-  //List<DirectionsRoute>? routes;
 
   RoutesModel({
     required this.origin,
@@ -32,8 +31,7 @@ class RoutesModel {
     final request = getRequest();
     final completer = Completer<dynamic>();
 
-    directionsService.route(request,
-        (DirectionsResult response, DirectionsStatus? status) {
+    directionsService.route(request, (DirectionsResult response, DirectionsStatus? status) {
       debugPrint("Full response: ${response.routes?.length}");
       if (status == DirectionsStatus.ok) {
         debugPrint("Test Request successful");

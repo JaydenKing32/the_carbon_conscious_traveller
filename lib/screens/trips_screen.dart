@@ -44,9 +44,7 @@ class _TripsScreenState extends State<TripsScreen> {
     if (trip.complete) return;
 
     // Get user's current location (make sure you have permission logic in place)
-    final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
-    );
+    final position = await Geolocator.getCurrentPosition();
 
     // Compare distance to trip's destination lat/lng
     double distanceInMeters = Geolocator.distanceBetween(

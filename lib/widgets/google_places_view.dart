@@ -23,8 +23,8 @@ import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
-import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng_bounds.dart' as LLBounds;
-import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng.dart' as LL;
+import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng_bounds.dart' as plat_ll_bounds;
+import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng.dart' as plat_ll;
 
 class GooglePlacesView extends StatefulWidget {
   const GooglePlacesView({super.key});
@@ -228,8 +228,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
     try {
       final ll = MapService().getUserLatLng()!;
       const biasRadius = 0.1;
-      LLBounds.LatLngBounds? bounds = LLBounds.LatLngBounds(
-          southwest: LL.LatLng(lat: ll.latitude - biasRadius, lng: ll.longitude - biasRadius), northeast: LL.LatLng(lat: ll.latitude + biasRadius, lng: ll.longitude + biasRadius));
+      plat_ll_bounds.LatLngBounds? bounds = plat_ll_bounds.LatLngBounds(
+          southwest: plat_ll.LatLng(lat: ll.latitude - biasRadius, lng: ll.longitude - biasRadius), northeast: plat_ll.LatLng(lat: ll.latitude + biasRadius, lng: ll.longitude + biasRadius));
 
       final result = await _places.findAutocompletePredictions(_predictLastText!, countries: _countries, newSessionToken: false, locationBias: bounds);
       setState(() {

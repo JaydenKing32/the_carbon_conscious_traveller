@@ -78,13 +78,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     } else if (distance < 5000) {
       return "That's about the length of the Golden Gate Bridge 🌉";
     } else if (distance < 42000) {
-      return "You've traveled more than a marathon! 🏃‍♂️";
+      return "You've travelled more than a marathon! 🏃‍♂️";
     } else if (distance < 892000) {
       return "That's almost the distance from Sydney to Melbourne! 🏙️🚆";
     } else if (distance < 384400000) {
       return "That's almost the distance to the Moon! 🌙🚀";
     } else {
-      return "You've traveled a distance beyond Earth's orbit! 🛰️";
+      return "You've travelled a distance beyond Earth's orbit! 🛰️";
     }
   }
 
@@ -145,7 +145,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
               child: Column(
                 children: [
-                  // Distance traveled + earth emoji on the same line
+                  // Distance travelled + earth emoji on the same line
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

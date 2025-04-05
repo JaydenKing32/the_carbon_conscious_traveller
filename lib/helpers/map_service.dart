@@ -13,8 +13,7 @@ class MapService {
 
   MapService._internal();
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   //go to location when user has entered a location
   Future<void> goToLocation(BuildContext context, LatLng coords) async {
@@ -77,8 +76,7 @@ class MapService {
     }
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
+      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
         return null;
       }
     }
@@ -95,8 +93,7 @@ class MapService {
   }
 
   Future<Placemark?> getAddressFromLatLng() async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-        _currentPosition!.latitude, _currentPosition!.longitude);
+    List<Placemark> placemarks = await placemarkFromCoordinates(_currentPosition!.latitude, _currentPosition!.longitude);
     return placemarks.isNotEmpty ? placemarks[0] : null;
   }
 

@@ -160,9 +160,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
 
     if (trip!.complete) return;
 
-    final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
-    );
+    final position = await Geolocator.getCurrentPosition();
 
     double distanceInMeters = Geolocator.distanceBetween(
       position.latitude,
@@ -399,7 +397,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                               onPressed: settings.enableGeolocationVerification
                                   // If geolocation is ON => attempt location-based completion
                                   ? () => _attemptGeolocCompletion(index)
-                                  // Otherwise => old behavior, just toggle completion
+                                  // Otherwise => old behaviour, just toggle completion
                                   : () => _toggleTripCompletion(index),
                             ),
                             const SizedBox(height: 5),

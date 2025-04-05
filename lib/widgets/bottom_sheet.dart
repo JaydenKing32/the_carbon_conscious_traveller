@@ -51,10 +51,7 @@ class TravelModeBottomSheet extends StatelessWidget {
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: const TravelModeView()),
+                        child: Container(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: const TravelModeView()),
                       )
                     ],
                   ),

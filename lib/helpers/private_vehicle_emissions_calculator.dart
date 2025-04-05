@@ -31,7 +31,7 @@ class PrivateVehicleEmissionsCalculator {
   double calculateMinEmission() {
     if (polylinesState.distances.isEmpty) {
       return 0.0;
-    };
+    }
     final minDist = polylinesState.distances.reduce(min);
     return minDist * factor;
   }
@@ -39,7 +39,7 @@ class PrivateVehicleEmissionsCalculator {
   double calculateMaxEmission() {
     if (polylinesState.distances.isEmpty) {
       return 0.0;
-    };
+    }
     final maxDist = polylinesState.distances.reduce(max);
     return maxDist * factor;
   }

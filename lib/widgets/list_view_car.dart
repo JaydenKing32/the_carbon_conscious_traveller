@@ -131,9 +131,7 @@ class _CarListViewState extends State<CarListView> {
 
     if (trip!.complete) return;
 
-    final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
-    );
+    final position = await Geolocator.getCurrentPosition();
 
     double distanceInMeters = Geolocator.distanceBetween(
       position.latitude,
@@ -341,7 +339,7 @@ class _CarListViewState extends State<CarListView> {
                               onPressed: settings.enableGeolocationVerification
                                   // If geolocation is ON => attempt location-based completion
                                   ? () => _attemptGeolocCompletion(index)
-                                  // Otherwise => old behavior, just toggle completion
+                                  // Otherwise => old behaviour, just toggle completion
                                   : () => _toggleTripCompletion(index),
                               tooltip: isCompleted ? 'Mark Incomplete' : 'Mark Complete',
                             ),

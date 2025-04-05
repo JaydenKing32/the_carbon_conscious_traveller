@@ -105,7 +105,7 @@ class _TransitState extends State<Transit> {
       travelMode: TravelMode.transit,
     );
 
-    final fetchedRoutes = await routesModel.getRouteInfo() ?? [];
+    final fetchedRoutes = await routesModel.getRouteInfo();
 
     // Save data in CoordinatesState outside the build
     coordsState.saveRouteData(fetchedRoutes);
