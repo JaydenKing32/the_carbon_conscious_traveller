@@ -1,5 +1,5 @@
 name: the_carbon_conscious_traveller
-description: "A new Flutter project."
+description: "The Carbon Conscious Traveller App."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -52,6 +52,7 @@ dependencies:
   http: ^1.3.0
   auto_size_text: ^3.0.0
   flutter_markdown: ^0.7.5
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
