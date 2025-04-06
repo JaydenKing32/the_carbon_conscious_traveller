@@ -115,6 +115,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final formattedMonthName = DateFormat('MMMM').format(_selectedDate);
     final dailyData = _aggregateData();
     double totalDistance = _calculateTotalDistance();
+    String distanceStr;
+    if (totalDistance < 1000) {
+      distanceStr = "$totalDistance m";
+    } else {
+      distanceStr = "${(totalDistance / 1000).toStringAsFixed(1)} km";
+    }
     String funFact = _getFunFact(totalDistance);
 
     // Generate data for 3-day window (including days from next month if needed)
@@ -151,8 +157,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          "In $formattedMonthName \nYou have consciously travelled: " // Modified text
-                          "${totalDistance.toStringAsFixed(1)} km!",
+                          "In $formattedMonthName \nYou have consciously travelled: $distanceStr!",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
