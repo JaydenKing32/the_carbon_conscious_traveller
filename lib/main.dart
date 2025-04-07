@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
           title: 'The Carbon Conscious Traveller',
         );
       }),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
