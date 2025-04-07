@@ -42,7 +42,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
 
 ## Introduction
 
-This privacy notice for The Carbon Conscious Traveller ('we', 'us', or 'our'), describes how and why we might collect, store, use, and/or share ('process') your information when you use our services ('Services'), such as when you:
+This privacy notice for The Carbon-Conscious Traveller ('we', 'us', or 'our'), describes how and why we might collect, store, use, and/or share ('process') your information when you use our services ('Services'), such as when you:
 
 - **Download and use** our mobile application (The Carbon-Conscious Traveller), or any other application of ours that links to this privacy notice
 - **Engage with us** in other related ways, including any sales, marketing, or events

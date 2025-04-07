@@ -39,7 +39,7 @@ class AboutScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "The Carbon Conscious Traveller",
+                      "The Carbon-Conscious Traveller",
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),

@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'The Carbon Conscious Traveller',
+      title: 'The Carbon-Conscious Traveller',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 7, 179, 110)),
         primaryColor: const Color.fromARGB(255, 7, 179, 110),
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
       ),
       home: Consumer<Settings>(builder: (context, settings, child) {
         return const MyHomePage(
-          title: 'The Carbon Conscious Traveller',
+          title: 'The Carbon-Conscious Traveller',
         );
       }),
       debugShowCheckedModeBanner: false,

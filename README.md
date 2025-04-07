@@ -1,4 +1,4 @@
-# The Carbon Conscious Traveller
+# The Carbon-Conscious Traveller
 
 ## Setup Instructions
 
