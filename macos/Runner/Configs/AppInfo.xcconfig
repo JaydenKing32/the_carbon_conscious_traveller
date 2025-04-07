@@ -8,7 +8,7 @@
 PRODUCT_NAME = the_carbon_conscious_traveller
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.mquniversity.theCarbonConsciousTraveller
+PRODUCT_BUNDLE_IDENTIFIER = com.mquniversity.tcct
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2024 com.example. All rights reserved.

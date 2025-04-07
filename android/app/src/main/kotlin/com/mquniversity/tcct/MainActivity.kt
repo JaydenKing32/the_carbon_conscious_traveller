@@ -1,4 +1,4 @@
-package com.mquniversity.the_carbon_conscious_traveller
+package com.mquniversity.tcct
 
 import io.flutter.embedding.android.FlutterActivity
 
