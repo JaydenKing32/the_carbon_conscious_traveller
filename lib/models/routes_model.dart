@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:the_carbon_conscious_traveller/constants.dart';
@@ -32,15 +33,21 @@ class RoutesModel {
     final completer = Completer<dynamic>();
 
     directionsService.route(request, (DirectionsResult response, DirectionsStatus? status) {
-      debugPrint("Full response: ${response.routes?.length}");
+      if (kDebugMode) {
+        debugPrint("Full response: ${response.routes?.length}");
+      }
       if (status == DirectionsStatus.ok) {
-        debugPrint("Test Request successful");
+        if (kDebugMode) {
+          debugPrint("Test Request successful");
+        }
         final routes = response.routes;
         if (!completer.isCompleted) {
           completer.complete(routes);
         }
       } else {
-        debugPrint("Test Request unsuccessful");
+        if (kDebugMode) {
+          debugPrint("Test Request unsuccessful");
+        }
         if (!completer.isCompleted) {
           completer.completeError("Request unsuccessful");
         }
@@ -49,8 +56,10 @@ class RoutesModel {
 
     try {
       final routes = await completer.future;
-      debugPrint("Request completed");
-      debugPrint("ROUTES result length ${routes?.length}");
+      if (kDebugMode) {
+        debugPrint("Request completed");
+        debugPrint("ROUTES result length ${routes?.length}");
+      }
       return routes;
     } catch (e) {
       debugPrint("Error: $e");

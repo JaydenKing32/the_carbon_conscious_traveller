@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart' as places;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -77,9 +78,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       googleApiKey,
       locale: initialLocale,
     );
-    _places.isInitialized().then((value) {
-      debugPrint('Places Initialised: $value');
-    });
+    if (kDebugMode) {
+      _places.isInitialized().then((value) {
+        debugPrint('Places Initialised: $value');
+      });
+    }
   }
 
   @override
