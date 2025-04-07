@@ -6,7 +6,7 @@
 
 1. **Clone the Repository:**
    ```sh
-   git clone https://github.com/paolareategui/the_carbon_conscious_traveller.git
+   git clone https://github.com/JaydenKing32/the_carbon_conscious_traveller.git
    cd yourproject
 
 2. **Install Dependencies:**
