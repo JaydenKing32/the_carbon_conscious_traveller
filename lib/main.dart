@@ -5,6 +5,7 @@ import 'package:the_carbon_conscious_traveller/state/marker_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/bottom_sheet.dart';
 import 'package:the_carbon_conscious_traveller/widgets/drawer.dart';
@@ -28,7 +29,31 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PrivateMotorcycleState()),
         ChangeNotifierProvider(create: (context) => PrivateCarState()),
         ChangeNotifierProvider(create: (context) => TransitState()),
-        ChangeNotifierProvider.value(value: settings), // Use pre-initialized settings
+        ChangeNotifierProvider.value(
+            value: settings), // Use pre-initialized settings
+        ChangeNotifierProxyProvider4<PrivateMotorcycleState, PrivateCarState,
+            TransitState, PolylinesState, ThemeState>(
+          create: (context) => ThemeState(),
+          update: (context, motorcycleState, carState, transitState,
+              polylineState, themeState) {
+            List<int> activeRouteEmissions = [];
+
+            switch (polylineState.mode) {
+              case 'motorcycling':
+                activeRouteEmissions = motorcycleState.emissions;
+                break;
+              case 'driving':
+                activeRouteEmissions = carState.emissions;
+                break;
+              case 'transit':
+                activeRouteEmissions = transitState.emissions;
+                break;
+            }
+            themeState!.updateTheme(activeRouteEmissions,
+                polylineState.activeRouteIndex, polylineState.mode);
+            return themeState;
+          },
+        ),
       ],
       child: const MyApp(),
     ),
@@ -40,35 +65,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'The Carbon-Conscious Traveller',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 7, 179, 110)),
-        primaryColor: const Color.fromARGB(255, 7, 179, 110),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(fontSize: 24),
-          displayMedium: TextStyle(fontSize: 20),
-          displaySmall: TextStyle(fontSize: 16),
-          bodyLarge: TextStyle(fontSize: 18),
-          bodyMedium: TextStyle(fontSize: 16),
-          bodySmall: TextStyle(
-            fontSize: 13,
-            color: Color.fromARGB(255, 125, 125, 125),
-          ),
-          titleLarge: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        useMaterial3: true,
-      ),
-      home: Consumer<Settings>(builder: (context, settings, child) {
-        return const MyHomePage(
-          title: 'The Carbon-Conscious Traveller',
-        );
-      }),
-      debugShowCheckedModeBanner: false,
-    );
+    return Consumer<ThemeState>(builder: (context, themeState, child) {
+      return MaterialApp(
+        title: 'The Carbon-Conscious Traveller',
+        theme: themeState.themeData,
+        home: Consumer<Settings>(builder: (context, settings, child) {
+          return const MyHomePage(
+            title: 'The Carbon-Conscious Traveller',
+          );
+        }),
+        debugShowCheckedModeBanner: false,
+      );
+    });
   }
 }
 
@@ -88,8 +96,11 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
+          title: Text(
+            widget.title,
+            style: const TextStyle(color: Colors.white),
+          ),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: const Stack(
           children: [
