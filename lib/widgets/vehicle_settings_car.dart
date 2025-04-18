@@ -54,8 +54,8 @@ class _CarSettingsState extends State<CarSettings> {
         final calculator = PrivateCarEmissionsCalculator(
           polylinesState: polylinesState,
           settings: settings,
-          routeCarSize: selectedSize ?? CarSize.label,
-          routeCarFuel: selectedFuelType ?? CarFuelType.label,
+          routeCarSize: carState.selectedSize ?? CarSize.label,
+          routeCarFuel: carState.selectedFuelType ?? CarFuelType.label,
         );
 
         // Calculate emissions
