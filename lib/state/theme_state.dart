@@ -9,7 +9,7 @@ class ThemeState extends ChangeNotifier {
 
   void getMinMaxEmissions(List<int> emissions) {
     final sortedEmissions = [...emissions]..sort();
-    min = sortedEmissions.first.toDouble();
+    min = min; // placeholder for min value
     max = sortedEmissions.last.toDouble();
     print("min $min");
     print("max $max");
@@ -21,7 +21,7 @@ class ThemeState extends ChangeNotifier {
     if (index >= 0 && emissions.isNotEmpty) {
       double selectedRouteEmission = emissions[index].toDouble();
       getMinMaxEmissions(emissions);
-      lightness = _calculateLightness(selectedRouteEmission, min, max);
+      lightness = _calculateLightness(selectedRouteEmission, min, max, mode);
     }
     print(
         "calculate lightness next. These are the emissions length: ${emissions.length}");
@@ -32,11 +32,20 @@ class ThemeState extends ChangeNotifier {
   }
 
 // Calculate the hue lightness
-  double _calculateLightness(double result, double min, double max) {
-    if (min == max) {
-      return 0.05;
+  double _calculateLightness(
+      double selectedRouteEmission, double min, double max, String mode) {
+    if (max == 0) {
+      return lightness; // needed when the app launches for our base colour
     } else {
-      return 0.5 * (1 - (result - min) / (max - min));
+      /* we increase lightness value as the emission value decreases
+       towards zero (zero emissions = brightest green)
+       but we cap the lightness value at 0.5*/
+      double maximumLightness = 0.5;
+      return maximumLightness *
+          (1 -
+              (selectedRouteEmission - min) /
+                  (max -
+                      min)); // substract 1 to reverse the result (otherwise, higher emissions would be brighter)
     }
   }
 
