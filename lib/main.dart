@@ -36,20 +36,20 @@ void main() async {
           create: (context) => ThemeState(),
           update: (context, motorcycleState, carState, transitState,
               polylineState, themeState) {
-            List<int> activeRouteEmissions = [];
+            List<int> travelModeEmissions = [];
 
             switch (polylineState.mode) {
               case 'motorcycling':
-                activeRouteEmissions = motorcycleState.emissions;
+                travelModeEmissions = motorcycleState.emissions;
                 break;
               case 'driving':
-                activeRouteEmissions = carState.emissions;
+                travelModeEmissions = carState.emissions;
                 break;
               case 'transit':
-                activeRouteEmissions = transitState.emissions;
+                travelModeEmissions = transitState.emissions;
                 break;
             }
-            themeState!.updateTheme(activeRouteEmissions,
+            themeState!.updateTheme(travelModeEmissions,
                 polylineState.activeRouteIndex, polylineState.mode);
             return themeState;
           },
