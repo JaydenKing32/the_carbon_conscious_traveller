@@ -6,18 +6,8 @@ class ThemeState extends ChangeNotifier {
   double min = 0;
   double max = 0;
   double lightness = 0.05;
-
-  void getMinMaxEmissions(List<int> emissions) {
-    final sortedEmissions = [...emissions]..sort();
-    min = min; // placeholder for min value
-
-    if (max < sortedEmissions.last.toDouble()) {
-      max = sortedEmissions.last.toDouble();
-    }
-
-    print("min $min");
-    print("max $max");
-  }
+  Color _seedColour = const HSLColor.fromAHSL(1, 149, 0.8, 0.1).toColor();
+  Color get seedColour => _seedColour;
 
   void updateTheme(List<int> emissions, int index, String mode) {
     print("index $index");
@@ -35,6 +25,18 @@ class ThemeState extends ChangeNotifier {
 
     _themeData = _buildTheme(lightness);
     notifyListeners();
+  }
+
+  void getMinMaxEmissions(List<int> emissions) {
+    final sortedEmissions = [...emissions]..sort();
+    min = min; // placeholder for min value
+
+    if (max < sortedEmissions.last.toDouble()) {
+      max = sortedEmissions.last.toDouble();
+    }
+
+    print("min $min");
+    print("max $max");
   }
 
 // Calculate the hue lightness
@@ -56,12 +58,12 @@ class ThemeState extends ChangeNotifier {
   }
 
   ThemeData _buildTheme(double lightness) {
-    final seedColour = HSLColor.fromAHSL(1, 149, 0.8, lightness).toColor();
+    _seedColour = HSLColor.fromAHSL(1, 149, 0.8, lightness).toColor();
 
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: seedColour),
+      colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
       appBarTheme: AppBarTheme(
-        backgroundColor: seedColour,
+        backgroundColor: _seedColour,
       ),
       textTheme: const TextTheme(
         displayLarge: TextStyle(fontSize: 24),
