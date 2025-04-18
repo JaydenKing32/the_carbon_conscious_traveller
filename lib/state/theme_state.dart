@@ -10,7 +10,11 @@ class ThemeState extends ChangeNotifier {
   void getMinMaxEmissions(List<int> emissions) {
     final sortedEmissions = [...emissions]..sort();
     min = min; // placeholder for min value
-    max = sortedEmissions.last.toDouble();
+
+    if (max < sortedEmissions.last.toDouble()) {
+      max = sortedEmissions.last.toDouble();
+    }
+
     print("min $min");
     print("max $max");
   }
@@ -18,15 +22,17 @@ class ThemeState extends ChangeNotifier {
   void updateTheme(List<int> emissions, int index, String mode) {
     print("index $index");
     print("mode $mode");
+
     if (index >= 0 && emissions.isNotEmpty) {
       double selectedRouteEmission = emissions[index].toDouble();
       getMinMaxEmissions(emissions);
       lightness = _calculateLightness(selectedRouteEmission, min, max, mode);
     }
+
     print(
         "calculate lightness next. These are the emissions length: ${emissions.length}");
-
     print("lightness = $lightness");
+
     _themeData = _buildTheme(lightness);
     notifyListeners();
   }
