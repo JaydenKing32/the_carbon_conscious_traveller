@@ -5,8 +5,8 @@ class ThemeState extends ChangeNotifier {
   ThemeData get themeData => _themeData;
   double min = 0;
   double max = 0;
-  double lightness = 0.05;
-  Color _seedColour = const HSLColor.fromAHSL(1, 149, 0.8, 0.1).toColor();
+  double lightness = 0.01;
+  late Color _seedColour;
   Color get seedColour => _seedColour;
 
   void updateTheme(List<int> emissions, int index, String mode) {
@@ -17,6 +17,7 @@ class ThemeState extends ChangeNotifier {
       double selectedRouteEmission = emissions[index].toDouble();
       getMinMaxEmissions(emissions);
       lightness = _calculateLightness(selectedRouteEmission, min, max, mode);
+      print("does this run on first load?");
     }
 
     print(
@@ -63,7 +64,7 @@ class ThemeState extends ChangeNotifier {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
       appBarTheme: AppBarTheme(
-        backgroundColor: _seedColour,
+        backgroundColor: _seedColour.withRed(15),
       ),
       textTheme: const TextTheme(
         displayLarge: TextStyle(fontSize: 24),
