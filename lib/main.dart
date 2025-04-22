@@ -37,20 +37,24 @@ void main() async {
           update: (context, motorcycleState, carState, transitState,
               polylineState, themeState) {
             List<int> travelModeEmissions = [];
+            int activeRouteIndex = 0;
 
             switch (polylineState.mode) {
               case 'motorcycling':
                 travelModeEmissions = motorcycleState.emissions;
+                activeRouteIndex = polylineState.motorcycleActiveRouteIndex;
                 break;
               case 'driving':
                 travelModeEmissions = carState.emissions;
+                activeRouteIndex = polylineState.carActiveRouteIndex;
                 break;
               case 'transit':
                 travelModeEmissions = transitState.emissions;
+                activeRouteIndex = polylineState.transitActiveRouteIndex;
                 break;
             }
-            themeState!.updateTheme(travelModeEmissions,
-                polylineState.activeRouteIndex, polylineState.mode);
+            themeState!.updateTheme(
+                travelModeEmissions, activeRouteIndex, polylineState.mode);
             return themeState;
           },
         ),
