@@ -8,7 +8,10 @@ class ThemeState extends ChangeNotifier {
   double lightness = 0.01;
   Color _seedColour = const HSLColor.fromAHSL(1, 149, 0.8, 0.01).toColor();
   Color get seedColour => _seedColour;
-  double maxLightness = 0.5;
+  final double _maxLightness = 0.5; // higher than 0.5 will wash out the colour
+  final double _minLightness = 0.2;
+  final _emissionThreshold =
+      1000; // emission below this will have a minimum lightness
   final Map<String, double> _lastEmissionsByMode = {};
   double currentLightness = 0.01;
   bool needsCalculation = true;
@@ -28,7 +31,7 @@ class ThemeState extends ChangeNotifier {
         _lastEmissionsByMode[mode] = selectedRouteEmission;
       } else if (selectedRouteEmission == 0.0 &&
           _lastEmissionsByMode[mode] != null) {
-        lightness = maxLightness;
+        lightness = _maxLightness;
         currentLightness = lightness;
       } else {
         print("NOT calculating lightness......");
@@ -52,15 +55,23 @@ class ThemeState extends ChangeNotifier {
 // Calculate the hue lightness
   double _calculateLightness(double selectedRouteEmission, double minEmissions,
       double maxEmissions, String mode) {
+    // We increase the lightness value as the emission value decreases
+    // towards zero (zero emissions = brightest green)
+    // but we cap the maximum lightness value at 0.5.
+    // We subtract 1 to reverse the result. Without this, higher emissions
+    // would result in a brighter color, which is the opposite of the desired effect.
+    // If maximum emissions don't reach 1000, we cap the minimum lightness value
+    // in order to avoid brown colours when the emissions are low
     if (maxEmissions == 0) {
       return lightness; // needed when the app launches for our base colour
+    } else if (maxEmissions <= _emissionThreshold) {
+      return _minLightness +
+          (_maxLightness - _minLightness) *
+              (1 -
+                  (selectedRouteEmission - minEmissions) /
+                      (maxEmissions - minEmissions));
     } else {
-      // we increase the lightness value as the emission value decreases
-      // towards zero (zero emissions = brightest green)
-      // but we cap the lightness value at 0.5
-      // we subtract 1 to reverse the result. Without this, higher emissions
-      // would result in a brighter color, which is the opposite of the desired effect
-      return maxLightness *
+      return _maxLightness *
           (1 -
               (selectedRouteEmission - minEmissions) /
                   (maxEmissions - minEmissions));
