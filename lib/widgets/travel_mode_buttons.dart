@@ -6,6 +6,7 @@ import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_flying.dart'; // Ensure correct import path
 
@@ -88,9 +89,16 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer5<CoordinatesState, PrivateMotorcycleState, PrivateCarState, TransitState, PolylinesState>(
-      builder:
-          (BuildContext context, CoordinatesState coordinatesState, PrivateMotorcycleState motorcycleState, PrivateCarState carState, TransitState transitState, PolylinesState polylineState, child) {
+    return Consumer6<CoordinatesState, PrivateMotorcycleState, PrivateCarState,
+        TransitState, PolylinesState, ThemeState>(
+      builder: (BuildContext context,
+          CoordinatesState coordinatesState,
+          PrivateMotorcycleState motorcycleState,
+          PrivateCarState carState,
+          TransitState transitState,
+          PolylinesState polylineState,
+          ThemeState theme,
+          child) {
         // Get emissions for each mode
         String drivingEmission = getCurrentMinMaxEmissions(
           'driving',
@@ -154,10 +162,9 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                     }
                   },
                   renderBorder: false,
-                  highlightColor: Colors.green[400],
-                  selectedColor: Colors.green[600],
+                  highlightColor: theme.seedColour.withAlpha(50),
+                  selectedColor: theme.seedColour,
                   color: Colors.grey[600],
-                  splashColor: Colors.green[200],
                   fillColor: Colors.transparent,
                   constraints: const BoxConstraints(
                     minHeight: 40.0,

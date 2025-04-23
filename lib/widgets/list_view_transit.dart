@@ -10,6 +10,7 @@ import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calcula
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/transit_steps.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
@@ -178,8 +179,8 @@ class _TransitListViewState extends State<TransitListView> {
       transitState.updateMinEmission(widget.emissions.reduce(min).round());
       transitState.updateMaxEmission(widget.emissions.reduce(max).round());
     });
-    return Consumer2<PolylinesState, Settings>(
-      builder: (context, polylinesState, settings, child) {
+    return Consumer3<PolylinesState, Settings, ThemeState>(
+      builder: (context, polylinesState, settings, theme, child) {
         final screenWidth = MediaQuery.of(context).size.width;
         final screenHeight = MediaQuery.of(context).size.height;
 
@@ -205,7 +206,9 @@ class _TransitListViewState extends State<TransitListView> {
                 transitState.updateMaxConfiguredEmissions(driving, carFactor * maxDistance);
                 transitState.updateMaxConfiguredEmissions(motorcycling, motorcycleFactor * maxDistance);
 
-                Color color = selectedIndex == index ? Colors.green : Colors.transparent;
+                Color color = selectedIndex == index
+                    ? theme.seedColour
+                    : Colors.transparent;
 
                 return InkWell(
                   onTap: () {
@@ -218,7 +221,7 @@ class _TransitListViewState extends State<TransitListView> {
                       border: Border(
                         left: BorderSide(
                           color: color,
-                          width: 4.0,
+                          width: 5.0,
                         ),
                       ),
                     ),
@@ -335,7 +338,9 @@ class _TransitListViewState extends State<TransitListView> {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              separatorBuilder: (BuildContext context, int index) => const Divider(
+                thickness: 2,
+                ),
             ),
           ],
         );
