@@ -40,6 +40,8 @@ class ThemeState extends ChangeNotifier {
     double upperBound =
         _minGlobalLightness + 0.05; // 0.25 and up makes green colours
 
+    print("index is $index & emissions is $emissions");
+
     if (index >= 0 && emissions.isNotEmpty) {
       double selectedRouteEmission = emissions[index].toDouble();
 
@@ -57,6 +59,8 @@ class ThemeState extends ChangeNotifier {
         if (lightness >= upperBound) {
           // 0.25 and up makes green colours
           print("lightness is $lightness, setting hue to 160");
+          print(
+              "changing hue to $_endHue & selectedRouteEmission is $selectedRouteEmission _lastEmissionsByMode[mode] $mode is ${_lastEmissionsByMode[mode]}");
           hue = _endHue;
           saturation = lightness;
         } else if (lightness >= lowerBound && lightness < upperBound) {
@@ -78,24 +82,35 @@ class ThemeState extends ChangeNotifier {
         currentLightness = lightness;
         currentSaturation = saturation;
         currentHue = hue;
-        _lastEmissionsByMode[mode] = selectedRouteEmission;
+        // _lastEmissionsByMode[mode] = selectedRouteEmission;
       } else if (selectedRouteEmission == 0.0 &&
-          _lastEmissionsByMode[mode] != null) {
+          currentHue == _endHue &&
+          _lastEmissionsByMode[mode] != null &&
+          _lastEmissionsByMode[mode] == selectedRouteEmission) {
+        // this covers the edge where the selected emissions are 0
+        // the issue is that the emissions list is created as soon as the travel mode button is pressed
+        print(
+            "changing hue to $_endHue & selectedRouteEmission is $selectedRouteEmission _lastEmissionsByMode[mode] $mode is ${_lastEmissionsByMode[mode]}");
         hue = _endHue;
         lightness = _maxLightness;
         saturation = lightness;
         currentLightness = lightness;
       } else {
         print(
-            "NOT calculating lightness...... & currentLightness is $currentLightness & current hue is $currentHue & current saturation is $currentSaturation");
+            "NOT calculating lightness...... & currentLightness is $currentLightness & current hue is $currentHue & current saturation is $currentSaturation  & selectedRouteEmission is $selectedRouteEmission _lastEmissionsByMode[mode] $mode is ${_lastEmissionsByMode[mode]}");
         hue = currentHue;
         lightness = currentLightness;
         saturation = currentSaturation;
       }
+      _lastEmissionsByMode[mode] = selectedRouteEmission;
       _themeData = _buildTheme(hue, saturation, lightness);
     } else {
-      _themeData =
-          _buildTheme(_startHue, _minGlobalSaturation, _minGlobalLightness);
+      print("else is running");
+      print(currentLightness);
+      lightness = currentLightness;
+      saturation = currentSaturation;
+      hue = currentHue;
+      _themeData = _buildTheme(hue, saturation, lightness);
     }
     notifyListeners();
   }
