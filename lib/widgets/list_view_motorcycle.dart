@@ -9,6 +9,7 @@ import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class MotorcycleListView extends StatefulWidget {
@@ -208,8 +209,8 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<PolylinesState, Settings>(
-      builder: (context, polylinesState, settings, child) {
+    return Consumer3<PolylinesState, Settings, ThemeState>(
+      builder: (context, polylinesState, settings, theme, child) {
         // Check if data is available
         if (polylinesState.resultForPrivateVehicle.isEmpty) {
           return const Center(
@@ -246,7 +247,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 int selectedIndex = polylinesState.motorcycleActiveRouteIndex;
                 Color color = Colors.transparent;
                 if (selectedIndex == index) {
-                  color = Colors.green;
+                  color = theme.seedColour;
                 } else {
                   color = Colors.transparent;
                 }
@@ -264,7 +265,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                       border: Border(
                         left: BorderSide(
                           color: color,
-                          width: 4.0,
+                          width: 5.0,
                         ),
                       ),
                     ),
@@ -280,7 +281,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: Colors.green,
+                                  color: theme.seedColour,
                                   size: 30,
                                 ),
                               ),
@@ -390,8 +391,11 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                             ),
                             IconButton(
                               icon: Icon(
-                                isCompleted ? Icons.check_circle : Icons.cancel_outlined,
-                                color: isCompleted ? Colors.green : Colors.black,
+                                isCompleted
+                                    ? Icons.check_circle
+                                    : Icons.cancel_outlined,
+                                color:
+                                    isCompleted ? Colors.green : Colors.black,
                                 size: 28,
                               ),
                               onPressed: settings.enableGeolocationVerification
@@ -408,7 +412,9 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              separatorBuilder: (BuildContext context, int index) => const Divider(
+                thickness: 2,
+              ),
             ),
           ],
         );

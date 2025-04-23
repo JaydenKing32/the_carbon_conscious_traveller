@@ -8,6 +8,7 @@ import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class CarListView extends StatefulWidget {
@@ -169,8 +170,8 @@ class _CarListViewState extends State<CarListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<PolylinesState, Settings>(
-      builder: (context, polylinesState, settings, child) {
+    return Consumer3<PolylinesState, Settings, ThemeState>(
+      builder: (context, polylinesState, settings, theme, child) {
         return Column(
           children: [
             ListView.separated(
@@ -205,7 +206,7 @@ class _CarListViewState extends State<CarListView> {
                 selectedIndex = polylinesState.carActiveRouteIndex;
                 Color color = Colors.transparent;
                 if (selectedIndex == index) {
-                  color = Colors.green;
+                  color = theme.seedColour;
                 } else {
                   color = Colors.transparent;
                 }
@@ -220,7 +221,7 @@ class _CarListViewState extends State<CarListView> {
                       border: Border(
                         left: BorderSide(
                           color: color,
-                          width: 4.0,
+                          width: 5.0,
                         ),
                       ),
                     ),
@@ -236,7 +237,7 @@ class _CarListViewState extends State<CarListView> {
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: Colors.green,
+                                  color: theme.seedColour,
                                   size: 25,
                                 ),
                               ),
@@ -245,7 +246,8 @@ class _CarListViewState extends State<CarListView> {
                                   padding: const EdgeInsets.only(right: 10),
                                   child: Text(
                                     'via ${widget.polylinesState.routeSummary[index]}',
-                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                     softWrap: true,
                                   ),
                                 ),
@@ -351,7 +353,10 @@ class _CarListViewState extends State<CarListView> {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(
+                thickness: 2,
+              ),
             ),
           ],
         );
