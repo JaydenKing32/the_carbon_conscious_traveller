@@ -102,9 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(
             widget.title,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
           ),
-          iconTheme: const IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onInverseSurface),
         ),
         body: const Stack(
           children: [
