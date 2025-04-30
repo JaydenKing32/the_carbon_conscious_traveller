@@ -42,6 +42,14 @@ class PolylinesState extends ChangeNotifier {
   int get motorcycleActiveRouteIndex => _motorcycleActiveRouteIndex;
   int get transitActiveRouteIndex => _transitActiveRouteIndex;
 
+  final List<Color> _polyColours = [];
+  List<Color> get polyColours => _polyColours;
+  List<Color> _darkPolyColours = [];
+
+  final List<Color> _carPolyColours = [];
+  final List<Color> _motoPolyColours = [];
+  final List<Color> _transitPolyColours =[];
+
   static const Map<String, TravelMode> _modeMap = {
     'driving': TravelMode.driving,
     'motorcycling': TravelMode.driving,
@@ -114,16 +122,19 @@ class PolylinesState extends ChangeNotifier {
     polylines.clear();
 
     for (int i = 0; i < result.length; i++) {
-      PolylineId id = PolylineId('poly$i');
+      PolylineId id = PolylineId('poly1$i');
       Polyline polyline = Polyline(
         polylineId: id,
-        color: i == _activeRouteIndex ? const Color.fromARGB(255, 40, 33, 243) : const Color.fromARGB(255, 136, 136, 136),
+        color: _polyColours.isNotEmpty
+            ? _polyColours[i]
+            : const Color.fromARGB(255, 136, 136, 136),
         points: routeCoordinates[i],
         width: i == _activeRouteIndex ? 7 : 5,
         zIndex: i == _activeRouteIndex ? 1 : 0, // Put active route on top
         geodesic: true,
         startCap: Cap.roundCap,
         endCap: Cap.roundCap,
+        jointType: JointType.round,
         consumeTapEvents: true,
         onTap: () => setActiveRoute(i),
       );
@@ -134,7 +145,26 @@ class PolylinesState extends ChangeNotifier {
       getDurationTexts();
       getRouteSummary();
     }
-
+    // Draw a second set of polylines to create an outline effect
+    for (int i = 0; i < result.length; i++) {
+      PolylineId id = PolylineId('poly2$i');
+      Polyline polyline = Polyline(
+        polylineId: id,
+        color: _darkPolyColours.isNotEmpty
+            ? _darkPolyColours[i]
+            : const Color.fromARGB(255, 136, 136, 136),
+        points: routeCoordinates[i],
+        width: i == _activeRouteIndex ? 9 : 8,
+        zIndex: i == _activeRouteIndex ? 0 : -2, // Put active route on top
+        geodesic: true,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        jointType: JointType.round,
+        consumeTapEvents: true,
+        onTap: () => setActiveRoute(i),
+      );
+      polylines[id] = polyline;
+    }
     notifyListeners();
   }
 
@@ -230,5 +260,60 @@ class PolylinesState extends ChangeNotifier {
     _routeSummary.clear();
 
     notifyListeners();
+  }
+
+  void setPolyColours(List<Color> colours) {
+    _polyColours.clear();
+    if (_mode == 'driving') {
+      _carPolyColours.clear();
+      for (int i = 0; i < colours.length; i++) {
+        _carPolyColours.add(colours[i]);
+      }
+      _polyColours.addAll(_carPolyColours);
+      _darkPolyColours.clear;
+      darkenColours(_carPolyColours);
+    }
+    if (_mode == 'motorcycling') {
+      _motoPolyColours.clear();
+      for (int i = 0; i < colours.length; i++) {
+        _motoPolyColours.add(colours[i]);
+      }
+      _polyColours.addAll(_motoPolyColours);
+      _darkPolyColours.clear;
+      darkenColours(_motoPolyColours);
+    }
+    if (_mode == 'transit') {
+      _transitPolyColours.clear();
+      for (int i = 0; i < colours.length; i++) {
+        _transitPolyColours.add(colours[i]);
+      }
+      _polyColours.addAll(_transitPolyColours);
+      _darkPolyColours.clear;
+      darkenColours(_transitPolyColours);
+    }
+    _updateActiveRoute(0);
+    print("the polyline colours are $colours");
+    notifyListeners();
+  }
+
+  void darkenColours(List<Color> colours) {
+    print("darken colours!");
+    print("colors length ${colours.length}");
+
+    if (_darkPolyColours.length != colours.length) {
+      _darkPolyColours = List<Color>.filled(colours.length, Colors.transparent);
+    }
+      for (int i = 0; i < colours.length; i++) {
+        final hsl = HSLColor.fromColor(colours[i]);
+        final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
+        _darkPolyColours[i] = darker.toColor();
+        print("colours darkened ${_darkPolyColours.length}");
+      }
+      print("all colours darkened!");
+  }
+
+  void resetPolyColours() {
+    _polyColours.clear();
+    _darkPolyColours.clear();
   }
 }
