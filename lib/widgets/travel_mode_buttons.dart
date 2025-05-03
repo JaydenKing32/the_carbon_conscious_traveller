@@ -105,7 +105,7 @@ void initState() {
     }
   });
 
-  // 👇 fire immediately if already ready
+  // fire immediately if already ready
   if (sync.coloursReady) {
     _handlePolyline();
     sync.setColoursReady(false);
@@ -187,29 +187,34 @@ void _handlePolyline() {
                       }
                     });
 
-                      //polylineState.updateColours(theme.seedColourList);
-                    // polylineState.setPolyColours(theme.seedColourList);
                     polylineState.transportMode = selectedMode;
 
                     // If coordinates are set, fetch new polyline
                     // this is called every time the button is pressed IF we have routes
                     if (coordinatesState.coordinates.isNotEmpty) {
-                      if(polylineState.mode == 'motorcycling') {
-                         print("seed colour list is in moto mode buttons ${theme.motoColourList.length}");
-                        //polylineState.updateColours(theme.motoColourList);
-                      // } else if(polylineState.mode == 'driving') {
-                      //   polylineState.setPolyColours(theme.seedColourList);
-                      } else if(polylineState.mode == 'transit') {
-                        print("seed colour list is in transit mode buttons ${theme.transitColourList.length}");
-                        //polylineState.updateColours(theme.transitColourList);
-                      }
-                      polylineState.setActiveRoute(polylineState.getActiveRoute());
-                     // context.read<ColourSyncState>().addListener(() {
-                      // if (context.read<ColourSyncState>().coloursReady) {
-                      //     polylineState.getPolyline(coordinatesState.coordinates);
-                      // }
-// });
+                      polylineState
+                          .setActiveRoute(polylineState.getActiveRoute());
+                    }
 
+                    final theme = context.read<ThemeState>();
+
+                    // Clear existing colours for that mode (if not already calculated)
+                    // This is to give visual feedback that that mode has not been calculated yet
+                    if (selectedMode == 'motorcycling') {
+                      if (theme.motoColourList.isEmpty) {
+                        polylineState
+                            .updateColours([]);
+                            polylineState.getPolyline(coordinatesState.coordinates);
+                      }
+                    } else if (selectedMode == 'transit') {
+                      if (theme.transitColourList.isEmpty) {
+                        polylineState.updateColours([]);
+                      }
+                    } else if (selectedMode == 'driving') {
+                      if (theme.carColourList.isEmpty) {
+                        polylineState.updateColours([]);
+                        polylineState.getPolyline(coordinatesState.coordinates);
+                      }
                     }
                   },
                   renderBorder: false,
