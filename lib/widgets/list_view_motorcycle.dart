@@ -255,10 +255,25 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 widget.vehicleState.getTreeIcons(index, context);
 
                 return InkWell(
+                  autofocus: index == selectedIndex,
+                  onFocusChange: (focused) {
+                    for (int i = 0;
+                        i < widget.vehicleState.emissions.length;
+                        i++) {
+                      theme.calculateColour(
+                          widget.vehicleState.minEmissionValue,
+                          widget.vehicleState.maxEmissionValue,
+                          widget.vehicleState.emissions[i],
+                          i,
+                          widget.vehicleState.emissions.length);
+                    }
+                    theme.setThemeColour(selectedIndex);
+                  },
                   onTap: () {
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(index);
                   },
                   child: Container(
                     decoration: BoxDecoration(

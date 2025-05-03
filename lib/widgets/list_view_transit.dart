@@ -211,10 +211,26 @@ class _TransitListViewState extends State<TransitListView> {
                     : Colors.transparent;
 
                 return InkWell(
+                  autofocus: index == selectedIndex,
+                  onFocusChange: (focused) {
+                    if (focused) {
+                      for (int i = 0; i < widget.snapshot.data!.length; i++) {
+                        theme.calculateColour(
+                          transitState.minEmissionValue,
+                          transitState.maxEmissionValue,
+                          transitState.emissions[i],
+                          i,
+                         transitState.emissions.length,
+                        );
+                      }
+                    }
+                    theme.setThemeColour(selectedIndex);
+                  },
                   onTap: () {
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(index);
                   },
                   child: Container(
                     decoration: BoxDecoration(
