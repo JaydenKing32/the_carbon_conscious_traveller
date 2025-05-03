@@ -40,7 +40,7 @@ class GoogleMapViewState extends State<GoogleMapView> {
   @override
   Widget build(BuildContext context) {
     final markerModel = Provider.of<MarkerState>(context);
-    final polylineModel = Provider.of<PolylinesState>(context);
+    final polylineModel = context.watch<PolylinesState>();
     return Scaffold(
       body: _currentLocation == null
           ? Center(

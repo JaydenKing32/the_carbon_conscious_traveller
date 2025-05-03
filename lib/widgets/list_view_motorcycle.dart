@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
@@ -29,12 +30,17 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
   final Map<String, int> _routeToTripId = {}; // Map route summary to trip ID
   final Map<int, bool> _tripCompletionStatus = {};
 
+  List<FocusNode> focusNodes = [];
+  
   @override
   void initState() {
     super.initState();
     _loadSavedTrips();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
+    FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
+  });
   }
-
   /// Loads saved trips from the database and maps them to their respective routes.
   Future<void> _loadSavedTrips() async {
     List<Trip> trips = await TripDatabase.instance.getAllTrips();
@@ -208,10 +214,16 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
   }
 
 
+
+final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
+
+
+
+
   @override
   Widget build(BuildContext context) {
 
-         List<FocusNode> focusNodes = [];
+        //  List<FocusNode> focusNodes = [];
 
     if (focusNodes.length != widget.vehicleState.emissions.length) {
     // Clean up old nodes
@@ -286,15 +298,17 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                       }
                       polylinesState.updateColours(theme.motoColourList);
                       theme.setThemeColour(index);
+                      context.read<ColourSyncState>().setColoursReady(true);     
                     }
                   },
-                  autofocus: selectedIndex == index,
+                  //autofocus: selectedIndex == index,
                   onTap: () {
                     FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
                     theme.setThemeColour(index);
+                    context.read<ColourSyncState>().setColoursReady(true); 
                   },
                   child: Container(
                     decoration: BoxDecoration(

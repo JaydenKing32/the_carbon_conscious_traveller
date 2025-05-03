@@ -8,6 +8,7 @@ import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
@@ -224,11 +225,11 @@ class _TransitListViewState extends State<TransitListView> {
 
                 return InkWell(
                   focusNode: focusNodes[index],
-                  onFocusChange: (focused) async {
+                  onFocusChange: (focused) {
                     if (focused) {
                       // theme.seedColourList.clear(); // this causes an invisible error
                       for (int i = 0; i < widget.emissions.length; i++) {
-                        await theme.calculateColour(
+                       theme.calculateColour(
                           transitState.minEmissionValue,
                           transitState.maxEmissionValue,
                           transitState.emissions[i],
@@ -238,8 +239,8 @@ class _TransitListViewState extends State<TransitListView> {
                         );
                       }
                       polylinesState.updateColours(theme.transitColourList);
-
                       theme.setThemeColour(index);
+                      context.read<ColourSyncState>().setColoursReady(true);   
                     }
                   },
                   autofocus: index == selectedIndex,
