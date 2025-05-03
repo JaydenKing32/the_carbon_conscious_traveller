@@ -179,6 +179,18 @@ class _TransitListViewState extends State<TransitListView> {
       transitState.updateMinEmission(widget.emissions.reduce(min).round());
       transitState.updateMaxEmission(widget.emissions.reduce(max).round());
     });
+
+    List<FocusNode> focusNodes = [];
+
+    if (focusNodes.length != widget.emissions.length) {
+    // Clean up old nodes
+    for (final node in focusNodes) {
+      node.dispose();
+    }
+
+    // Recreate new nodes
+    focusNodes = List.generate(widget.emissions.length, (_) => FocusNode());
+  }
     return Consumer3<PolylinesState, Settings, ThemeState>(
       builder: (context, polylinesState, settings, theme, child) {
         final screenWidth = MediaQuery.of(context).size.width;
@@ -211,22 +223,28 @@ class _TransitListViewState extends State<TransitListView> {
                     : Colors.transparent;
 
                 return InkWell(
-                  autofocus: index == selectedIndex,
-                  onFocusChange: (focused) {
+                  focusNode: focusNodes[index],
+                  onFocusChange: (focused) async {
                     if (focused) {
-                      for (int i = 0; i < widget.snapshot.data!.length; i++) {
-                        theme.calculateColour(
+                      // theme.seedColourList.clear(); // this causes an invisible error
+                      for (int i = 0; i < widget.emissions.length; i++) {
+                        await theme.calculateColour(
                           transitState.minEmissionValue,
                           transitState.maxEmissionValue,
                           transitState.emissions[i],
                           i,
-                         transitState.emissions.length,
+                          transitState.emissions.length,
+                          polylinesState.mode,
                         );
                       }
+                      polylinesState.updateColours(theme.transitColourList);
+
+                      theme.setThemeColour(index);
                     }
-                    theme.setThemeColour(selectedIndex);
                   },
+                  autofocus: index == selectedIndex,
                   onTap: () {
+                    FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });

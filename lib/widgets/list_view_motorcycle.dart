@@ -207,8 +207,21 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
         index < widget.vehicleState.emissions.length;
   }
 
+
   @override
   Widget build(BuildContext context) {
+
+         List<FocusNode> focusNodes = [];
+
+    if (focusNodes.length != widget.vehicleState.emissions.length) {
+    // Clean up old nodes
+    for (final node in focusNodes) {
+      node.dispose();
+    }
+
+    // Recreate new nodes
+    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+  }
     return Consumer3<PolylinesState, Settings, ThemeState>(
       builder: (context, polylinesState, settings, theme, child) {
         // Check if data is available
@@ -255,21 +268,29 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 widget.vehicleState.getTreeIcons(index, context);
 
                 return InkWell(
-                  autofocus: index == selectedIndex,
+                  focusNode: focusNodes[index],
                   onFocusChange: (focused) {
-                    for (int i = 0;
-                        i < widget.vehicleState.emissions.length;
-                        i++) {
-                      theme.calculateColour(
+                    if (focused) {
+                      // theme.seedColourList.clear();
+                      for (int i = 0;
+                          i < widget.vehicleState.emissions.length;
+                          i++) {
+                        theme.calculateColour(
                           widget.vehicleState.minEmissionValue,
                           widget.vehicleState.maxEmissionValue,
                           widget.vehicleState.emissions[i],
                           i,
-                          widget.vehicleState.emissions.length);
+                          widget.vehicleState.emissions.length,
+                          polylinesState.mode,
+                        );
+                      }
+                      polylinesState.updateColours(theme.motoColourList);
+                      theme.setThemeColour(index);
                     }
-                    theme.setThemeColour(selectedIndex);
                   },
+                  autofocus: selectedIndex == index,
                   onTap: () {
+                    FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
