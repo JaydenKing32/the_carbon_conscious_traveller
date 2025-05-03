@@ -163,26 +163,26 @@ class PolylinesState extends ChangeNotifier {
       getRouteSummary();
     }
     // Draw a second set of polylines to create an outline effect
-    // for (int i = 0; i < result.length; i++) {
-    //   print("lenght of dark colours inside if in updateroute ${_darkPolyColours.length}");
-    //   PolylineId id = PolylineId('poly2$i');
-    //   Polyline polyline = Polyline(
-    //     polylineId: id,
-    //     color: _darkPolyColours.isNotEmpty
-    //         ? _darkPolyColours[i]
-    //         : const Color.fromARGB(255, 136, 136, 136),
-    //     points: routeCoordinates[i],
-    //     width: i == _activeRouteIndex ? 9 : 8,
-    //     zIndex: i == _activeRouteIndex ? 0 : -2, // Put active route on top
-    //     geodesic: true,
-    //     startCap: Cap.roundCap,
-    //     endCap: Cap.roundCap,
-    //     jointType: JointType.round,
-    //     consumeTapEvents: true,
-    //     onTap: () => setActiveRoute(i),
-    //   );
-    //   polylines[id] = polyline;
-    // }
+    for (int i = 0; i < result.length; i++) {
+      print("lenght of dark colours inside if in updateroute ${_darkPolyColours.length}");
+      PolylineId id = PolylineId('poly2$i');
+      Polyline polyline = Polyline(
+        polylineId: id,
+        color: _darkPolyColours.isNotEmpty
+            ? _darkPolyColours[i]
+            : const Color.fromARGB(255, 136, 136, 136),
+        points: routeCoordinates[i],
+        width: i == _activeRouteIndex ? 10 : 7,
+        zIndex: i == _activeRouteIndex ? 0 : -2, // Put active route on top
+        geodesic: true,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        jointType: JointType.round,
+        consumeTapEvents: true,
+        onTap: () => setActiveRoute(i),
+      );
+      polylines[id] = polyline;
+    }
     notifyListeners();
   }
 
@@ -283,29 +283,29 @@ class PolylinesState extends ChangeNotifier {
   void setPolyColours(List<Color> colours) {
     print("length of themecolours inside set poly colours: ${colours.length}");
     _polyColours.clear();
-
-      _polyColours.addAll(colours);
-      notifyListeners();
+    _polyColours.addAll(colours);
+    darkenColours(_polyColours);
+    notifyListeners();
     print("length of colours inside set poly colours: ${_polyColours.length}");
   }
 
 
-//   void darkenColours(List<Color> colours) {
+  void darkenColours(List<Color> colours) {
+    _darkPolyColours = colours.map((color) {
+      final hsl = HSLColor.fromColor(color);
+      final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
+      return darker.toColor();
+    }).toList();
 
-//     _darkPolyColours = colours.map((color) {
-//     final hsl = HSLColor.fromColor(color);
-//     final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
-//     return darker.toColor();
-//   }).toList();
-
-//   for (int i = 0; i < colours.length; i++) {
-//     final hsl = HSLColor.fromColor(colours[i]);
-//     final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
-//     _darkPolyColours[i] = darker.toColor();
-//   }
-//       print("all colours darkened!");
-//         print("lenght of colours inside darken colours ${_polyColours.length}");
-// print("lenght of dark colours inside darken colours ${_darkPolyColours.length}");
-//   }
+    for (int i = 0; i < colours.length; i++) {
+      final hsl = HSLColor.fromColor(colours[i]);
+      final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
+      _darkPolyColours[i] = darker.toColor();
+    }
+    print("all colours darkened!");
+    print("lenght of colours inside darken colours ${_polyColours.length}");
+    print(
+        "lenght of dark colours inside darken colours ${_darkPolyColours.length}");
+  }
 
 }
