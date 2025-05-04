@@ -277,15 +277,16 @@ class PolylinesState extends ChangeNotifier {
   void darkenColours(List<Color> colours) {
     _darkPolyColours = colours.map((color) {
       final hsl = HSLColor.fromColor(color);
-      final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
-      return darker.toColor();
+      print('HSL: $hsl');
+      
+      if(hsl.lightness > 0.9) {
+       const darker = HSLColor.fromAHSL(1, 27, 0.17, 0.7);
+        return darker.toColor();
+      }
+        else {final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
+        return darker.toColor();
+      }
     }).toList();
-
-    for (int i = 0; i < colours.length; i++) {
-      final hsl = HSLColor.fromColor(colours[i]);
-      final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
-      _darkPolyColours[i] = darker.toColor();
-    }
   }
 
 }
