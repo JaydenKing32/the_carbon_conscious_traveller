@@ -183,15 +183,16 @@ class _TransitListViewState extends State<TransitListView> {
 
     List<FocusNode> focusNodes = [];
 
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
     if (focusNodes.length != widget.emissions.length) {
-    // Clean up old nodes
-    for (final node in focusNodes) {
-      node.dispose();
+      // Clean up old nodes
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      // Recreate new nodes
+      focusNodes = List.generate(widget.emissions.length, (_) => FocusNode());
     }
-
-    // Recreate new nodes
-    focusNodes = List.generate(widget.emissions.length, (_) => FocusNode());
-  }
     return Consumer3<PolylinesState, Settings, ThemeState>(
       builder: (context, polylinesState, settings, theme, child) {
         final screenWidth = MediaQuery.of(context).size.width;
@@ -227,7 +228,7 @@ class _TransitListViewState extends State<TransitListView> {
                   focusNode: focusNodes[index],
                   onFocusChange: (focused) {
                     if (focused) {
-                      // theme.seedColourList.clear(); // this causes an invisible error
+                      // theme.seedColourList.clear(); // this causes an invisible error. Do not use
                       for (int i = 0; i < widget.emissions.length; i++) {
                        theme.calculateColour(
                           transitState.minEmissionValue,

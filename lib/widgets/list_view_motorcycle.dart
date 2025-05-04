@@ -223,14 +223,13 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
   @override
   Widget build(BuildContext context) {
 
-        //  List<FocusNode> focusNodes = [];
-
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
     if (focusNodes.length != widget.vehicleState.emissions.length) {
     // Clean up old nodes
     for (final node in focusNodes) {
       node.dispose();
     }
-
     // Recreate new nodes
     focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
   }
