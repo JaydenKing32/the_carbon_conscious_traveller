@@ -1,111 +1,73 @@
 import 'package:flutter/material.dart';
 
 class ThemeState extends ChangeNotifier {
-  late ThemeData _themeData;
+  late ThemeData _themeData = _buildTheme();
   ThemeData get themeData => _themeData;
 
-  double minEmissions = 0;
-  double maxEmissions = 0;
-  final _minEmissionThreshold =
-      5000; // emissions below this will have a minimum t value to keep the colour scheme green
-  final _maxEmissionThreshold =
-      29000; // emissions above this will have a maximum t valye to keep the colour scheme not too green
-
-  final HSLColor _startColour = const HSLColor.fromAHSL(1, 20, 0.3, 0.2);
-  final HSLColor _endColour = const HSLColor.fromAHSL(1, 107, 0.60, 0.53);
+  final HSLColor _startColour = const HSLColor.fromAHSL(1, 110, 0.75, 0.95);
+  final HSLColor _endColour = const HSLColor.fromAHSL(1, 107, 0.64, 0.48);
 
   Color _seedColour = const HSLColor.fromAHSL(1, 230, 1, 0).toColor();
   Color get seedColour => _seedColour;
+  List<Color> _seedColourList = [];
+  List<Color> get seedColourList => _seedColourList;
 
-  final Map<String, double> _lastEmissionsByMode = {};
+  List<Color> _transitColours = [];
+  List<Color> _motoColours = [];
+  List<Color> _carColours = [];
+  List<Color> get transitColourList => _transitColours;
+  List<Color> get motoColourList => _motoColours;
+  List<Color> get carColourList => _carColours;
+
   bool needsCalculation = true;
 
   double currentMaxEmissions = 0;
   double currentMinEmissions = 0;
 
-  void updateTheme(List<int> emissions, int index, String mode) {
-    print("index is $index & emissions is $emissions");
+  calculateColour(minEmissions, maxEmissions, selectedRouteEmission,
+      int activeRouteIndex, int totalRouteCount, String mode) {
+    double t = 0;
 
-    if (index >= 0 && emissions.isNotEmpty) {
-      double selectedRouteEmission = emissions[index].toDouble();
+    // Ensure the list is exactly the right length
+    if (_seedColourList.length != totalRouteCount) {
+      _seedColourList =
+          List<Color>.filled(totalRouteCount, _startColour.toColor());
+    }
 
-      print(
-          "selectedRouteEmission is $selectedRouteEmission for $mode &  ${_lastEmissionsByMode[mode]}");
+    t = (selectedRouteEmission - minEmissions) / (maxEmissions - minEmissions);
+    print("t value in else block: $t");
 
-      needsCalculation = (selectedRouteEmission > 0.0);
+    t = t.clamp(0.0, 1.0);
+    print("Final t value after clamping: $t");
 
-      if (needsCalculation) {
-        print("calculating colour for $selectedRouteEmission emissions....");
-        getMinMaxEmissions(emissions);
-        _seedColour = calculateColour(
-            currentMinEmissions, currentMaxEmissions, selectedRouteEmission);
-      } else {
-        print("NOT calculating colour");
-        return;
-      }
-      _themeData = _buildTheme();
-    } else {
-      _themeData = _buildTheme();
+    Color newColour = HSLColor.lerp(_endColour, _startColour, t)!.toColor();
+    _seedColourList[activeRouteIndex] = newColour;
+
+    if (mode == 'driving') {
+      _carColours = [];
+      _carColours.addAll(_seedColourList);
+    } else if (mode == 'motorcycling') {
+      _motoColours = [];
+      _motoColours.addAll(_seedColourList);
+    } else if (mode == 'transit') {
+      _transitColours = [];
+      _transitColours.addAll(_seedColourList);
     }
     notifyListeners();
   }
 
-  void getMinMaxEmissions(List<int> emissions) {
-    final sortedEmissions = [...emissions]..sort();
-    minEmissions = sortedEmissions.first.toDouble();
-    maxEmissions = sortedEmissions.last.toDouble();
-
-    print("max emissions is $maxEmissions");
-    print("min emissions is $minEmissions");
-
-    if (currentMaxEmissions < maxEmissions) {
-      currentMaxEmissions = maxEmissions;
-    }
-
-    if ((currentMinEmissions > minEmissions && maxEmissions != minEmissions) ||
-        currentMinEmissions == 0) {
-      currentMinEmissions = minEmissions;
-    }
-
-    print(
-        "current max emissions is $currentMaxEmissions && currentminEmissions $currentMinEmissions");
+  void setThemeColour(activeRouteIndex) {
+    _seedColour = _seedColourList[activeRouteIndex];
+    _themeData = _buildTheme();
+    notifyListeners();
   }
 
-  calculateColour(minEmissions, maxEmissions, selectedRouteEmission) {
-    double t = 0;
-    print(
-        "selectedRouteEmission is inside calculateColour $selectedRouteEmission");
-    print("max emissions is inside calculateColour $maxEmissions");
-    print("min emissions is inside calculateColour $minEmissions");
-    print("Initial t value: $t");
-    if (maxEmissions <= _minEmissionThreshold) {
-      double tLimit = 0.3; // cannot be higher than this to avoid brown colours
-      double tResult = ((selectedRouteEmission - minEmissions) /
-              (maxEmissions - minEmissions)) *
-          tLimit;
-      t = tResult;
-      print("t value in if block: $t");
-    } else if (minEmissions >= _maxEmissionThreshold) {
-      double lowerLimit = 0.0; // might need this value to adjust the colour
-      double upperLimit = 0.8; // cannot be lower than this to avoid brown colours
-      double range = upperLimit - lowerLimit;
-      double proportion = ((selectedRouteEmission - minEmissions) /
-          (maxEmissions - minEmissions));
-      t = lowerLimit + proportion * range;
-      print("t value in else if block: $t");
-    } else {
-      t = (selectedRouteEmission - minEmissions) /
-          (maxEmissions - minEmissions);
-      print("t value in else block: $t");
-    }
-    t = t.clamp(0.0, 1.0);
-    print("Final t value after clamping: $t");
-    return HSLColor.lerp(_endColour, _startColour, t)!.toColor();
+  void resetThemeColour() {
+    _seedColourList.clear();
+    notifyListeners();
   }
 
   ThemeData _buildTheme() {
-    print("seed colour is $_seedColour");
-
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
       appBarTheme: AppBarTheme(

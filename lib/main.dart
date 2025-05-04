@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/marker_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
@@ -31,33 +32,8 @@ void main() async {
         ChangeNotifierProvider(create: (context) => TransitState()),
         ChangeNotifierProvider.value(
             value: settings), // Use pre-initialized settings
-        ChangeNotifierProxyProvider4<PrivateMotorcycleState, PrivateCarState,
-            TransitState, PolylinesState, ThemeState>(
-          create: (context) => ThemeState(),
-          update: (context, motorcycleState, carState, transitState,
-              polylineState, themeState) {
-            List<int> travelModeEmissions = [];
-            int activeRouteIndex = 0;
-
-            switch (polylineState.mode) {
-              case 'motorcycling':
-                travelModeEmissions = motorcycleState.emissions;
-                activeRouteIndex = polylineState.motorcycleActiveRouteIndex;
-                break;
-              case 'driving':
-                travelModeEmissions = carState.emissions;
-                activeRouteIndex = polylineState.carActiveRouteIndex;
-                break;
-              case 'transit':
-                travelModeEmissions = transitState.emissions;
-                activeRouteIndex = polylineState.transitActiveRouteIndex;
-                break;
-            }
-            themeState!.updateTheme(
-                travelModeEmissions, activeRouteIndex, polylineState.mode);
-            return themeState;
-          },
-        ),
+        ChangeNotifierProvider(create: (context) => ThemeState()),
+        ChangeNotifierProvider(create: (_) => ColourSyncState()),
       ],
       child: const MyApp(),
     ),
@@ -102,9 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(
             widget.title,
-            style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+            style: TextStyle(color: Colors.black),
           ),
-          iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onInverseSurface),
+          iconTheme: IconThemeData(color: Colors.black),
         ),
         body: const Stack(
           children: [

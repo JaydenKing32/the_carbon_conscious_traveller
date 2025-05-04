@@ -42,6 +42,11 @@ class PolylinesState extends ChangeNotifier {
   int get motorcycleActiveRouteIndex => _motorcycleActiveRouteIndex;
   int get transitActiveRouteIndex => _transitActiveRouteIndex;
 
+  final List<Color> _polyColours = [];
+  List<Color> get polyColours => _polyColours;
+  List<Color> _darkPolyColours = [];
+  final List<Color> _themeColours = [];
+
   static const Map<String, TravelMode> _modeMap = {
     'driving': TravelMode.driving,
     'motorcycling': TravelMode.driving,
@@ -57,6 +62,12 @@ class PolylinesState extends ChangeNotifier {
 
   void resetPolyline() {
     _routeCoordinates.clear();
+    notifyListeners();
+  }
+
+  void updateColours(List<Color> colours) {
+    _themeColours.clear();
+    _themeColours.addAll(colours);
     notifyListeners();
   }
 
@@ -111,19 +122,23 @@ class PolylinesState extends ChangeNotifier {
 
   void _updateActiveRoute(int index) {
     _activeRouteIndex = index;
+    setPolyColours(_themeColours);
     polylines.clear();
 
     for (int i = 0; i < result.length; i++) {
-      PolylineId id = PolylineId('poly$i');
+      PolylineId id = PolylineId('poly1$i');
       Polyline polyline = Polyline(
         polylineId: id,
-        color: i == _activeRouteIndex ? const Color.fromARGB(255, 40, 33, 243) : const Color.fromARGB(255, 136, 136, 136),
+        color: _polyColours.isNotEmpty
+            ? _polyColours[i]
+            : const Color.fromARGB(255, 136, 136, 136),
         points: routeCoordinates[i],
         width: i == _activeRouteIndex ? 7 : 5,
         zIndex: i == _activeRouteIndex ? 1 : 0, // Put active route on top
         geodesic: true,
         startCap: Cap.roundCap,
         endCap: Cap.roundCap,
+        jointType: JointType.round,
         consumeTapEvents: true,
         onTap: () => setActiveRoute(i),
       );
@@ -134,7 +149,26 @@ class PolylinesState extends ChangeNotifier {
       getDurationTexts();
       getRouteSummary();
     }
-
+    // Draw a second set of polylines to create an outline effect
+    for (int i = 0; i < result.length; i++) {
+      PolylineId id = PolylineId('poly2$i');
+      Polyline polyline = Polyline(
+        polylineId: id,
+        color: _darkPolyColours.isNotEmpty
+            ? _darkPolyColours[i]
+            : const Color.fromARGB(255, 136, 136, 136),
+        points: routeCoordinates[i],
+        width: i == _activeRouteIndex ? 10 : 7,
+        zIndex: i == _activeRouteIndex ? 0 : -2, // Put active route on top
+        geodesic: true,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        jointType: JointType.round,
+        consumeTapEvents: true,
+        onTap: () => setActiveRoute(i),
+      );
+      polylines[id] = polyline;
+    }
     notifyListeners();
   }
 
@@ -231,4 +265,28 @@ class PolylinesState extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void setPolyColours(List<Color> colours) {
+    _polyColours.clear();
+    _polyColours.addAll(colours);
+    darkenColours(_polyColours);
+    notifyListeners();
+  }
+
+
+  void darkenColours(List<Color> colours) {
+    _darkPolyColours = colours.map((color) {
+      final hsl = HSLColor.fromColor(color);
+      print('HSL: $hsl');
+      
+      if(hsl.lightness > 0.9) {
+       const darker = HSLColor.fromAHSL(1, 27, 0.17, 0.7);
+        return darker.toColor();
+      }
+        else {final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
+        return darker.toColor();
+      }
+    }).toList();
+  }
+
 }

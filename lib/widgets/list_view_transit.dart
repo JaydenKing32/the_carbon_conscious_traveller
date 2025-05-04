@@ -8,6 +8,7 @@ import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
@@ -179,6 +180,19 @@ class _TransitListViewState extends State<TransitListView> {
       transitState.updateMinEmission(widget.emissions.reduce(min).round());
       transitState.updateMaxEmission(widget.emissions.reduce(max).round());
     });
+
+    List<FocusNode> focusNodes = [];
+
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
+    if (focusNodes.length != widget.emissions.length) {
+      // Clean up old nodes
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      // Recreate new nodes
+      focusNodes = List.generate(widget.emissions.length, (_) => FocusNode());
+    }
     return Consumer3<PolylinesState, Settings, ThemeState>(
       builder: (context, polylinesState, settings, theme, child) {
         final screenWidth = MediaQuery.of(context).size.width;
@@ -211,10 +225,32 @@ class _TransitListViewState extends State<TransitListView> {
                     : Colors.transparent;
 
                 return InkWell(
+                  focusNode: focusNodes[index],
+                  onFocusChange: (focused) {
+                    if (focused) {
+                      // theme.seedColourList.clear(); // this causes an invisible error. Do not use
+                      for (int i = 0; i < widget.emissions.length; i++) {
+                       theme.calculateColour(
+                          transitState.minEmissionValue,
+                          transitState.maxEmissionValue,
+                          transitState.emissions[i],
+                          i,
+                          transitState.emissions.length,
+                          polylinesState.mode,
+                        );
+                      }
+                      polylinesState.updateColours(theme.transitColourList);
+                      theme.setThemeColour(index);
+                      context.read<ColourSyncState>().setColoursReady(true);   
+                    }
+                  },
+                  autofocus: index == selectedIndex,
                   onTap: () {
+                    //FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(index);
                   },
                   child: Container(
                     decoration: BoxDecoration(

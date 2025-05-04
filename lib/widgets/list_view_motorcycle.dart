@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
@@ -29,12 +30,17 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
   final Map<String, int> _routeToTripId = {}; // Map route summary to trip ID
   final Map<int, bool> _tripCompletionStatus = {};
 
+  List<FocusNode> focusNodes = [];
+  
   @override
   void initState() {
     super.initState();
     _loadSavedTrips();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
+    FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
+  });
   }
-
   /// Loads saved trips from the database and maps them to their respective routes.
   Future<void> _loadSavedTrips() async {
     List<Trip> trips = await TripDatabase.instance.getAllTrips();
@@ -207,8 +213,26 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
         index < widget.vehicleState.emissions.length;
   }
 
+
+
+final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
+
+
+
+
   @override
   Widget build(BuildContext context) {
+
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
+    if (focusNodes.length != widget.vehicleState.emissions.length) {
+    // Clean up old nodes
+    for (final node in focusNodes) {
+      node.dispose();
+    }
+    // Recreate new nodes
+    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+  }
     return Consumer3<PolylinesState, Settings, ThemeState>(
       builder: (context, polylinesState, settings, theme, child) {
         // Check if data is available
@@ -255,10 +279,35 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 widget.vehicleState.getTreeIcons(index, context);
 
                 return InkWell(
+                  focusNode: focusNodes[index],
+                  onFocusChange: (focused) {
+                    if (focused) {
+                      // theme.seedColourList.clear();
+                      for (int i = 0;
+                          i < widget.vehicleState.emissions.length;
+                          i++) {
+                        theme.calculateColour(
+                          widget.vehicleState.minEmissionValue,
+                          widget.vehicleState.maxEmissionValue,
+                          widget.vehicleState.emissions[i],
+                          i,
+                          widget.vehicleState.emissions.length,
+                          polylinesState.mode,
+                        );
+                      }
+                      polylinesState.updateColours(theme.motoColourList);
+                      theme.setThemeColour(index);
+                      context.read<ColourSyncState>().setColoursReady(true);     
+                    }
+                  },
+                  //autofocus: selectedIndex == index,
                   onTap: () {
+                   // FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(index);
+                    //context.read<ColourSyncState>().setColoursReady(true); 
                   },
                   child: Container(
                     decoration: BoxDecoration(

@@ -4,10 +4,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 
 import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/list_view_transit.dart';
 
 class Transit extends StatefulWidget {
@@ -112,7 +114,15 @@ class _TransitState extends State<Transit> {
 
     // Update polylines (listen: false => doesn't trigger immediate rebuild)
     polylinesState.transportMode = 'transit';
-    await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
+    //polylinesState.setPolyColours(null);
+    //Provider.of<ThemeState>(context, listen: false).seedColourList.clear();
+    final sync = context.read<ColourSyncState>();
+
+    if(sync.coloursReady) {
+      polylinesState.setPolyColours(Provider.of<ThemeState>(context, listen: false).seedColourList);
+       await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
+    } 
+    // await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
 
     return fetchedRoutes;
   }

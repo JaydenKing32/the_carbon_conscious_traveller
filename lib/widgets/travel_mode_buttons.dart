@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
@@ -16,6 +17,10 @@ class TravelModeButtons extends StatefulWidget {
   @override
   State<TravelModeButtons> createState() => _TravelModeButtonsState();
 }
+
+
+
+final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
 
 const String motorcycling = 'motorcycling';
 const String driving = 'driving';
@@ -88,6 +93,35 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
   }
 
   @override
+void initState() {
+  super.initState();
+
+  final sync = context.read<ColourSyncState>();
+
+  sync.addListener(() {
+    if (sync.coloursReady) {
+      _handlePolyline();
+      sync.setColoursReady(false);
+    }
+  });
+
+  // fire immediately if already ready
+  if (sync.coloursReady) {
+    _handlePolyline();
+    sync.setColoursReady(false);
+  }
+}
+
+void _handlePolyline() {
+  final polylineState = context.read<PolylinesState>();
+  final coordinates = context.read<CoordinatesState>().coordinates;
+
+  if (coordinates.isNotEmpty) {
+    polylineState.getPolyline(coordinates);
+  }
+}
+
+  @override
   Widget build(BuildContext context) {
     return Consumer6<CoordinatesState, PrivateMotorcycleState, PrivateCarState,
         TransitState, PolylinesState, ThemeState>(
@@ -156,9 +190,31 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                     polylineState.transportMode = selectedMode;
 
                     // If coordinates are set, fetch new polyline
+                    // this is called every time the button is pressed IF we have routes
                     if (coordinatesState.coordinates.isNotEmpty) {
-                      polylineState.setActiveRoute(polylineState.getActiveRoute());
-                      polylineState.getPolyline(coordinatesState.coordinates);
+                      polylineState
+                          .setActiveRoute(polylineState.getActiveRoute());
+                    }
+
+                    final theme = context.read<ThemeState>();
+
+                    // Clear existing colours for that mode (if not already calculated)
+                    // This is to give visual feedback that that mode has not been calculated yet
+                    if (selectedMode == 'motorcycling') {
+                      if (theme.motoColourList.isEmpty) {
+                        polylineState
+                            .updateColours([]);
+                            polylineState.getPolyline(coordinatesState.coordinates);
+                      }
+                    } else if (selectedMode == 'transit') {
+                      if (theme.transitColourList.isEmpty) {
+                        polylineState.updateColours([]);
+                      }
+                    } else if (selectedMode == 'driving') {
+                      if (theme.carColourList.isEmpty) {
+                        polylineState.updateColours([]);
+                        polylineState.getPolyline(coordinatesState.coordinates);
+                      }
                     }
                   },
                   renderBorder: false,
