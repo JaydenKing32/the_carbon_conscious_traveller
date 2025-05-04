@@ -270,8 +270,10 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                 bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
                 int selectedIndex = polylinesState.motorcycleActiveRouteIndex;
                 Color color = Colors.transparent;
-                if (selectedIndex == index) {
+                if (selectedIndex == index && !theme.isTooLight) {
                   color = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  color = Colors.brown;
                 } else {
                   color = Colors.transparent;
                 }
@@ -330,7 +332,6 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: theme.seedColour,
                                   size: 30,
                                 ),
                               ),

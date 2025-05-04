@@ -218,10 +218,6 @@ void _handlePolyline() {
                     }
                   },
                   renderBorder: false,
-                  highlightColor: theme.seedColour.withAlpha(50),
-                  selectedColor: theme.seedColour,
-                  color: Colors.grey[600],
-                  fillColor: Colors.transparent,
                   constraints: const BoxConstraints(
                     minHeight: 40.0,
                     minWidth: 40.0,

@@ -224,9 +224,11 @@ class _CarListViewState extends State<CarListView> {
                 //Change the border color of the active route
 
                 selectedIndex = polylinesState.carActiveRouteIndex;
-                Color color = Colors.transparent;
-                if (selectedIndex == index) {
+                  Color color = Colors.transparent;
+                if (selectedIndex == index && !theme.isTooLight) {
                   color = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  color = Colors.brown;
                 } else {
                   color = Colors.transparent;
                 }
@@ -278,7 +280,6 @@ class _CarListViewState extends State<CarListView> {
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: theme.seedColour,
                                   size: 25,
                                 ),
                               ),

@@ -220,9 +220,14 @@ class _TransitListViewState extends State<TransitListView> {
                 transitState.updateMaxConfiguredEmissions(driving, carFactor * maxDistance);
                 transitState.updateMaxConfiguredEmissions(motorcycling, motorcycleFactor * maxDistance);
 
-                Color color = selectedIndex == index
-                    ? theme.seedColour
-                    : Colors.transparent;
+                Color color = Colors.transparent;
+                if (selectedIndex == index && !theme.isTooLight) {
+                  color = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  color = Colors.brown;
+                } else {
+                  color = Colors.transparent;
+                }
 
                 return InkWell(
                   focusNode: focusNodes[index],
