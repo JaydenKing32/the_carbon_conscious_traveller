@@ -245,7 +245,7 @@ class _TransitListViewState extends State<TransitListView> {
                   },
                   autofocus: index == selectedIndex,
                   onTap: () {
-                    FocusScope.of(context).requestFocus(focusNodes[index]);
+                    //FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });

@@ -303,12 +303,12 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                   },
                   //autofocus: selectedIndex == index,
                   onTap: () {
-                    FocusScope.of(context).requestFocus(focusNodes[index]);
+                   // FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
                     theme.setThemeColour(index);
-                    context.read<ColourSyncState>().setColoursReady(true); 
+                    //context.read<ColourSyncState>().setColoursReady(true); 
                   },
                   child: Container(
                     decoration: BoxDecoration(
