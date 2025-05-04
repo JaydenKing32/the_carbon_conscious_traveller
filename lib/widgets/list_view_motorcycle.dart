@@ -277,6 +277,15 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                 } else {
                   color = Colors.transparent;
                 }
+
+                Color iconColor = Colors.transparent;
+                if (selectedIndex == index && !theme.isTooLight) {
+                  iconColor = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  iconColor = Colors.brown;
+                } else {
+                  iconColor = Colors.black;
+                }
                 // Fetch tree icons based on emission
                 widget.vehicleState.getTreeIcons(index, context);
 
@@ -332,6 +341,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
+                                  color: iconColor,
                                   size: 30,
                                 ),
                               ),
