@@ -7,7 +7,7 @@ class ThemeState extends ChangeNotifier {
   final HSLColor _startColour = const HSLColor.fromAHSL(1, 110, 0.75, 0.95);
   final HSLColor _endColour = const HSLColor.fromAHSL(1, 107, 0.64, 0.48);
 
-  Color _seedColour = const HSLColor.fromAHSL(1, 230, 1, 0).toColor();
+  Color _seedColour = const HSLColor.fromAHSL(1, 0, 0, 0).toColor();
   Color get seedColour => _seedColour;
   List<Color> _seedColourList = [];
   List<Color> get seedColourList => _seedColourList;
@@ -18,6 +18,9 @@ class ThemeState extends ChangeNotifier {
   List<Color> get transitColourList => _transitColours;
   List<Color> get motoColourList => _motoColours;
   List<Color> get carColourList => _carColours;
+
+  bool _isTooLight = false;
+  bool get isTooLight => _isTooLight;
 
   bool needsCalculation = true;
 
@@ -68,10 +71,24 @@ class ThemeState extends ChangeNotifier {
   }
 
   ThemeData _buildTheme() {
-    return ThemeData(
+    HSLColor hslColour = HSLColor.fromColor(_seedColour);
+
+    if (hslColour.lightness > 0.8) {
+      _isTooLight = true;
+    } else {
+      _isTooLight = false;
+    }
+
+    // Initial theme data
+    ThemeData themeData1 = ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
       appBarTheme: AppBarTheme(
         backgroundColor: _seedColour,
+        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+          opacity: 1,
+        ),
       ),
       textTheme: const TextTheme(
         displayLarge: TextStyle(fontSize: 24),
@@ -85,7 +102,148 @@ class ThemeState extends ChangeNotifier {
           fontWeight: FontWeight.bold,
         ),
       ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: _seedColour,
+          foregroundColor: Colors.white,
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+      toggleButtonsTheme: ToggleButtonsThemeData(
+        color: Colors.grey,
+        selectedColor: Colors.black,
+        fillColor: Colors.transparent,
+        highlightColor: Colors.black.withAlpha(50),
+      ),
       useMaterial3: true,
     );
+
+    // Theme data for when calculated colours are too light
+    // Lightness > 0.8
+    ThemeData themeData2 = ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
+      appBarTheme: AppBarTheme(
+        backgroundColor: _seedColour,
+        foregroundColor: Colors.black,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+          opacity: 1,
+        ),
+      ),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(fontSize: 24),
+        displayMedium: TextStyle(fontSize: 20),
+        displaySmall: TextStyle(fontSize: 16),
+        bodyLarge: TextStyle(fontSize: 18),
+        bodyMedium: TextStyle(fontSize: 16),
+        bodySmall: TextStyle(fontSize: 20),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: _seedColour,
+          foregroundColor: Colors.white,
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+      toggleButtonsTheme: ToggleButtonsThemeData(
+        color: Colors.grey,
+        selectedColor: Colors.black,
+        fillColor: Colors.transparent,
+        highlightColor: Colors.black.withAlpha(50),
+      ),
+      iconTheme: const IconThemeData(
+        color: Colors.black,
+      ),
+      useMaterial3: true,
+    );
+
+    // Theme data for the rest of the cases
+    ThemeData themeData3 = ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
+      appBarTheme: AppBarTheme(
+        backgroundColor: _seedColour,
+        foregroundColor: Colors.black,
+        iconTheme: const IconThemeData(
+          color: Colors.black,  
+          opacity: 1,
+        ),
+      ),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(fontSize: 24),
+        displayMedium: TextStyle(fontSize: 20),
+        displaySmall: TextStyle(fontSize: 16),
+        bodyLarge: TextStyle(fontSize: 18),
+        bodyMedium: TextStyle(fontSize: 16),
+        bodySmall: TextStyle(fontSize: 20),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: _seedColour,
+          foregroundColor: Colors.white,
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+      toggleButtonsTheme: ToggleButtonsThemeData(
+        color: Colors.grey,
+        selectedColor: Colors.black,
+        fillColor: Colors.transparent,
+        highlightColor: Colors.black.withAlpha(50),
+      ),
+      iconTheme: const IconThemeData(
+        color: Colors.black ,
+      ),
+      useMaterial3: true,
+    );
+
+    if (hslColour.lightness == 0) {
+      print("theme is black & hsl is $hslColour");
+      return themeData1;
+    } else if (hslColour.lightness > 0.8) {
+      print("theme is brown & hsl is $hslColour");
+      return themeData2;
+    } else {
+      print("theme is seedcolour & hsl is $hslColour");
+      return themeData3;
+    }
+
+    // return ThemeData(
+    //   colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
+    //   appBarTheme: AppBarTheme(
+    //     backgroundColor: _seedColour,
+    //     foregroundColor: Colors.white,
+    //     iconTheme: const IconThemeData(
+    //       color: Colors.white,
+    //       opacity: 1,
+    //     ),
+    //   ),
+    //   textTheme: const TextTheme(
+    //     displayLarge: TextStyle(fontSize: 24),
+    //     displayMedium: TextStyle(fontSize: 20),
+    //     displaySmall: TextStyle(fontSize: 16),
+    //     bodyLarge: TextStyle(fontSize: 18),
+    //     bodyMedium: TextStyle(fontSize: 16),
+    //     bodySmall: TextStyle(fontSize: 20),
+    //     titleLarge: TextStyle(
+    //       fontSize: 20,
+    //       fontWeight: FontWeight.bold,
+    //     ),
+    //   ),
+    //   filledButtonTheme: FilledButtonThemeData(
+    //     style: FilledButton.styleFrom(
+    //       backgroundColor: _seedColour,
+    //       foregroundColor: Colors.white,
+    //       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    //     ),
+    //   ),
+    //   useMaterial3: true,
+    // );
   }
 }
