@@ -4,11 +4,6 @@ class ThemeState extends ChangeNotifier {
   late ThemeData _themeData = _buildTheme();
   ThemeData get themeData => _themeData;
 
-  final _minEmissionThreshold =
-      0; // emissions below this will have a minimum t value to keep the colour scheme green
-  final _maxEmissionThreshold =
-      0; // emissions above this will have a maximum t valye to keep the colour scheme not too green
-
   final HSLColor _startColour = const HSLColor.fromAHSL(1, 110, 0.75, 0.95);
   final HSLColor _endColour = const HSLColor.fromAHSL(1, 107, 0.64, 0.48);
 
@@ -29,35 +24,14 @@ class ThemeState extends ChangeNotifier {
   double currentMaxEmissions = 0;
   double currentMinEmissions = 0;
 
-  //void getMinMaxEmissions(List<int> emissions) {
-  //   final sortedEmissions = [...emissions]..sort();
-  //   minEmissions = sortedEmissions.first.toDouble();
-  //   maxEmissions = sortedEmissions.last.toDouble();
-
-  //   print("max emissions is $maxEmissions");
-  //   print("min emissions is $minEmissions");
-
-  //   if (currentMaxEmissions < maxEmissions) {
-  //     currentMaxEmissions = maxEmissions;
-  //   }
-
-  //   if ((currentMinEmissions > minEmissions && maxEmissions != minEmissions) ||
-  //       currentMinEmissions == 0) {
-  //     currentMinEmissions = minEmissions;
-  //   }
-
-  //   print(
-  //       "current max emissions is $currentMaxEmissions && currentminEmissions $currentMinEmissions");
-  // }
-
-  calculateColour(minEmissions, maxEmissions, selectedRouteEmission, int activeRouteIndex, int totalRouteCount, String mode) {
+  calculateColour(minEmissions, maxEmissions, selectedRouteEmission,
+      int activeRouteIndex, int totalRouteCount, String mode) {
     double t = 0;
-    print("total route count is $totalRouteCount");
-    print("seed COLOUR LIST ${_seedColourList.length}");
 
     // Ensure the list is exactly the right length
     if (_seedColourList.length != totalRouteCount) {
-      _seedColourList = List<Color>.filled(totalRouteCount, _startColour.toColor());
+      _seedColourList =
+          List<Color>.filled(totalRouteCount, _startColour.toColor());
     }
 
     t = (selectedRouteEmission - minEmissions) / (maxEmissions - minEmissions);
@@ -75,20 +49,15 @@ class ThemeState extends ChangeNotifier {
     } else if (mode == 'motorcycling') {
       _motoColours = [];
       _motoColours.addAll(_seedColourList);
-      print("motorcycle colours ${_motoColours.length}");
     } else if (mode == 'transit') {
       _transitColours = [];
       _transitColours.addAll(_seedColourList);
     }
-
-    print("The length of the seed colour list ${_seedColourList.length}");
     notifyListeners();
   }
 
   void setThemeColour(activeRouteIndex) {
-    print("setting theme colour");
     _seedColour = _seedColourList[activeRouteIndex];
-    print("setting theme colour to $_seedColour");
     _themeData = _buildTheme();
     notifyListeners();
   }
@@ -99,8 +68,6 @@ class ThemeState extends ChangeNotifier {
   }
 
   ThemeData _buildTheme() {
-    print("seed colour is inside build theme $_seedColour");
-
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
       appBarTheme: AppBarTheme(

@@ -47,10 +47,6 @@ class PolylinesState extends ChangeNotifier {
   List<Color> _darkPolyColours = [];
   final List<Color> _themeColours = [];
 
-  final List<Color> _carPolyColours = [];
-  final List<Color> _motoPolyColours = [];
-  final List<Color> _transitPolyColours =[];
-
   static const Map<String, TravelMode> _modeMap = {
     'driving': TravelMode.driving,
     'motorcycling': TravelMode.driving,
@@ -70,11 +66,8 @@ class PolylinesState extends ChangeNotifier {
   }
 
   void updateColours(List<Color> colours) {
-    print("length of colours inside update colours: ${colours.length}");
     _themeColours.clear();
     _themeColours.addAll(colours);
-     print("length of themecolours inside update colours: ${_themeColours.length}");
-     //_updateActiveRoute(0);
     notifyListeners();
   }
 
@@ -128,15 +121,9 @@ class PolylinesState extends ChangeNotifier {
   }
 
   void _updateActiveRoute(int index) {
-    print(
-        "length of themecolours inside update route: ${_themeColours.length}");
-
     _activeRouteIndex = index;
     setPolyColours(_themeColours);
     polylines.clear();
-
-    print(
-        "result length ${result.length} & length of colours inside updateroute ${_polyColours.length}");
 
     for (int i = 0; i < result.length; i++) {
       PolylineId id = PolylineId('poly1$i');
@@ -164,7 +151,6 @@ class PolylinesState extends ChangeNotifier {
     }
     // Draw a second set of polylines to create an outline effect
     for (int i = 0; i < result.length; i++) {
-      print("lenght of dark colours inside if in updateroute ${_darkPolyColours.length}");
       PolylineId id = PolylineId('poly2$i');
       Polyline polyline = Polyline(
         polylineId: id,
@@ -281,12 +267,10 @@ class PolylinesState extends ChangeNotifier {
   }
 
   void setPolyColours(List<Color> colours) {
-    print("length of themecolours inside set poly colours: ${colours.length}");
     _polyColours.clear();
     _polyColours.addAll(colours);
     darkenColours(_polyColours);
     notifyListeners();
-    print("length of colours inside set poly colours: ${_polyColours.length}");
   }
 
 
@@ -302,10 +286,6 @@ class PolylinesState extends ChangeNotifier {
       final darker = hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0));
       _darkPolyColours[i] = darker.toColor();
     }
-    print("all colours darkened!");
-    print("lenght of colours inside darken colours ${_polyColours.length}");
-    print(
-        "lenght of dark colours inside darken colours ${_darkPolyColours.length}");
   }
 
 }
