@@ -144,7 +144,7 @@ class ThemeState extends ChangeNotifier {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: _seedColour,
+          backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -186,7 +186,7 @@ class ThemeState extends ChangeNotifier {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: _seedColour,
+          backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
