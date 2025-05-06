@@ -72,8 +72,10 @@ class ThemeState extends ChangeNotifier {
 
   ThemeData _buildTheme() {
     HSLColor hslColour = HSLColor.fromColor(_seedColour);
+    double lightnessLimit =
+        0.8; // value of lightness when green becomes too light
 
-    if (hslColour.lightness > 0.8) {
+    if (hslColour.lightness > lightnessLimit) {
       _isTooLight = true;
     } else {
       _isTooLight = false;
@@ -168,7 +170,7 @@ class ThemeState extends ChangeNotifier {
         backgroundColor: _seedColour,
         foregroundColor: Colors.black,
         iconTheme: const IconThemeData(
-          color: Colors.black,  
+          color: Colors.black,
           opacity: 1,
         ),
       ),
@@ -198,7 +200,7 @@ class ThemeState extends ChangeNotifier {
         highlightColor: Colors.black.withAlpha(50),
       ),
       iconTheme: const IconThemeData(
-        color: Colors.black ,
+        color: Colors.black,
       ),
       useMaterial3: true,
     );
@@ -206,44 +208,12 @@ class ThemeState extends ChangeNotifier {
     if (hslColour.lightness == 0) {
       print("theme is black & hsl is $hslColour");
       return themeData1;
-    } else if (hslColour.lightness > 0.8) {
+    } else if (hslColour.lightness > lightnessLimit) {
       print("theme is brown & hsl is $hslColour");
       return themeData2;
     } else {
       print("theme is seedcolour & hsl is $hslColour");
       return themeData3;
     }
-
-    // return ThemeData(
-    //   colorScheme: ColorScheme.fromSeed(seedColor: _seedColour),
-    //   appBarTheme: AppBarTheme(
-    //     backgroundColor: _seedColour,
-    //     foregroundColor: Colors.white,
-    //     iconTheme: const IconThemeData(
-    //       color: Colors.white,
-    //       opacity: 1,
-    //     ),
-    //   ),
-    //   textTheme: const TextTheme(
-    //     displayLarge: TextStyle(fontSize: 24),
-    //     displayMedium: TextStyle(fontSize: 20),
-    //     displaySmall: TextStyle(fontSize: 16),
-    //     bodyLarge: TextStyle(fontSize: 18),
-    //     bodyMedium: TextStyle(fontSize: 16),
-    //     bodySmall: TextStyle(fontSize: 20),
-    //     titleLarge: TextStyle(
-    //       fontSize: 20,
-    //       fontWeight: FontWeight.bold,
-    //     ),
-    //   ),
-    //   filledButtonTheme: FilledButtonThemeData(
-    //     style: FilledButton.styleFrom(
-    //       backgroundColor: _seedColour,
-    //       foregroundColor: Colors.white,
-    //       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-    //     ),
-    //   ),
-    //   useMaterial3: true,
-    // );
   }
 }
