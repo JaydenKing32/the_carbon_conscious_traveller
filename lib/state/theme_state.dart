@@ -4,10 +4,10 @@ class ThemeState extends ChangeNotifier {
   late ThemeData _themeData = _buildTheme();
   ThemeData get themeData => _themeData;
 
-  final HSLColor _startColour = const HSLColor.fromAHSL(1, 110, 0.75, 0.95);
-  final HSLColor _endColour = const HSLColor.fromAHSL(1, 107, 0.64, 0.48);
+  final HSLColor _startColour = const HSLColor.fromAHSL(1, 107, 0.64, 0.48); // bright green
+  final HSLColor _endColour = const HSLColor.fromAHSL(1, 110, 0.75, 0.95); // light green
 
-  Color _seedColour = const HSLColor.fromAHSL(1, 0, 0, 0).toColor();
+  Color _seedColour = const HSLColor.fromAHSL(1, 0, 0, 0).toColor(); // black
   Color get seedColour => _seedColour;
   List<Color> _seedColourList = [];
   List<Color> get seedColourList => _seedColourList;
@@ -37,15 +37,20 @@ class ThemeState extends ChangeNotifier {
           List<Color>.filled(totalRouteCount, _startColour.toColor());
     }
 
+     if (totalRouteCount == 1) {
+      _seedColourList[activeRouteIndex] = _endColour.toColor();
+    }
+    else {
     t = (selectedRouteEmission - minEmissions) / (maxEmissions - minEmissions);
     print("t value in else block: $t");
 
     t = t.clamp(0.0, 1.0);
     print("Final t value after clamping: $t");
 
-    Color newColour = HSLColor.lerp(_endColour, _startColour, t)!.toColor();
+    Color newColour = HSLColor.lerp(_startColour, _endColour, t)!.toColor();
     _seedColourList[activeRouteIndex] = newColour;
-
+    }
+    
     if (mode == 'driving') {
       _carColours = [];
       _carColours.addAll(_seedColourList);
