@@ -36,7 +36,7 @@ class TransitSteps extends StatelessWidget {
         builder: (context, theme, child) { 
         return Column(
           children: [
-            Icon(Icons.directions_walk, size: screenWidth * 0.05, color: theme.seedColour), // Smaller walk icon
+            Icon(Icons.directions_walk, size: screenWidth * 0.05), // Smaller walk icon
             Padding(
               padding: EdgeInsets.only(top: screenHeight * 0.002),
               child: AutoSizeText(

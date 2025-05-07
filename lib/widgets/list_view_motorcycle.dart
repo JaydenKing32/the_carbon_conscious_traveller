@@ -270,10 +270,21 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                 bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
                 int selectedIndex = polylinesState.motorcycleActiveRouteIndex;
                 Color color = Colors.transparent;
-                if (selectedIndex == index) {
+                if (selectedIndex == index && !theme.isTooLight) {
                   color = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  color = Colors.brown;
                 } else {
                   color = Colors.transparent;
+                }
+
+                Color iconColor = Colors.transparent;
+                if (selectedIndex == index && !theme.isTooLight) {
+                  iconColor = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  iconColor = Colors.brown;
+                } else {
+                  iconColor = Colors.black;
                 }
                 // Fetch tree icons based on emission
                 widget.vehicleState.getTreeIcons(index, context);
@@ -330,7 +341,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: theme.seedColour,
+                                  color: iconColor,
                                   size: 30,
                                 ),
                               ),

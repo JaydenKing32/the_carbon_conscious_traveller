@@ -70,6 +70,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -78,9 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(
             widget.title,
-            style: TextStyle(color: Colors.black),
           ),
-          iconTheme: IconThemeData(color: Colors.black),
         ),
         body: const Stack(
           children: [

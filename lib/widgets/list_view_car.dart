@@ -224,12 +224,24 @@ class _CarListViewState extends State<CarListView> {
                 //Change the border color of the active route
 
                 selectedIndex = polylinesState.carActiveRouteIndex;
-                Color color = Colors.transparent;
-                if (selectedIndex == index) {
+                  Color color = Colors.transparent;
+                if (selectedIndex == index && !theme.isTooLight) {
                   color = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  color = Colors.brown;
                 } else {
                   color = Colors.transparent;
                 }
+
+                Color iconColor = Colors.transparent;
+                if (selectedIndex == index && !theme.isTooLight) {
+                  iconColor = theme.seedColour;
+                } else if (selectedIndex == index && theme.isTooLight) {
+                  iconColor = Colors.brown;
+                } else {
+                  iconColor = Colors.black;
+                }
+
                 return InkWell(
                   focusNode: focusNodes[index],
                   onFocusChange: (focused) {
@@ -278,7 +290,7 @@ class _CarListViewState extends State<CarListView> {
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: theme.seedColour,
+                                  color: iconColor,
                                   size: 25,
                                 ),
                               ),

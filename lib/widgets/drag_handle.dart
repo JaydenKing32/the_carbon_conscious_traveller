@@ -12,7 +12,7 @@ class DragHandle extends StatelessWidget {
           Consumer<ThemeState>(builder: (BuildContext context, theme, child) {
         return Container(
           decoration: BoxDecoration(
-            color: theme.seedColour,
+            color: theme.isTooLight ? Colors.brown : theme.seedColour,
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
           height: 4,
