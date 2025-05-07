@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
@@ -53,6 +54,9 @@ class _CarListViewState extends State<CarListView> {
         index >= widget.vehicleState.emissions.length) {
       return;
     }
+    List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
+    // Add service, every minute check current location within certain distance of any coord in list, when near end location mark as complete and end service
+    // https://pub.dev/packages/flutter_background_service
 
     int maxEmission = widget.vehicleState.emissions.isNotEmpty ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce((a, b) => a > b ? a : b) : 0;
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();

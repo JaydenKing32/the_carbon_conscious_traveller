@@ -79,7 +79,7 @@ class _TransitState extends State<Transit> {
                 return const Text("No emissions data available");
               }
 
-              return TransitListView(snapshot: snapshot, emissions: emissions, settings: Provider.of<Settings>(context));
+              return TransitListView(polylinesState: Provider.of<PolylinesState>(context), snapshot: snapshot, emissions: emissions, settings: Provider.of<Settings>(context));
             }
           },
         );

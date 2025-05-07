@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -17,11 +18,12 @@ import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 class TransitListView extends StatefulWidget {
-  const TransitListView({super.key, required this.snapshot, required this.emissions, required this.settings});
+  const TransitListView({super.key, required this.polylinesState, required this.snapshot, required this.emissions, required this.settings});
 
   final dynamic snapshot;
   final List<double> emissions;
   final Settings settings;
+  final PolylinesState polylinesState;
 
   @override
   State<TransitListView> createState() => _TransitListViewState();
@@ -55,6 +57,7 @@ class _TransitListViewState extends State<TransitListView> {
 
   Future<void> _saveTrip(int index) async {
     int maxEmission = widget.emissions.isNotEmpty ? widget.emissions.map((e) => e.toInt()).reduce(max) : 0;
+    List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
 
     double selectedEmission = widget.emissions[index];
     double reduction = max(0, maxEmission - selectedEmission);
