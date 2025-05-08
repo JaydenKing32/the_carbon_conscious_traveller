@@ -47,6 +47,15 @@ class PolylinesState extends ChangeNotifier {
   List<Color> _darkPolyColours = [];
   final List<Color> _themeColours = [];
 
+  bool _polyTapped = false;
+  bool get polyTapped => _polyTapped;
+  set polyTapped(bool isTapped) {
+    if (_polyTapped != isTapped) {
+      _polyTapped = isTapped;
+      notifyListeners();
+    }
+  }
+
   static const Map<String, TravelMode> _modeMap = {
     'driving': TravelMode.driving,
     'motorcycling': TravelMode.driving,
@@ -140,7 +149,10 @@ class PolylinesState extends ChangeNotifier {
         endCap: Cap.roundCap,
         jointType: JointType.round,
         consumeTapEvents: true,
-        onTap: () => setActiveRoute(i),
+        onTap: () {
+           _polyTapped = true;
+           setActiveRoute(i);
+        } 
       );
       polylines[id] = polyline;
       getDistanceValues();
@@ -165,7 +177,10 @@ class PolylinesState extends ChangeNotifier {
         endCap: Cap.roundCap,
         jointType: JointType.round,
         consumeTapEvents: true,
-        onTap: () => setActiveRoute(i),
+        onTap: () {
+           _polyTapped = true;
+           setActiveRoute(i);
+        } 
       );
       polylines[id] = polyline;
     }

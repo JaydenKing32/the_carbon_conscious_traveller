@@ -41,6 +41,17 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
   });
   }
+
+  @override
+    void dispose() {
+      // Clean up all the focus nodes to avoid memory leaks
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      focusNodes.clear();
+      super.dispose();
+    }
+
   /// Loads saved trips from the database and maps them to their respective routes.
   Future<void> _loadSavedTrips() async {
     List<Trip> trips = await TripDatabase.instance.getAllTrips();
@@ -269,23 +280,37 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                 int? tripId = _routeToTripId[route];
                 bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
                 int selectedIndex = polylinesState.motorcycleActiveRouteIndex;
-                Color color = Colors.transparent;
-                if (selectedIndex == index && !theme.isTooLight) {
-                  color = theme.seedColour;
-                } else if (selectedIndex == index && theme.isTooLight) {
-                  color = Colors.brown;
-                } else {
-                  color = Colors.transparent;
+
+                // Determine the border color using the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                //Default to transparent if not selected
+                Color borderColour = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.transparent;
+
+                // Set the icon color based on the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                // Default to black if not selected
+                Color iconColor = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.black;
+
+                // If the polyline was tapped, update the theme color
+                if (polylinesState.polyTapped) {
+                  // Bring back the focus to the selected route in the list view
+                  // if needed
+                  if (focusNodes.length != widget.vehicleState.emissions.length) {
+                    // Clean up old nodes
+                    for (final node in focusNodes) {
+                      node.dispose();
+                    }
+                    // Recreate new nodes
+                    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+                  }
+                  theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
+                  polylinesState.polyTapped = false;
                 }
 
-                Color iconColor = Colors.transparent;
-                if (selectedIndex == index && !theme.isTooLight) {
-                  iconColor = theme.seedColour;
-                } else if (selectedIndex == index && theme.isTooLight) {
-                  iconColor = Colors.brown;
-                } else {
-                  iconColor = Colors.black;
-                }
                 // Fetch tree icons based on emission
                 widget.vehicleState.getTreeIcons(index, context);
 
@@ -324,7 +349,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                     decoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: color,
+                          color: borderColour,
                           width: 5.0,
                         ),
                       ),

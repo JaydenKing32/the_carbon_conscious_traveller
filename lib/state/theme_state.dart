@@ -67,7 +67,12 @@ class ThemeState extends ChangeNotifier {
   void setThemeColour(activeRouteIndex) {
     _seedColour = _seedColourList[activeRouteIndex];
     _themeData = _buildTheme();
-    notifyListeners();
+    // We need this to ensure the theme is rebuilt
+    // when a polyline is tapped. Otherwise, the theme
+    // does not update immediately
+    WidgetsBinding.instance.addPostFrameCallback((_) { 
+      notifyListeners();
+    });
   }
 
   void resetThemeColour() {
