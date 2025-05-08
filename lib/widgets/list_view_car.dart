@@ -41,6 +41,16 @@ class _CarListViewState extends State<CarListView> {
     });
   }
 
+    @override
+    void dispose() {
+      // Clean up all the focus nodes to avoid memory leaks
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      focusNodes.clear();
+      super.dispose();
+    }
+
   Future<void> _loadSavedTrips() async {
     List<Trip> trips = await TripDatabase.instance.getAllTrips();
     setState(() {
@@ -221,25 +231,36 @@ class _CarListViewState extends State<CarListView> {
 
                 int? tripId = _indexToTripId[index];
                 bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
-                //Change the border color of the active route
-
                 selectedIndex = polylinesState.carActiveRouteIndex;
-                  Color color = Colors.transparent;
-                if (selectedIndex == index && !theme.isTooLight) {
-                  color = theme.seedColour;
-                } else if (selectedIndex == index && theme.isTooLight) {
-                  color = Colors.brown;
-                } else {
-                  color = Colors.transparent;
-                }
 
-                Color iconColor = Colors.transparent;
-                if (selectedIndex == index && !theme.isTooLight) {
-                  iconColor = theme.seedColour;
-                } else if (selectedIndex == index && theme.isTooLight) {
-                  iconColor = Colors.brown;
-                } else {
-                  iconColor = Colors.black;
+                // Determine the border color using the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                //Default to transparent if not selected
+                Color borderColour = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.transparent;
+
+                // Set the icon color based on the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                // Default to black if not selected
+                Color iconColor = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.black;
+
+                // If the polyline was tapped, update the theme color
+                if (polylinesState.polyTapped) {
+                  // Bring back the focus to the selected route in the list view
+                  // if needed
+                  if (focusNodes.length != widget.vehicleState.emissions.length) {
+                    // Clean up old nodes
+                    for (final node in focusNodes) {
+                      node.dispose();
+                    }
+                    // Recreate new nodes
+                    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+                  }
+                  theme.setThemeColour(polylinesState.carActiveRouteIndex);
+                  polylinesState.polyTapped = false;
                 }
 
                 return InkWell(
@@ -273,7 +294,7 @@ class _CarListViewState extends State<CarListView> {
                     decoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: color,
+                          color: borderColour,
                           width: 5.0,
                         ),
                       ),
