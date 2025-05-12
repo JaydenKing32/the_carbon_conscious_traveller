@@ -13,6 +13,7 @@ import 'package:the_carbon_conscious_traveller/widgets/drawer.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_map_view.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_places_view.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,6 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
             GoogleMapView(),
             TravelModeBottomSheet(),
             GooglePlacesView(),
+            TravelModeButtons(),
           ],
         ),
       ),
