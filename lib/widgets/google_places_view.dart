@@ -26,6 +26,7 @@ import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng_bounds.dart' as plat_ll_bounds;
 import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng.dart' as plat_ll;
+import 'package:the_carbon_conscious_traveller/widgets/travel_emissions_text.dart';
 
 class GooglePlacesView extends StatefulWidget {
   const GooglePlacesView({super.key});
@@ -156,10 +157,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         padding: EdgeInsets.only(top: 10.0),
         child: Image(
           image: places.FlutterGooglePlacesSdk.ASSET_POWERED_BY_GOOGLE_ON_WHITE,
+          height: 16,
         ),
       ),
       // Travel mode buttons
-      const TravelModeButtons(),
+      const TravelEmissionsText(),
       if (_fetchingPlaceErr != null || _predictErr != null) ...[
         _buildErrorWidget(_fetchingPlaceErr),
         _buildErrorWidget(_predictErr),
