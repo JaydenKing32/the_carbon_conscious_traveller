@@ -34,10 +34,26 @@ class _TransitListViewState extends State<TransitListView> {
   final Map<int, int> _indexToTripId = {}; // Maps UI index -> DB trip ID
   final Map<int, bool> _tripCompletionStatus = {};
 
+  List<FocusNode> focusNodes = [];
+
   @override
   void initState() {
     super.initState();
     _loadSavedTrips();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
+      FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up all the focus nodes to avoid memory leaks
+    for (final node in focusNodes) {
+      node.dispose();
+    }
+    focusNodes.clear();
+    super.dispose();
   }
 
   Future<void> _loadSavedTrips() async {
@@ -181,8 +197,6 @@ class _TransitListViewState extends State<TransitListView> {
       transitState.updateMaxEmission(widget.emissions.reduce(max).round());
     });
 
-    List<FocusNode> focusNodes = [];
-
     // We need to create focus nodes to handle the focus of the list items
     // This way we handle colour updates based on the selected route
     if (focusNodes.length != widget.emissions.length) {
@@ -220,13 +234,27 @@ class _TransitListViewState extends State<TransitListView> {
                 transitState.updateMaxConfiguredEmissions(driving, carFactor * maxDistance);
                 transitState.updateMaxConfiguredEmissions(motorcycling, motorcycleFactor * maxDistance);
 
-                Color color = Colors.transparent;
-                if (selectedIndex == index && !theme.isTooLight) {
-                  color = theme.seedColour;
-                } else if (selectedIndex == index && theme.isTooLight) {
-                  color = Colors.brown;
-                } else {
-                  color = Colors.transparent;
+                // Determine the border color using the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                //Default to transparent if not selected
+                Color borderColour = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.transparent;
+
+                // If the polyline was tapped, update the theme color
+                if (polylinesState.polyTapped) {
+                  // Bring back the focus to the selected route in the list view
+                  // if needed
+                  if (focusNodes.length != transitState.emissions.length) {
+                    // Clean up old nodes
+                    for (final node in focusNodes) {
+                      node.dispose();
+                    }
+                    // Recreate new nodes
+                    focusNodes = List.generate(transitState.emissions.length, (_) => FocusNode());
+                  }
+                  theme.setThemeColour(polylinesState.transitActiveRouteIndex);
+                  polylinesState.polyTapped = false;
                 }
 
                 return InkWell(
@@ -261,7 +289,7 @@ class _TransitListViewState extends State<TransitListView> {
                     decoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: color,
+                          color: borderColour,
                           width: 5.0,
                         ),
                       ),
