@@ -135,7 +135,7 @@ class _TravelEmissionsText extends State<TravelEmissionsText> {
                     ),
                     const SizedBox(width: 2),
                     Text(
-                      motorcyclingEmission,
+                      drivingEmission,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14
@@ -170,7 +170,7 @@ class _TravelEmissionsText extends State<TravelEmissionsText> {
                     ),
                     const SizedBox(width: 2),
                     Text(
-                      motorcyclingEmission,
+                      transitEmission,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
