@@ -207,14 +207,14 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
             ...List.generate(4, (index) {
               // Calculate button position
               double calculatedTop = (index < lastSelectedIndex)
-                  ? (index + 1) * 60.0
-                  : (index) * 60.0;
+                  ? (index + 1) * 50.0
+                  : (index) * 50.0;
 
               return AnimatedPositioned(
                 duration: Duration(
                     milliseconds: 500 + (index * 100)), // Staggered delay
                 curve: Curves.easeInOutCubic, // Smoother slide
-                top: isSelected[index] ? calculatedTop : (calculatedTop - 60),
+                top: isSelected[index] ? calculatedTop : (calculatedTop - 50),
                 right: 0,
                 child: IgnorePointer(
                   ignoring:
@@ -232,10 +232,10 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                         resetSelection();
                       },
                       child: Container(
-                        width: 50,
-                        height: 50,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: Colors.grey[200],
                           shape: BoxShape.circle,
                           boxShadow: const [
                             BoxShadow(
@@ -273,11 +273,12 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                   });
                 },
                 child: Container(
-                  width: 50,
-                  height: 50,
+                  width: 40,
+                  height: 40,
                   decoration: const BoxDecoration(
                     color: Colors.black,
                     shape: BoxShape.circle,
+
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black26,
