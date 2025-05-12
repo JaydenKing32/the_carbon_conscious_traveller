@@ -19,8 +19,6 @@ class TravelModeButtons extends StatefulWidget {
   State<TravelModeButtons> createState() => _TravelModeButtonsState();
 }
 
-
-
 final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
 
 const String motorcycling = 'motorcycling';
@@ -29,7 +27,8 @@ const String transit = 'transit';
 const String flying = 'flying'; // Flying mode
 
 class _TravelModeButtonsState extends State<TravelModeButtons> {
-  final List<bool> _selectedModes = <bool>[true, false, false, false];
+  List<bool> isSelected = <bool>[true, false, false, false];
+  int lastSelectedIndex = 0;
 
   final List<({IconData icon, String mode})> transportModes = [
     (icon: Icons.directions_car_outlined, mode: 'driving'),
@@ -37,6 +36,61 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
     (icon: Icons.train_outlined, mode: 'transit'),
     (icon: Icons.airplanemode_active_outlined, mode: 'flying'),
   ];
+
+  void toggleInactiveButtons() {
+    setState(() {
+      for (int i = 0; i < isSelected.length; i++) {
+        if (i != lastSelectedIndex) {
+          isSelected[i] =
+              !isSelected[i]; // Toggle visibility of inactive buttons
+        }
+      }
+    });
+  }
+
+  void toggleSelection(int index) {
+    String selectedMode = transportModes[index].mode;
+
+    if (selectedMode == 'flying') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Flying(),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      lastSelectedIndex = index; // Update the active button index
+      for (int i = 0; i < isSelected.length; i++) {
+        isSelected[i] = (i == index); // Only the selected button is active
+      }
+
+      // Call the polylineState and coordinatesState logic
+      final polylineState = context.read<PolylinesState>();
+      final coordinatesState = context.read<CoordinatesState>();
+      polylineState.transportMode = selectedMode;
+
+      if (coordinatesState.coordinates.isNotEmpty) {
+        polylineState.setActiveRoute(polylineState.getActiveRoute());
+      }
+
+      // Clear existing colours for that mode (if not already calculated)
+      // This is to give visual feedback that that mode has not been calculated yet
+      final theme = context.read<ThemeState>();
+
+      if (selectedMode == 'motorcycling' && theme.motoColourList.isEmpty) {
+        polylineState.updateColours([]);
+        polylineState.getPolyline(coordinatesState.coordinates);
+      } else if (selectedMode == 'transit' && theme.transitColourList.isEmpty) {
+        polylineState.updateColours([]);
+      } else if (selectedMode == 'driving' && theme.carColourList.isEmpty) {
+        polylineState.updateColours([]);
+        polylineState.getPolyline(coordinatesState.coordinates);
+      }
+    });
+  }
 
   String getCurrentMinMaxEmissions(
     String mode,
@@ -46,9 +100,9 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
   ) {
     String formatNumber(int number) {
       if (number >= 1000) {
-        return '${(number / 1000).toStringAsFixed(2)} kg';
+        return '${(number / 1000).toStringAsFixed(2)}kg';
       } else {
-        return '${number.round()} g';
+        return '${number.round()}g';
       }
     }
 
@@ -89,202 +143,162 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
           transitState.minEmissionValue,
         );
       default:
-        return ''; // Handle 'flying' or other modes
+        return '';
     }
   }
 
+  void resetSelection() {
+    setState(() {
+      for (int i = 0; i < isSelected.length; i++) {
+        isSelected[i] = false;
+      }
+    });
+  }
+
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  final sync = context.read<ColourSyncState>();
+    final sync = context.read<ColourSyncState>();
 
-  // Listen for changes in the colours
-  sync.addListener(() {
+    sync.addListener(() {
+      if (sync.coloursReady) {
+        _handlePolyline();
+        sync.setColoursReady(false);
+      }
+    });
+
+    // fire immediately if already ready
     if (sync.coloursReady) {
       _handlePolyline();
       sync.setColoursReady(false);
     }
-  });
-
-  // fire immediately if already ready
-  if (sync.coloursReady) {
-    _handlePolyline();
-    sync.setColoursReady(false);
   }
-}
 
-void _handlePolyline() {
-  final polylineState = context.read<PolylinesState>();
-  final coordinates = context.read<CoordinatesState>().coordinates;
+  void _handlePolyline() {
+    final polylineState = context.read<PolylinesState>();
+    final coordinates = context.read<CoordinatesState>().coordinates;
 
-  if (coordinates.isNotEmpty) {
-    polylineState.getPolyline(coordinates);
+    if (coordinates.isNotEmpty) {
+      polylineState.getPolyline(coordinates);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Consumer6<CoordinatesState, PrivateMotorcycleState, PrivateCarState,
-        TransitState, PolylinesState, ThemeState>(
-      builder: (BuildContext context,
-          CoordinatesState coordinatesState,
-          PrivateMotorcycleState motorcycleState,
-          PrivateCarState carState,
-          TransitState transitState,
-          PolylinesState polylineState,
-          ThemeState theme,
-          child) {
+            TransitState, PolylinesState, ThemeState>(
+        builder: (BuildContext context,
+            CoordinatesState coordinatesState,
+            PrivateMotorcycleState motorcycleState,
+            PrivateCarState carState,
+            TransitState transitState,
+            PolylinesState polylineState,
+            ThemeState theme,
+            child) {
+      return Padding(
+        padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height * 0.24, right: 16),
+        child: Stack(
+          alignment: Alignment.topRight,
+          clipBehavior: Clip.none, // Allow overflow
+          children: [
+            // Inactive buttons (always behind)
+            ...List.generate(4, (index) {
+              // Calculate button position
+              double calculatedTop = (index < lastSelectedIndex)
+                  ? (index + 1) * 60.0
+                  : (index) * 60.0;
 
-        // Get emissions for each mode
-        String drivingEmission = getCurrentMinMaxEmissions(
-          'driving',
-          motorcycleState,
-          carState,
-          transitState,
-        );
-
-        String motorcyclingEmission = getCurrentMinMaxEmissions(
-          'motorcycling',
-          motorcycleState,
-          carState,
-          transitState,
-        );
-
-        String transitEmission = getCurrentMinMaxEmissions(
-          'transit',
-          motorcycleState,
-          carState,
-          transitState,
-        );
-
-        // String flyingEmission = ''; // If you don't handle flying emissions
-
-        return Container(
-          padding: const EdgeInsets.all(8.0),
-          alignment: Alignment.center,
-          color: Colors.white,
-          child: Column(
-            children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ToggleButtons(
-                  onPressed: (int index) {
-                    String selectedMode = transportModes[index].mode;
-
-                    if (selectedMode == flying) {
-                      // For 'flying' mode, navigate to Flying widget
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Flying(),
+              return AnimatedPositioned(
+                duration: Duration(
+                    milliseconds: 500 + (index * 100)), // Staggered delay
+                curve: Curves.easeInOutCubic, // Smoother slide
+                top: isSelected[index] ? calculatedTop : (calculatedTop - 60),
+                right: 0,
+                child: IgnorePointer(
+                  ignoring:
+                      !isSelected[index], // Only interactable when visible
+                  child: AnimatedOpacity(
+                    duration: Duration(
+                        milliseconds: 250 + (index * 50)), // Staggered fade
+                    opacity: isSelected[index]
+                        ? 1.0
+                        : 0.0, // Only visible when active
+                    child: GestureDetector(
+                      onTap: () {
+                        toggleSelection(index);
+                        toggleInactiveButtons();
+                        resetSelection();
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          shape: BoxShape.circle,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 2.0,
+                              spreadRadius: 2.0,
+                            ),
+                          ],
                         ),
-                      );
-                      return; // Exit the onPressed handler
-                    }
-
-                    setState(() {
-                      // The button that is tapped is set to true, and the others to false
-                      for (int i = 0; i < _selectedModes.length; i++) {
-                        _selectedModes[i] = i == index;
-                      }
-                    });
-
-                    polylineState.transportMode = selectedMode;
-
-                    // If coordinates are set, fetch new polyline
-                    // this is called every time the button is pressed IF we have routes
-                    if (coordinatesState.coordinates.isNotEmpty) {
-                      polylineState
-                          .setActiveRoute(polylineState.getActiveRoute());
-                    }
-
-                    final theme = context.read<ThemeState>();
-
-                    // Clear colours for the current polylines before redrawing them for the new mode
-                    // This is to give visual feedback that that mode emisisons have not been calculated yet
-                    if (selectedMode == 'motorcycling') {
-                      // But first, we need to check if the settings for motorcycling are predefined
-                      // If not predefined && motocolours list is empty, we empty any existing polycolours
-                      // and draw the polylines for the current moden without any colours until the emissions are calculated
-                      // If predefined, we move to calculating the theme colours since the emisisons are already calculated
-                      Settings settings = context.read<Settings>();
-                      bool isPredefined = settings.useSpecifiedMotorcycle;
-                      if (theme.motoColourList.isEmpty && !isPredefined) {
-                        polylineState.updateColours([]);
-                        polylineState.getPolyline(coordinatesState.coordinates);
-                      } else if (isPredefined) {
-                        isPredefined = false;
-                      }
-                    } else if (selectedMode == 'transit') {
-                      if (theme.transitColourList.isEmpty) {
-                        polylineState.updateColours([]);
-                      }
-                    } else if (selectedMode == 'driving') {
-                      if (theme.carColourList.isEmpty) {
-                        polylineState.updateColours([]);
-                        polylineState.getPolyline(coordinatesState.coordinates);
-                      }
-                    }
-                  },
-                  renderBorder: false,
-                  constraints: const BoxConstraints(
-                    minHeight: 40.0,
-                    minWidth: 40.0,
-                  ),
-                  isSelected: _selectedModes,
-                  children: transportModes
-                      .map(
-                        (travelMode) => Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 4.0),
-                                child: Icon(
-                                  travelMode.icon,
-                                  size: 30.0,
-                                ),
-                              ),
-                              if (travelMode.mode == 'motorcycling')
-                                Text(
-                                  motorcyclingEmission,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              if (travelMode.mode == 'driving')
-                                Text(
-                                  drivingEmission,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              if (travelMode.mode == 'transit')
-                                Text(
-                                  transitEmission,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              if (travelMode.mode == 'flying')
-                                const Text(
-                                  '',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                            ],
+                        child: Center(
+                          child: Icon(
+                            transportModes[index].icon,
+                            color: Colors.black,
+                            size: 24,
                           ),
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+
+            // Active button (always on top, drawn separately)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOutCubic,
+              top: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    // Toggle visibility of other buttons
+                    toggleInactiveButtons();
+                  });
+                },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 2.0,
+                        spreadRadius: 2.0,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      transportModes[lastSelectedIndex].icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
                 ),
               ),
-            ],
-          ),
-        );
-      },
-    );
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
