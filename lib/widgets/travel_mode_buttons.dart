@@ -7,6 +7,7 @@ import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_flying.dart'; // Ensure correct import path
@@ -98,7 +99,9 @@ void initState() {
 
   final sync = context.read<ColourSyncState>();
 
+  // Listen for changes in the colours
   sync.addListener(() {
+      print("sync colours ready ${sync.coloursReady}");
     if (sync.coloursReady) {
       _handlePolyline();
       sync.setColoursReady(false);
@@ -110,6 +113,7 @@ void initState() {
     _handlePolyline();
     sync.setColoursReady(false);
   }
+  print("sync colours ready ${sync.coloursReady}");
 }
 
 void _handlePolyline() {
@@ -133,6 +137,7 @@ void _handlePolyline() {
           PolylinesState polylineState,
           ThemeState theme,
           child) {
+
         // Get emissions for each mode
         String drivingEmission = getCurrentMinMaxEmissions(
           'driving',
@@ -198,24 +203,32 @@ void _handlePolyline() {
 
                     final theme = context.read<ThemeState>();
 
-                    // Clear existing colours for that mode (if not already calculated)
-                    // This is to give visual feedback that that mode has not been calculated yet
+                    // Clear colours for the current polylines before redrawing them for the new mode
+                    // This is to give visual feedback that that mode emisisons have not been calculated yet
                     if (selectedMode == 'motorcycling') {
-                      if (theme.motoColourList.isEmpty) {
-                        polylineState
-                            .updateColours([]);
-                            polylineState.getPolyline(coordinatesState.coordinates);
+                      // But first, we need to check if the settings for motorcycling are set
+                      // If not, the polylcolours list will be empty
+                      Settings settings = context.read<Settings>();
+                      bool isPredefined = settings.useSpecifiedMotorcycle;
+                      if (theme.motoColourList.isEmpty && !isPredefined) {
+                        polylineState.updateColours([]);
+                        polylineState.getPolyline(coordinatesState.coordinates);
+                      } else if (isPredefined) {
+                        isPredefined = false;
                       }
                     } else if (selectedMode == 'transit') {
                       if (theme.transitColourList.isEmpty) {
                         polylineState.updateColours([]);
                       }
                     } else if (selectedMode == 'driving') {
+                      print(">> polylineState.colours ${polylineState.polyColours}");
+                      print(">> carcolours ${theme.carColourList}");
                       if (theme.carColourList.isEmpty) {
                         polylineState.updateColours([]);
                         polylineState.getPolyline(coordinatesState.coordinates);
                       }
                     }
+                     print(">> polylineState.colours ${polylineState.polyColours}");
                   },
                   renderBorder: false,
                   constraints: const BoxConstraints(
