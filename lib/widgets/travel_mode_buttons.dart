@@ -80,9 +80,19 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
       // This is to give visual feedback that that mode has not been calculated yet
       final theme = context.read<ThemeState>();
 
-      if (selectedMode == 'motorcycling' && theme.motoColourList.isEmpty) {
-        polylineState.updateColours([]);
-        polylineState.getPolyline(coordinatesState.coordinates);
+      if (selectedMode == 'motorcycling') {
+        // But first, we need to check if the settings for motorcycling are predefined
+        // If not predefined && motocolours list is empty, we empty any existing polycolours
+        // and draw the polylines for the current moden without any colours until the emissions are calculated
+        // If predefined, we move to calculating the theme colours since the emisisons are already calculated
+        Settings settings = context.read<Settings>();
+        bool isPredefined = settings.useSpecifiedMotorcycle;
+        if (theme.motoColourList.isEmpty && !isPredefined) {
+          polylineState.updateColours([]);
+          polylineState.getPolyline(coordinatesState.coordinates);
+        } else if (isPredefined) {
+          isPredefined = false;
+        }
       } else if (selectedMode == 'transit' && theme.transitColourList.isEmpty) {
         polylineState.updateColours([]);
       } else if (selectedMode == 'driving' && theme.carColourList.isEmpty) {
@@ -278,7 +288,6 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                   decoration: const BoxDecoration(
                     color: Colors.black,
                     shape: BoxShape.circle,
-
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black26,
