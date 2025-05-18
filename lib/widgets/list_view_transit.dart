@@ -273,7 +273,7 @@ class _TransitListViewState extends State<TransitListView> {
                         );
                       }
                       polylinesState.updateColours(theme.transitColourList);
-                      theme.setThemeColour(index);
+                      theme.setThemeColour(polylinesState.transitActiveRouteIndex);
                       context.read<ColourSyncState>().setColoursReady(true);   
                     }
                   },
@@ -283,7 +283,7 @@ class _TransitListViewState extends State<TransitListView> {
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
-                    theme.setThemeColour(index);
+                    theme.setThemeColour(polylinesState.transitActiveRouteIndex);
                   },
                   child: Container(
                     decoration: BoxDecoration(

@@ -280,7 +280,7 @@ class _CarListViewState extends State<CarListView> {
                         );
                       }
                       polylinesState.updateColours(theme.carColourList);
-                      theme.setThemeColour(index);
+                      theme.setThemeColour(polylinesState.carActiveRouteIndex);
                       context.read<ColourSyncState>().setColoursReady(true);     
                     }
                   },
@@ -288,7 +288,7 @@ class _CarListViewState extends State<CarListView> {
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
-                    theme.setThemeColour(index);
+                    theme.setThemeColour(polylinesState.carActiveRouteIndex);
                   },
                   child: Container(
                     decoration: BoxDecoration(

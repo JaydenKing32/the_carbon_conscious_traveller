@@ -332,7 +332,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                         );
                       }
                       polylinesState.updateColours(theme.motoColourList);
-                      theme.setThemeColour(index);
+                      theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
                       context.read<ColourSyncState>().setColoursReady(true);     
                     }
                   },
@@ -342,7 +342,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
-                    theme.setThemeColour(index);
+                    theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
                     //context.read<ColourSyncState>().setColoursReady(true); 
                   },
                   child: Container(

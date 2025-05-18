@@ -7,6 +7,7 @@ import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_car_state.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
+import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_flying.dart'; // Ensure correct import path
@@ -98,6 +99,7 @@ void initState() {
 
   final sync = context.read<ColourSyncState>();
 
+  // Listen for changes in the colours
   sync.addListener(() {
     if (sync.coloursReady) {
       _handlePolyline();
@@ -133,6 +135,7 @@ void _handlePolyline() {
           PolylinesState polylineState,
           ThemeState theme,
           child) {
+
         // Get emissions for each mode
         String drivingEmission = getCurrentMinMaxEmissions(
           'driving',
@@ -198,13 +201,20 @@ void _handlePolyline() {
 
                     final theme = context.read<ThemeState>();
 
-                    // Clear existing colours for that mode (if not already calculated)
-                    // This is to give visual feedback that that mode has not been calculated yet
+                    // Clear colours for the current polylines before redrawing them for the new mode
+                    // This is to give visual feedback that that mode emisisons have not been calculated yet
                     if (selectedMode == 'motorcycling') {
-                      if (theme.motoColourList.isEmpty) {
-                        polylineState
-                            .updateColours([]);
-                            polylineState.getPolyline(coordinatesState.coordinates);
+                      // But first, we need to check if the settings for motorcycling are predefined
+                      // If not predefined && motocolours list is empty, we empty any existing polycolours
+                      // and draw the polylines for the current moden without any colours until the emissions are calculated
+                      // If predefined, we move to calculating the theme colours since the emisisons are already calculated
+                      Settings settings = context.read<Settings>();
+                      bool isPredefined = settings.useSpecifiedMotorcycle;
+                      if (theme.motoColourList.isEmpty && !isPredefined) {
+                        polylineState.updateColours([]);
+                        polylineState.getPolyline(coordinatesState.coordinates);
+                      } else if (isPredefined) {
+                        isPredefined = false;
                       }
                     } else if (selectedMode == 'transit') {
                       if (theme.transitColourList.isEmpty) {
