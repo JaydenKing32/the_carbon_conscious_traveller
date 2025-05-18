@@ -19,7 +19,7 @@ class TravelModeButtons extends StatefulWidget {
   State<TravelModeButtons> createState() => _TravelModeButtonsState();
 }
 
-final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
+// final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
 
 const String motorcycling = 'motorcycling';
 const String driving = 'driving';
@@ -29,6 +29,7 @@ const String flying = 'flying'; // Flying mode
 class _TravelModeButtonsState extends State<TravelModeButtons> {
   List<bool> isSelected = <bool>[true, false, false, false];
   int lastSelectedIndex = 0;
+  bool buttonPressed = false;
 
   final List<({IconData icon, String mode})> transportModes = [
     (icon: Icons.directions_car_outlined, mode: 'driving'),
@@ -196,6 +197,25 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
 
   @override
   Widget build(BuildContext context) {
+    // Handle button state based on settings
+    bool carSettings = context.watch<Settings>().useSpecifiedCar;
+    Settings motoSettings = context.watch<Settings>();
+    bool isMotorcycleSpecified = motoSettings.useSpecifiedMotorcycle;
+    bool isMotorcycleInsteadOfCar = motoSettings.useMotorcycleInsteadOfCar;
+    bool shouldBeMotorcycle = isMotorcycleSpecified ||
+        (isMotorcycleInsteadOfCar && isMotorcycleSpecified);
+
+    if (carSettings &&
+        !motoSettings.useMotorcycleInsteadOfCar &&
+        !buttonPressed) {
+      toggleSelection(0);
+      resetSelection();
+    } else if (shouldBeMotorcycle && !buttonPressed) {
+      toggleSelection(1);
+      resetSelection();
+    }
+    buttonPressed = false;
+
     return Consumer6<CoordinatesState, PrivateMotorcycleState, PrivateCarState,
             TransitState, PolylinesState, ThemeState>(
         builder: (BuildContext context,
@@ -240,6 +260,9 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                         toggleSelection(index);
                         toggleInactiveButtons();
                         resetSelection();
+                        isMotorcycleSpecified = false;
+                        isMotorcycleInsteadOfCar = false;
+                        buttonPressed = true;
                       },
                       child: Container(
                         width: 40,
@@ -280,6 +303,9 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
                   setState(() {
                     // Toggle visibility of other buttons
                     toggleInactiveButtons();
+                    buttonPressed = true;
+                    isMotorcycleInsteadOfCar = false;
+                    isMotorcycleInsteadOfCar = false;
                   });
                 },
                 child: Container(
