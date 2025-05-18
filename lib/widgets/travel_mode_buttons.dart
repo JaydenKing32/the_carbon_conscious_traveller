@@ -101,7 +101,6 @@ void initState() {
 
   // Listen for changes in the colours
   sync.addListener(() {
-      print("sync colours ready ${sync.coloursReady}");
     if (sync.coloursReady) {
       _handlePolyline();
       sync.setColoursReady(false);
@@ -113,7 +112,6 @@ void initState() {
     _handlePolyline();
     sync.setColoursReady(false);
   }
-  print("sync colours ready ${sync.coloursReady}");
 }
 
 void _handlePolyline() {
@@ -206,8 +204,10 @@ void _handlePolyline() {
                     // Clear colours for the current polylines before redrawing them for the new mode
                     // This is to give visual feedback that that mode emisisons have not been calculated yet
                     if (selectedMode == 'motorcycling') {
-                      // But first, we need to check if the settings for motorcycling are set
-                      // If not, the polylcolours list will be empty
+                      // But first, we need to check if the settings for motorcycling are predefined
+                      // If not predefined && motocolours list is empty, we empty any existing polycolours
+                      // and draw the polylines for the current moden without any colours until the emissions are calculated
+                      // If predefined, we move to calculating the theme colours since the emisisons are already calculated
                       Settings settings = context.read<Settings>();
                       bool isPredefined = settings.useSpecifiedMotorcycle;
                       if (theme.motoColourList.isEmpty && !isPredefined) {
@@ -221,14 +221,11 @@ void _handlePolyline() {
                         polylineState.updateColours([]);
                       }
                     } else if (selectedMode == 'driving') {
-                      print(">> polylineState.colours ${polylineState.polyColours}");
-                      print(">> carcolours ${theme.carColourList}");
                       if (theme.carColourList.isEmpty) {
                         polylineState.updateColours([]);
                         polylineState.getPolyline(coordinatesState.coordinates);
                       }
                     }
-                     print(">> polylineState.colours ${polylineState.polyColours}");
                   },
                   renderBorder: false,
                   constraints: const BoxConstraints(
