@@ -42,7 +42,7 @@ class ThemeState extends ChangeNotifier {
     }
 
     if (totalRouteCount == 1) {
-      _seedColourList[activeRouteIndex] = _endColour.toColor();
+      _seedColourList[activeRouteIndex] = _startColour.toColor();
     } else {
       t = (selectedRouteEmission - minEmissions) /
           (maxEmissions - minEmissions);
