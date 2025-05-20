@@ -74,8 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
           title: Text(
@@ -90,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
             TravelModeButtons(),
           ],
         ),
-      ),
-    );
+      );
   }
 }
