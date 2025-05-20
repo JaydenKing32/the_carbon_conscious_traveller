@@ -85,8 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             GoogleMapView(),
             TravelModeBottomSheet(),
-            GooglePlacesView(),
             TravelModeButtons(),
+            GooglePlacesView(),
           ],
         ),
       );
