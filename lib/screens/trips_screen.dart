@@ -99,7 +99,6 @@ class _TripsScreenState extends State<TripsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Trips"),
-        backgroundColor: const Color.fromARGB(255, 7, 179, 110),
       ),
       body: FutureBuilder<List<Trip>>(
         future: _trips,

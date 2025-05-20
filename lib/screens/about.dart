@@ -27,7 +27,6 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("About"),
-        backgroundColor: const Color.fromARGB(255, 7, 179, 110),
       ),
       body: SafeArea(
         child: Column(

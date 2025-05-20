@@ -135,7 +135,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Statistics"),
-        backgroundColor: const Color.fromARGB(255, 7, 179, 110),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
