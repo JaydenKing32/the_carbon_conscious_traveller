@@ -92,7 +92,16 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
     return SingleChildScrollView(
       child: Container(
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 2.0,
+            spreadRadius: 1.0,
+            offset: Offset(0, 1),
+          ),
+        ],
+        ),
         child: Column(children: predictionsWidgets),
       ),
     );
@@ -148,6 +157,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       ),
       Container(
         color: Colors.white,
+        padding: const EdgeInsets.only(left: 30, right: 30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: (_predictions ?? []).map(_buildPredictionItem).toList(growable: false),
