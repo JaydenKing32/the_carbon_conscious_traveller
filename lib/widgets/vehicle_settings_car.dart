@@ -54,13 +54,27 @@ class _CarSettingsState extends State<CarSettings> {
         final calculator = PrivateCarEmissionsCalculator(
           polylinesState: polylinesState,
           settings: settings,
-          routeCarSize: selectedSize ?? CarSize.label,
-          routeCarFuel: selectedFuelType ?? CarFuelType.label,
+          routeCarSize: carState.selectedSize ?? CarSize.label,
+          routeCarFuel: carState.selectedFuelType ?? CarFuelType.label,
         );
 
         // Calculate emissions
-        final emissions = List<int>.generate(polylinesState.result.length, (i) => calculator.calculateEmissions(i, settings.selectedCarSize, settings.selectedCarFuelType).round());
+        // final emissions = List<int>.generate(
+        //     polylinesState.result.length,
+        //     (i) => calculator
+        //         .calculateEmissions(
+        //             i, settings.selectedCarSize, settings.selectedCarFuelType)
+        //         .round()); <-- this code produces unexpected results
 
+        // We need to calculate the emissions for the "privateVehicleResult"
+        // instead of "result". Otherwise, it will calculate the public transport emissions
+        final emissions = List<int>.generate(
+            polylinesState.resultForPrivateVehicle.length,
+            (i) => calculator
+                .calculateEmissions(
+                    i, settings.selectedCarSize, settings.selectedCarFuelType)
+                .round());
+                
         // Update state
         carState.saveEmissions(emissions);
         carState.updateVisibility(true);

@@ -102,7 +102,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       Container(
         color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 20),
+          padding: const EdgeInsets.only(left: 30, right: 30),
           child: Column(
             children: [
               // --- ORIGIN ---
@@ -118,10 +118,10 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                 onChanged: (value) => _onPredictTextChanged(value, "start"),
                 decoration: InputDecoration(
                   label: const Text("Enter a start location"),
-                  icon: const Icon(
-                    Icons.location_searching_outlined,
-                    color: Colors.grey,
-                  ),
+                  // icon: const Icon(
+                  //   Icons.location_searching_outlined,
+                  //   color: Colors.grey,
+                  //),
                   suffixIcon: LocationButton(callback: getUserLocationDetails),
                 ),
               ),
@@ -138,7 +138,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                 onChanged: (value) => _onPredictTextChanged(value, "destination"),
                 decoration: const InputDecoration(
                   label: Text("Enter a destination"),
-                  icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
+                  //icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
                 ),
               ),
             ],
@@ -352,6 +352,12 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         try {
           // Calculate Car Emissions
           final settings = Provider.of<Settings>(context, listen: false);
+
+          if (settings.useSpecifiedCar) {
+            carState.updateSelectedSize(settings.selectedCarSize);
+            carState.updateSelectedFuelType(settings.selectedCarFuelType);
+          }
+
           final emissionsCalculator = PrivateCarEmissionsCalculator(
             polylinesState: polylineState,
             settings: settings,
@@ -378,6 +384,9 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           }
 
           // Calculate Motorcycle Emissions
+          if (settings.useSpecifiedMotorcycle) {
+            motorcycleState.updateSelectedValue(settings.selectedMotorcycleSize);
+          }
           final motoEmissionsCalc = PrivateVehicleEmissionsCalculator(
             polylinesState: polylineState,
             settings: settings,
@@ -432,6 +441,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           // Calculate Car Emissions
           final settings = Provider.of<Settings>(context, listen: false);
 
+          if (settings.useSpecifiedCar) {
+            carState.updateSelectedSize(settings.selectedCarSize);
+            carState.updateSelectedFuelType(settings.selectedCarFuelType);
+          }
+
           final emissionsCalculator = PrivateCarEmissionsCalculator(
             polylinesState: polylineState,
             settings: settings,
@@ -458,6 +472,10 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           }
 
           // Calculate Motorcycle Emissions
+          if (settings.useSpecifiedMotorcycle) {
+            motorcycleState.updateSelectedValue(settings.selectedMotorcycleSize);
+          }
+
           final motoEmissionsCalc = PrivateVehicleEmissionsCalculator(
             polylinesState: polylineState,
             settings: settings,

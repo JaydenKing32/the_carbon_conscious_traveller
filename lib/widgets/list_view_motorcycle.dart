@@ -4,11 +4,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/private_motorcycle_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class MotorcycleListView extends StatefulWidget {
@@ -28,11 +30,27 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
   final Map<String, int> _routeToTripId = {}; // Map route summary to trip ID
   final Map<int, bool> _tripCompletionStatus = {};
 
+  List<FocusNode> focusNodes = [];
+  
   @override
   void initState() {
     super.initState();
     _loadSavedTrips();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
+    FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
+  });
   }
+
+  @override
+    void dispose() {
+      // Clean up all the focus nodes to avoid memory leaks
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      focusNodes.clear();
+      super.dispose();
+    }
 
   /// Loads saved trips from the database and maps them to their respective routes.
   Future<void> _loadSavedTrips() async {
@@ -206,10 +224,28 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
         index < widget.vehicleState.emissions.length;
   }
 
+
+
+final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
+
+
+
+
   @override
   Widget build(BuildContext context) {
-    return Consumer2<PolylinesState, Settings>(
-      builder: (context, polylinesState, settings, child) {
+
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
+    if (focusNodes.length != widget.vehicleState.emissions.length) {
+    // Clean up old nodes
+    for (final node in focusNodes) {
+      node.dispose();
+    }
+    // Recreate new nodes
+    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+  }
+    return Consumer3<PolylinesState, Settings, ThemeState>(
+      builder: (context, polylinesState, settings, theme, child) {
         // Check if data is available
         if (polylinesState.resultForPrivateVehicle.isEmpty) {
           return const Center(
@@ -244,27 +280,77 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                 int? tripId = _routeToTripId[route];
                 bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
                 int selectedIndex = polylinesState.motorcycleActiveRouteIndex;
-                Color color = Colors.transparent;
-                if (selectedIndex == index) {
-                  color = Colors.green;
-                } else {
-                  color = Colors.transparent;
+
+                // Determine the border color using the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                //Default to transparent if not selected
+                Color borderColour = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.transparent;
+
+                // Set the icon color based on the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                // Default to black if not selected
+                Color iconColor = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.black;
+
+                // If the polyline was tapped, update the theme color
+                if (polylinesState.polyTapped) {
+                  // Bring back the focus to the selected route in the list view
+                  // if needed
+                  if (focusNodes.length != widget.vehicleState.emissions.length) {
+                    // Clean up old nodes
+                    for (final node in focusNodes) {
+                      node.dispose();
+                    }
+                    // Recreate new nodes
+                    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+                  }
+                  theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
+                  polylinesState.polyTapped = false;
                 }
+
                 // Fetch tree icons based on emission
                 widget.vehicleState.getTreeIcons(index, context);
 
                 return InkWell(
+                  focusNode: focusNodes[index],
+                  onFocusChange: (focused) {
+                    if (focused) {
+                      // theme.seedColourList.clear();
+                      for (int i = 0;
+                          i < widget.vehicleState.emissions.length;
+                          i++) {
+                        theme.calculateColour(
+                          widget.vehicleState.minEmissionValue,
+                          widget.vehicleState.maxEmissionValue,
+                          widget.vehicleState.emissions[i],
+                          i,
+                          widget.vehicleState.emissions.length,
+                          polylinesState.mode,
+                        );
+                      }
+                      polylinesState.updateColours(theme.motoColourList);
+                      theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
+                      context.read<ColourSyncState>().setColoursReady(true);     
+                    }
+                  },
+                  //autofocus: selectedIndex == index,
                   onTap: () {
+                   // FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
+                    //context.read<ColourSyncState>().setColoursReady(true); 
                   },
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: color,
-                          width: 4.0,
+                          color: borderColour,
+                          width: 5.0,
                         ),
                       ),
                     ),
@@ -280,7 +366,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: Colors.green,
+                                  color: iconColor,
                                   size: 30,
                                 ),
                               ),
@@ -390,8 +476,11 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                             ),
                             IconButton(
                               icon: Icon(
-                                isCompleted ? Icons.check_circle : Icons.cancel_outlined,
-                                color: isCompleted ? Colors.green : Colors.black,
+                                isCompleted
+                                    ? Icons.check_circle
+                                    : Icons.cancel_outlined,
+                                color:
+                                    isCompleted ? Colors.green : Colors.black,
                                 size: 28,
                               ),
                               onPressed: settings.enableGeolocationVerification
@@ -408,7 +497,9 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              separatorBuilder: (BuildContext context, int index) => const Divider(
+                thickness: 2,
+              ),
             ),
           ],
         );

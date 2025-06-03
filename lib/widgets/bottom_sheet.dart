@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/widgets/drag_handle.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_view.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 
 class TravelModeBottomSheet extends StatelessWidget {
   const TravelModeBottomSheet({super.key});
@@ -36,20 +38,24 @@ class TravelModeBottomSheet extends StatelessWidget {
                   child: CustomScrollView(
                     controller: scrollController,
                     slivers: [
-                      const SliverAppBar(
-                        automaticallyImplyLeading: false,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
+                      Consumer<ThemeState>(builder:
+                          (BuildContext context, theme, Widget? child) {
+                        return SliverAppBar(
+                          backgroundColor: theme.themeData.canvasColor,
+                          automaticallyImplyLeading: false,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
                           ),
-                        ),
-                        pinned: true,
-                        expandedHeight: 20,
-                        flexibleSpace: FlexibleSpaceBar(
-                          title: DragHandle(),
-                        ),
-                      ),
+                          pinned: true,
+                          expandedHeight: 20,
+                          flexibleSpace: const FlexibleSpaceBar(
+                            title: DragHandle(),
+                          ),
+                        );
+                      }),
                       SliverToBoxAdapter(
                         child: Container(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: const TravelModeView()),
                       )

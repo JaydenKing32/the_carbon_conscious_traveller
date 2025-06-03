@@ -5,10 +5,12 @@ import 'package:google_directions_api/google_directions_api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/tree_icons.dart';
 
 class CarListView extends StatefulWidget {
@@ -28,11 +30,27 @@ class _CarListViewState extends State<CarListView> {
   final Map<int, int> _indexToTripId = {};
   final Map<int, bool> _tripCompletionStatus = {};
 
+   List<FocusNode> focusNodes = [];
+
   @override
   void initState() {
     super.initState();
     _loadSavedTrips();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
+      FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
+    });
   }
+
+    @override
+    void dispose() {
+      // Clean up all the focus nodes to avoid memory leaks
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      focusNodes.clear();
+      super.dispose();
+    }
 
   Future<void> _loadSavedTrips() async {
     List<Trip> trips = await TripDatabase.instance.getAllTrips();
@@ -173,8 +191,21 @@ class _CarListViewState extends State<CarListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<PolylinesState, Settings>(
-      builder: (context, polylinesState, settings, child) {
+
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
+    if (focusNodes.length != widget.vehicleState.emissions.length) {
+      // Clean up old nodes
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      // Recreate new nodes
+      focusNodes = List.generate(
+          widget.vehicleState.emissions.length, (_) => FocusNode());
+    }
+
+    return Consumer3<PolylinesState, Settings, ThemeState>(
+      builder: (context, polylinesState, settings, theme, child) {
         return Column(
           children: [
             ListView.separated(
@@ -204,27 +235,71 @@ class _CarListViewState extends State<CarListView> {
 
                 int? tripId = _indexToTripId[index];
                 bool isCompleted = tripId != null ? _tripCompletionStatus[tripId] ?? false : false;
-                //Change the border color of the active route
-
                 selectedIndex = polylinesState.carActiveRouteIndex;
-                Color color = Colors.transparent;
-                if (selectedIndex == index) {
-                  color = Colors.green;
-                } else {
-                  color = Colors.transparent;
+
+                // Determine the border color using the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                //Default to transparent if not selected
+                Color borderColour = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.transparent;
+
+                // Set the icon color based on the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                // Default to black if not selected
+                Color iconColor = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.black;
+
+                // If the polyline was tapped, update the theme color
+                if (polylinesState.polyTapped) {
+                  // Bring back the focus to the selected route in the list view
+                  // if needed
+                  if (focusNodes.length != widget.vehicleState.emissions.length) {
+                    // Clean up old nodes
+                    for (final node in focusNodes) {
+                      node.dispose();
+                    }
+                    // Recreate new nodes
+                    focusNodes = List.generate(widget.vehicleState.emissions.length, (_) => FocusNode());
+                  }
+                  theme.setThemeColour(polylinesState.carActiveRouteIndex);
+                  polylinesState.polyTapped = false;
                 }
+
                 return InkWell(
+                  focusNode: focusNodes[index],
+                  onFocusChange: (focused) {
+                    if (focused) {
+                      for (int i = 0;
+                          i < widget.vehicleState.emissions.length;
+                          i++) {
+                        theme.calculateColour(
+                          widget.vehicleState.minEmissionValue,
+                          widget.vehicleState.maxEmissionValue,
+                          widget.vehicleState.emissions[i],
+                          i,
+                          widget.vehicleState.emissions.length,
+                          polylinesState.mode,
+                        );
+                      }
+                      polylinesState.updateColours(theme.carColourList);
+                      theme.setThemeColour(polylinesState.carActiveRouteIndex);
+                      context.read<ColourSyncState>().setColoursReady(true);     
+                    }
+                  },
                   onTap: () {
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(polylinesState.carActiveRouteIndex);
                   },
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: color,
-                          width: 4.0,
+                          color: borderColour,
+                          width: 5.0,
                         ),
                       ),
                     ),
@@ -240,7 +315,7 @@ class _CarListViewState extends State<CarListView> {
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
                                   widget.icon,
-                                  color: Colors.green,
+                                  color: iconColor,
                                   size: 25,
                                 ),
                               ),
@@ -249,7 +324,8 @@ class _CarListViewState extends State<CarListView> {
                                   padding: const EdgeInsets.only(right: 10),
                                   child: Text(
                                     'via ${widget.polylinesState.routeSummary[index]}',
-                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                     softWrap: true,
                                   ),
                                 ),
@@ -355,7 +431,10 @@ class _CarListViewState extends State<CarListView> {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(
+                thickness: 2,
+              ),
             ),
           ],
         );

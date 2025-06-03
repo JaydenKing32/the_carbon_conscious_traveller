@@ -9,8 +9,10 @@ import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/transit_steps.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
@@ -34,10 +36,26 @@ class _TransitListViewState extends State<TransitListView> {
   final Map<int, int> _indexToTripId = {}; // Maps UI index -> DB trip ID
   final Map<int, bool> _tripCompletionStatus = {};
 
+  List<FocusNode> focusNodes = [];
+
   @override
   void initState() {
     super.initState();
     _loadSavedTrips();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
+      FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up all the focus nodes to avoid memory leaks
+    for (final node in focusNodes) {
+      node.dispose();
+    }
+    focusNodes.clear();
+    super.dispose();
   }
 
   Future<void> _loadSavedTrips() async {
@@ -181,8 +199,19 @@ class _TransitListViewState extends State<TransitListView> {
       transitState.updateMinEmission(widget.emissions.reduce(min).round());
       transitState.updateMaxEmission(widget.emissions.reduce(max).round());
     });
-    return Consumer2<PolylinesState, Settings>(
-      builder: (context, polylinesState, settings, child) {
+
+    // We need to create focus nodes to handle the focus of the list items
+    // This way we handle colour updates based on the selected route
+    if (focusNodes.length != widget.emissions.length) {
+      // Clean up old nodes
+      for (final node in focusNodes) {
+        node.dispose();
+      }
+      // Recreate new nodes
+      focusNodes = List.generate(widget.emissions.length, (_) => FocusNode());
+    }
+    return Consumer3<PolylinesState, Settings, ThemeState>(
+      builder: (context, polylinesState, settings, theme, child) {
         final screenWidth = MediaQuery.of(context).size.width;
         final screenHeight = MediaQuery.of(context).size.height;
 
@@ -208,20 +237,63 @@ class _TransitListViewState extends State<TransitListView> {
                 transitState.updateMaxConfiguredEmissions(driving, carFactor * maxDistance);
                 transitState.updateMaxConfiguredEmissions(motorcycling, motorcycleFactor * maxDistance);
 
-                Color color = selectedIndex == index ? Colors.green : Colors.transparent;
+                // Determine the border color using the currently selected route
+                // If the theme is too light, use brown. Otherwise, use the seed color
+                //Default to transparent if not selected
+                Color borderColour = (selectedIndex == index)
+                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
+                    : Colors.transparent;
+
+                // If the polyline was tapped, update the theme color
+                if (polylinesState.polyTapped) {
+                  // Bring back the focus to the selected route in the list view
+                  // if needed
+                  if (focusNodes.length != transitState.emissions.length) {
+                    // Clean up old nodes
+                    for (final node in focusNodes) {
+                      node.dispose();
+                    }
+                    // Recreate new nodes
+                    focusNodes = List.generate(transitState.emissions.length, (_) => FocusNode());
+                  }
+                  theme.setThemeColour(polylinesState.transitActiveRouteIndex);
+                  polylinesState.polyTapped = false;
+                }
 
                 return InkWell(
+                  focusNode: focusNodes[index],
+                  onFocusChange: (focused) {
+                    if (focused) {
+                      // theme.seedColourList.clear(); // this causes an invisible error. Do not use
+                      for (int i = 0; i < widget.emissions.length; i++) {
+                       theme.calculateColour(
+                          transitState.minEmissionValue,
+                          transitState.maxEmissionValue,
+                          transitState.emissions[i],
+                          i,
+                          transitState.emissions.length,
+                          polylinesState.mode,
+                        );
+                      }
+                      polylinesState.updateColours(theme.transitColourList);
+                      theme.setThemeColour(polylinesState.transitActiveRouteIndex);
+                      context.read<ColourSyncState>().setColoursReady(true);   
+                    }
+                  },
+                  autofocus: index == selectedIndex,
                   onTap: () {
+                    //FocusScope.of(context).requestFocus(focusNodes[index]);
                     setState(() {
                       polylinesState.setActiveRoute(index);
                     });
+                    theme.setThemeColour(polylinesState.transitActiveRouteIndex);
                   },
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: color,
-                          width: 4.0,
+                          color: borderColour,
+                          width: 5.0,
                         ),
                       ),
                     ),
@@ -338,7 +410,9 @@ class _TransitListViewState extends State<TransitListView> {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              separatorBuilder: (BuildContext context, int index) => const Divider(
+                thickness: 2,
+                ),
             ),
           ],
         );

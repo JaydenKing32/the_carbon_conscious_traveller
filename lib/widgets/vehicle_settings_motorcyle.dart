@@ -44,11 +44,18 @@ class _MotorcycleSettingsState extends State<MotorcycleSettings> {
         );
 
         // 3) Generate emissions for each route
+        // final computedEmissions = List<int>.generate( 
+        //   polylinesState.result.length,
+        //   (i) => calculator.calculateEmission(i).round(),  <-- this code produces unexpected results
+        // );
+
+        // We need to calculate the emissions for the "privateVehicleResult"
+        // instead of "result". Otherwise, it will calculate the public transport emissions
         final computedEmissions = List<int>.generate(
-          polylinesState.result.length,
+          polylinesState.resultForPrivateVehicle.length,
           (i) => calculator.calculateEmission(i).round(),
         );
-
+        
         // 4) Populate PrivateMotorcycleState and show the list
         motorcycleState.saveEmissions(computedEmissions);
         motorcycleState.updateVisibility(true);

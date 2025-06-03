@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 
 class TransitSteps extends StatelessWidget {
   const TransitSteps({super.key, required this.steps, required this.stepEmissions});
@@ -30,20 +32,24 @@ class TransitSteps extends StatelessWidget {
     var shortNameText = step.transit?.line?.shortName ?? step.transit?.line?.name;
 
     if (step.transit?.line?.vehicle?.icon == null && step.travelMode == TravelMode.walking) {
-      return Column(
-        children: [
-          Icon(Icons.directions_walk, size: screenWidth * 0.05), // Smaller walk icon
-          Padding(
-            padding: EdgeInsets.only(top: screenHeight * 0.002),
-            child: AutoSizeText(
-              formatNumber(stepEmissions[steps.indexOf(step)]),
-              style: Theme.of(context).textTheme.bodySmall,
-              minFontSize: 8, // Smaller text
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+      return Consumer<ThemeState>(
+        builder: (context, theme, child) { 
+        return Column(
+          children: [
+            Icon(Icons.directions_walk, size: screenWidth * 0.05), // Smaller walk icon
+            Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.002),
+              child: AutoSizeText(
+                formatNumber(stepEmissions[steps.indexOf(step)]),
+                style: Theme.of(context).textTheme.bodySmall,
+                minFontSize: 8, // Smaller text
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-        ],
+          ],
+        );
+      },
       );
     } else {
       return Padding(
@@ -115,7 +121,7 @@ class TransitSteps extends StatelessWidget {
               // Display arrow only if not the first step
               if (steps.indexOf(step) != 0)
                 Padding(
-                  padding: EdgeInsets.only(top: screenHeight * 0.002),
+                  padding: EdgeInsets.only(top: screenHeight * 0.002, bottom: screenHeight * 0.035),
                   child: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.025), // Smaller arrow
                 ),
               _buildStepIcon(context, step),
