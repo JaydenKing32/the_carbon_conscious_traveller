@@ -31,7 +31,7 @@ class Trip {
     required this.model,
   });
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'date': date,
@@ -50,7 +50,7 @@ class Trip {
     };
   }
 
-  factory Trip.fromMap(Map<String, dynamic> map) {
+  factory Trip.fromJson(Map<String, dynamic> map) {
     return Trip(
       id: map['id'],
       date: map['date'],

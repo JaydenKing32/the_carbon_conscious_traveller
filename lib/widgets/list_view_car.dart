@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
+import 'package:the_carbon_conscious_traveller/helpers/verify_service.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
@@ -72,9 +73,6 @@ class _CarListViewState extends State<CarListView> {
         index >= widget.vehicleState.emissions.length) {
       return;
     }
-    List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
-    // Add service, every minute check current location within certain distance of any coord in list, when near end location mark as complete and end service
-    // https://pub.dev/packages/flutter_background_service
 
     int maxEmission = widget.vehicleState.emissions.isNotEmpty ? widget.vehicleState.emissions.map((e) => e.toInt()).reduce((a, b) => a > b ? a : b) : 0;
     double selectedEmission = widget.vehicleState.getEmission(index).toDouble();
@@ -118,6 +116,11 @@ class _CarListViewState extends State<CarListView> {
       _savedTripIds.add(id);
       _indexToTripId[index] = id;
     });
+
+    if (widget.settings.enableGeolocationVerification) {
+      List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
+      VerifyService.update(coords, id);
+    }
   }
 
   Future<void> _deleteTrip(int index) async {
@@ -285,7 +288,7 @@ class _CarListViewState extends State<CarListView> {
                       }
                       polylinesState.updateColours(theme.carColourList);
                       theme.setThemeColour(polylinesState.carActiveRouteIndex);
-                      context.read<ColourSyncState>().setColoursReady(true);     
+                      context.read<ColourSyncState>().setColoursReady(true);
                     }
                   },
                   onTap: () {

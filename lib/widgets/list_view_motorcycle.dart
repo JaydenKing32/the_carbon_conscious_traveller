@@ -2,8 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_directions_api/google_directions_api.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
+import 'package:the_carbon_conscious_traveller/helpers/verify_service.dart';
 import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -31,7 +33,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
   final Map<int, bool> _tripCompletionStatus = {};
 
   List<FocusNode> focusNodes = [];
-  
+
   @override
   void initState() {
     super.initState();
@@ -123,6 +125,11 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
       _savedTripIds.add(id);
       _routeToTripId[route] = id;
     });
+
+    if (widget.settings.enableGeolocationVerification) {
+      List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
+      VerifyService.update(coords, id);
+    }
   }
 
   /// Deletes a trip from the database and updates the local state.
@@ -333,7 +340,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                       }
                       polylinesState.updateColours(theme.motoColourList);
                       theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
-                      context.read<ColourSyncState>().setColoursReady(true);     
+                      context.read<ColourSyncState>().setColoursReady(true);
                     }
                   },
                   //autofocus: selectedIndex == index,
@@ -343,7 +350,7 @@ final ValueNotifier<bool> coloursReadyNotifier = ValueNotifier(false);
                       polylinesState.setActiveRoute(index);
                     });
                     theme.setThemeColour(polylinesState.motorcycleActiveRouteIndex);
-                    //context.read<ColourSyncState>().setColoursReady(true); 
+                    //context.read<ColourSyncState>().setColoursReady(true);
                   },
                   child: Container(
                     decoration: BoxDecoration(

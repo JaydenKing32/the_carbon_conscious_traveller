@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/transit_emissions_calculator.dart';
+import 'package:the_carbon_conscious_traveller/helpers/verify_service.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
@@ -75,7 +76,6 @@ class _TransitListViewState extends State<TransitListView> {
 
   Future<void> _saveTrip(int index) async {
     int maxEmission = widget.emissions.isNotEmpty ? widget.emissions.map((e) => e.toInt()).reduce(max) : 0;
-    List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
 
     double selectedEmission = widget.emissions[index];
     double reduction = max(0, maxEmission - selectedEmission);
@@ -118,6 +118,11 @@ class _TransitListViewState extends State<TransitListView> {
       _savedTripIds.add(id);
       _indexToTripId[index] = id;
     });
+
+    if (widget.settings.enableGeolocationVerification) {
+      List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
+      VerifyService.update(coords, id);
+    }
   }
 
   Future<void> _deleteTrip(int index) async {
@@ -277,7 +282,7 @@ class _TransitListViewState extends State<TransitListView> {
                       }
                       polylinesState.updateColours(theme.transitColourList);
                       theme.setThemeColour(polylinesState.transitActiveRouteIndex);
-                      context.read<ColourSyncState>().setColoursReady(true);   
+                      context.read<ColourSyncState>().setColoursReady(true);
                     }
                   },
                   autofocus: index == selectedIndex,

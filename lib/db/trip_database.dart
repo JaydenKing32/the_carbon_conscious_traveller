@@ -64,7 +64,7 @@ class TripDatabase {
 
   Future<int> insertTrip(Trip trip) async {
     final db = await instance.database;
-    return await db.insert('trips', trip.toMap());
+    return await db.insert('trips', trip.toJson());
   }
 
   Future<int> updateTripCompletion(int id, bool complete) async {
@@ -80,7 +80,7 @@ class TripDatabase {
   Future<List<Trip>> getAllTrips() async {
     final db = await instance.database;
     final result = await db.query('trips');
-    return result.map((map) => Trip.fromMap(map)).toList();
+    return result.map((map) => Trip.fromJson(map)).toList();
   }
 
   Future<int> deleteTrip(int id) async {
@@ -97,7 +97,7 @@ class TripDatabase {
     );
 
     if (maps.isNotEmpty) {
-      return Trip.fromMap(maps.first);
+      return Trip.fromJson(maps.first);
     }
     return null;
   }

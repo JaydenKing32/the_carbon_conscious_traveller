@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/helpers/verify_service.dart';
 import 'package:the_carbon_conscious_traveller/state/coloursync_state.dart';
 import 'package:the_carbon_conscious_traveller/state/coordinates_state.dart';
 import 'package:the_carbon_conscious_traveller/state/marker_state.dart';
@@ -20,6 +21,11 @@ void main() async {
   // Initialize settings first
   final settings = Settings();
   await settings.loadPreferences();
+
+  if (settings.enableGeolocationVerification) {
+    await VerifyService.initializeService();
+    VerifyService.startBackgroundService();
+  }
 
   runApp(
     MultiProvider(
@@ -70,7 +76,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
