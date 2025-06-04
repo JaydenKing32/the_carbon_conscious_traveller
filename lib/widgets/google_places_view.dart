@@ -78,11 +78,6 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       googleApiKey,
       locale: initialLocale,
     );
-    if (kDebugMode) {
-      _places.isInitialized().then((value) {
-        debugPrint('Places Initialised: $value');
-      });
-    }
   }
 
   @override

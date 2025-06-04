@@ -37,17 +37,11 @@ class RoutesModel {
         debugPrint("Full response: ${response.routes?.length}");
       }
       if (status == DirectionsStatus.ok) {
-        if (kDebugMode) {
-          debugPrint("Test Request successful");
-        }
         final routes = response.routes;
         if (!completer.isCompleted) {
           completer.complete(routes);
         }
       } else {
-        if (kDebugMode) {
-          debugPrint("Test Request unsuccessful");
-        }
         if (!completer.isCompleted) {
           completer.completeError("Request unsuccessful");
         }
@@ -57,7 +51,6 @@ class RoutesModel {
     try {
       final routes = await completer.future;
       if (kDebugMode) {
-        debugPrint("Request completed");
         debugPrint("ROUTES result length ${routes?.length}");
       }
       return routes;
