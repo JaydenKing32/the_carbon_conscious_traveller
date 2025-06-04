@@ -76,4 +76,9 @@ class Trip {
       return "$distance m";
     }
   }
+
+  @override
+  String toString() {
+    return "$id; $date; $origin; $destination";
+  }
 }
