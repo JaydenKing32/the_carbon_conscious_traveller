@@ -228,7 +228,7 @@ class _TravelModeButtonsState extends State<TravelModeButtons> {
             child) {
       return Padding(
         padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.24, right: 16),
+            top: MediaQuery.of(context).size.height * 0.02, right: 16),
         child: Stack(
           alignment: Alignment.topRight,
           clipBehavior: Clip.none, // Allow overflow
