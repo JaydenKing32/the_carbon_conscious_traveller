@@ -26,6 +26,7 @@ import 'package:the_carbon_conscious_traveller/widgets/location_button.dart';
 import 'package:the_carbon_conscious_traveller/widgets/travel_mode_buttons.dart';
 import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng_bounds.dart' as plat_ll_bounds;
 import 'package:flutter_google_places_sdk_platform_interface/src/types/lat_lng.dart' as plat_ll;
+import 'package:the_carbon_conscious_traveller/widgets/travel_emissions_text.dart';
 
 class GooglePlacesView extends StatefulWidget {
   const GooglePlacesView({super.key});
@@ -67,6 +68,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
   final travelMode = dir.TravelMode.driving;
 
+  bool showDestinationField = false;
+
   @override
   void initState() {
     super.initState();
@@ -86,7 +89,16 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
     return SingleChildScrollView(
       child: Container(
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 2.0,
+            spreadRadius: 1.0,
+            offset: Offset(0, 1),
+          ),
+        ],
+        ),
         child: Column(children: predictionsWidgets),
       ),
     );
@@ -121,19 +133,22 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                 ),
               ),
               // --- DESTINATION ---
-              TextFormField(
-                controller: destinationController,
-                focusNode: _destinationFocusNode,
-                onTapOutside: (PointerDownEvent event) {
-                  setState(() {
-                    _destinationFocusNode.unfocus();
-                    FocusScope.of(context).unfocus();
-                  });
-                },
-                onChanged: (value) => _onPredictTextChanged(value, "destination"),
-                decoration: const InputDecoration(
-                  label: Text("Enter a destination"),
-                  //icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
+              Visibility(
+                visible: showDestinationField,
+                child: TextFormField(
+                  controller: destinationController,
+                  focusNode: _destinationFocusNode,
+                  onTapOutside: (PointerDownEvent event) {
+                    setState(() {
+                      _destinationFocusNode.unfocus();
+                      FocusScope.of(context).unfocus();
+                    });
+                  },
+                  onChanged: (value) => _onPredictTextChanged(value, "destination"),
+                  decoration: const InputDecoration(
+                    label: Text("Enter a destination"),
+                    //icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
+                  ),
                 ),
               ),
             ],
@@ -142,6 +157,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
       ),
       Container(
         color: Colors.white,
+        padding: const EdgeInsets.only(left: 30, right: 30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: (_predictions ?? []).map(_buildPredictionItem).toList(growable: false),
@@ -151,10 +167,11 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         padding: EdgeInsets.only(top: 10.0),
         child: Image(
           image: places.FlutterGooglePlacesSdk.ASSET_POWERED_BY_GOOGLE_ON_WHITE,
+          height: 16,
         ),
       ),
       // Travel mode buttons
-      const TravelModeButtons(),
+      const TravelEmissionsText(),
       if (_fetchingPlaceErr != null || _predictErr != null) ...[
         _buildErrorWidget(_fetchingPlaceErr),
         _buildErrorWidget(_predictErr),
@@ -270,6 +287,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           _fetchingPlace = false;
           originLatLng = origin?.latLng;
           _predictions = [];
+          showDestinationField = true;
         });
 
         if (originLatLng != null) {
@@ -508,6 +526,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         final currentAddress = "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
         setState(() {
           originController.text = currentAddress;
+          showDestinationField = true;
         });
       } else {
         _buildErrorWidget("Address not found. Try entering an address manually");

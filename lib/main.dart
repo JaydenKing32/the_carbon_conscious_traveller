@@ -12,8 +12,8 @@ import 'package:the_carbon_conscious_traveller/state/transit_state.dart';
 import 'package:the_carbon_conscious_traveller/widgets/bottom_sheet.dart';
 import 'package:the_carbon_conscious_traveller/widgets/drawer.dart';
 import 'package:the_carbon_conscious_traveller/widgets/google_map_view.dart';
-import 'package:the_carbon_conscious_traveller/widgets/google_places_view.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
+import 'package:the_carbon_conscious_traveller/widgets/googlePlaces_modeButton_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,8 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
           title: Text(
@@ -91,10 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             GoogleMapView(),
             TravelModeBottomSheet(),
-            GooglePlacesView(),
+            GoogleplacesModebuttonView(),
           ],
         ),
-      ),
-    );
+      );
   }
 }

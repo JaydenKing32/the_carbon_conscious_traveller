@@ -24,41 +24,47 @@ class _AppDrawerState extends State<AppDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          TextButton(
-            child: const Row(
-              children: [Icon(Icons.info_outline_rounded), Text(' About')],
-            ),
-            onPressed: () => _navigateWithUnfocus(const AboutScreen()),
+    return SafeArea(
+      bottom: false,
+      child: Drawer(
+        child: Padding(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              TextButton(
+                child: const Row(
+                  children: [Icon(Icons.info_outline_rounded), Text(' About')],
+                ),
+                onPressed: () => _navigateWithUnfocus(const AboutScreen()),
+              ),
+              TextButton(
+                child: const Row(
+                  children: [Icon(Icons.history_outlined), Text(' Trips')],
+                ),
+                onPressed: () => _navigateWithUnfocus(const TripsScreen()),
+              ),
+              TextButton(
+                child: const Row(
+                  children: [Icon(Icons.show_chart_outlined), Text(' Statistics')],
+                ),
+                onPressed: () => _navigateWithUnfocus(const StatisticsScreen()),
+              ),
+              TextButton(
+                child: const Row(
+                  children: [Icon(Icons.privacy_tip_outlined), Text(' Privacy')],
+                ),
+                onPressed: () => _navigateWithUnfocus(const PrivacyPolicyScreen()),
+              ),
+              TextButton(
+                child: const Row(
+                  children: [Icon(Icons.settings_outlined), Text(' Settings')],
+                ),
+                onPressed: () => _navigateWithUnfocus(const SettingsScreen()),
+              ),
+            ],
           ),
-          TextButton(
-            child: const Row(
-              children: [Icon(Icons.history_outlined), Text(' Trips')],
-            ),
-            onPressed: () => _navigateWithUnfocus(const TripsScreen()),
-          ),
-          TextButton(
-            child: const Row(
-              children: [Icon(Icons.show_chart_outlined), Text(' Statistics')],
-            ),
-            onPressed: () => _navigateWithUnfocus(const StatisticsScreen()),
-          ),
-          TextButton(
-            child: const Row(
-              children: [Icon(Icons.privacy_tip_outlined), Text(' Privacy')],
-            ),
-            onPressed: () => _navigateWithUnfocus(const PrivacyPolicyScreen()),
-          ),
-          TextButton(
-            child: const Row(
-              children: [Icon(Icons.settings_outlined), Text(' Settings')],
-            ),
-            onPressed: () => _navigateWithUnfocus(const SettingsScreen()),
-          ),
-        ],
+        ),
       ),
     );
   }

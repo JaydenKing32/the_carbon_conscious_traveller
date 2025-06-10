@@ -141,7 +141,6 @@ By using our app, you agree to this Privacy Policy.
     return Scaffold(
       appBar: AppBar(
         title: const Text("Privacy Policy"),
-        backgroundColor: const Color.fromARGB(255, 7, 179, 110),
       ),
       body: SafeArea(
         child: Column(

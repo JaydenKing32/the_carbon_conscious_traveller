@@ -14,7 +14,6 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        backgroundColor: const Color.fromARGB(255, 7, 179, 110),
       ),
       body: settings.emissionValues.isEmpty
           ? const Center(child: CircularProgressIndicator())
