@@ -68,6 +68,8 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
 
   final travelMode = dir.TravelMode.driving;
 
+  bool showDestinationField = false;
+
   @override
   void initState() {
     super.initState();
@@ -136,19 +138,22 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
                 ),
               ),
               // --- DESTINATION ---
-              TextFormField(
-                controller: destinationController,
-                focusNode: _destinationFocusNode,
-                onTapOutside: (PointerDownEvent event) {
-                  setState(() {
-                    _destinationFocusNode.unfocus();
-                    FocusScope.of(context).unfocus();
-                  });
-                },
-                onChanged: (value) => _onPredictTextChanged(value, "destination"),
-                decoration: const InputDecoration(
-                  label: Text("Enter a destination"),
-                  //icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
+              Visibility(
+                visible: showDestinationField,
+                child: TextFormField(
+                  controller: destinationController,
+                  focusNode: _destinationFocusNode,
+                  onTapOutside: (PointerDownEvent event) {
+                    setState(() {
+                      _destinationFocusNode.unfocus();
+                      FocusScope.of(context).unfocus();
+                    });
+                  },
+                  onChanged: (value) => _onPredictTextChanged(value, "destination"),
+                  decoration: const InputDecoration(
+                    label: Text("Enter a destination"),
+                    //icon: Icon(Icons.location_searching_outlined, color: Colors.grey),
+                  ),
                 ),
               ),
             ],
@@ -287,6 +292,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
           _fetchingPlace = false;
           originLatLng = origin?.latLng;
           _predictions = [];
+          showDestinationField = true;
         });
 
         if (originLatLng != null) {
@@ -525,6 +531,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
         final currentAddress = "${placemark.street!} ${placemark.locality!} ${placemark.postalCode!} ${placemark.country!}";
         setState(() {
           originController.text = currentAddress;
+          showDestinationField = true;
         });
       } else {
         _buildErrorWidget("Address not found. Try entering an address manually");
