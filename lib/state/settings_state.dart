@@ -1,3 +1,4 @@
+import 'package:advertising_id/advertising_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
@@ -29,6 +30,9 @@ class Settings extends ChangeNotifier {
   bool _enableGeolocationVerification = false;
 
   bool get enableGeolocationVerification => _enableGeolocationVerification;
+
+  String _deviceId = "";
+  String get deviceId => _deviceId;
 
   Settings() {
     _initializeDefaults();
@@ -70,6 +74,22 @@ class Settings extends ChangeNotifier {
 
     final motorcycleSizeString = prefs.getString('selectedMotorcycleSize');
     _selectedMotorcycleSize = motorcycleSizeString != null ? stringToMotorcycleSize(motorcycleSizeString) : MotorcycleSize.small;
+
+    String? deviceId = prefs.getString('deviceId');
+
+    if (deviceId == null || deviceId == "") {
+      try {
+        deviceId = await AdvertisingId.id();
+        if (deviceId != null && deviceId != "") {
+          _deviceId = deviceId;
+          prefs.setString("deviceId", deviceId);
+        }
+      } catch (e) {
+        _deviceId = "";
+      }
+    } else {
+      _deviceId = deviceId;
+    }
   }
 
   void toggleGeolocationVerification(bool value) async {

@@ -1,6 +1,6 @@
-import 'package:advertising_id/advertising_id.dart';
 import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/constants.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
 
@@ -12,8 +12,9 @@ class DynamoHelper {
   static final service = DynamoDB(region: "ap-southeast-2", credentials: AwsClientCredentials(accessKey: Constants.aws_key, secretKey: Constants.aws_secret));
 
   static Future<Map<String, AttributeValue>> tripToMap(Trip trip) async {
+    final prefs = await SharedPreferences.getInstance();
     return {
-      'device_id': AttributeValue(s: await AdvertisingId.id()),
+      'device_id': AttributeValue(s: prefs.getString("deviceId")),
       'trip_id': AttributeValue(n: trip.id.toString()),
       'date': AttributeValue(s: trip.date),
       'origin': AttributeValue(s: trip.origin),
