@@ -111,7 +111,7 @@ class _CarListViewState extends State<CarListView> {
         model: carModel);
 
     int id = await TripDatabase.instance.insertTrip(trip);
-
+    trip.id = id;
     setState(() {
       _savedTripIds.add(id);
       _indexToTripId[index] = id;

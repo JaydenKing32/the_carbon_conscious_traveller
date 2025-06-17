@@ -121,6 +121,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
     );
 
     int id = await TripDatabase.instance.insertTrip(trip);
+    trip.id = id;
     setState(() {
       _savedTripIds.add(id);
       _routeToTripId[route] = id;

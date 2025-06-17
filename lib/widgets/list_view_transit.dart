@@ -113,7 +113,7 @@ class _TransitListViewState extends State<TransitListView> {
     );
 
     int id = await TripDatabase.instance.insertTrip(trip);
-
+    trip.id = id;
     setState(() {
       _savedTripIds.add(id);
       _indexToTripId[index] = id;
