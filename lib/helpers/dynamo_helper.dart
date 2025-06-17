@@ -33,7 +33,7 @@ class DynamoHelper {
   static Future insertTrip(Trip? trip) async {
     if (trip != null) {
       debugPrint("adding trip $trip");
-      service.putItem(item: await tripToMap(trip), tableName: "tcct-trips");
+      await service.putItem(item: await tripToMap(trip), tableName: "tcct-trips");
     }
   }
 }
