@@ -66,7 +66,7 @@ class VerifyService {
           await TripDatabase.instance.updateTripCompletion(tripId, true);
           // show message that trip is complete
           debugPrint("Completed trip");
-          service.invoke("stop");
+          service.stopSelf();
           return;
         }
 
@@ -82,7 +82,7 @@ class VerifyService {
         await TripDatabase.instance.deleteTrip(tripId);
         // show message that trip is cancelled
         debugPrint("Cancelling trip");
-        service.invoke("stop");
+        service.stopSelf();
       });
     });
   }
