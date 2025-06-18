@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
@@ -52,6 +53,7 @@ class VerifyService {
       final tripId = event?["trip"];
 
       final Trip? trip = await TripDatabase.instance.getTripById(tripId);
+      Fluttertoast.showToast(msg: "Starting location verification");
       debugPrint("Starting location verification with $trip");
 
       // TODO: Set to longer duration before deploying
@@ -65,7 +67,7 @@ class VerifyService {
 
         if (dist <= distThreshold) {
           await TripDatabase.instance.updateTripCompletion(tripId, true);
-          // show message that trip is complete
+          Fluttertoast.showToast(msg: "Completed trip");
           debugPrint("Completed trip");
           await DynamoHelper.insertTrip(trip);
           service.stopSelf();
@@ -82,7 +84,7 @@ class VerifyService {
         }
 
         await TripDatabase.instance.deleteTrip(tripId);
-        // show message that trip is cancelled
+        Fluttertoast.showToast(msg: "Cancelling trip");
         debugPrint("Cancelling trip");
         service.stopSelf();
       });

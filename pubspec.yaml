@@ -58,6 +58,7 @@ dependencies:
   google_fonts: ^6.2.1
   aws_dynamodb_api: ^2.0.0
   advertising_id: ^2.7.1
+  fluttertoast: ^8.2.12
 
 dev_dependencies:
   flutter_test:
