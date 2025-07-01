@@ -43,7 +43,7 @@ class _TransitListViewState extends State<TransitListView> {
   void initState() {
     super.initState();
     _loadSavedTrips();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final indexToFocus = context.read<PolylinesState>().activeRouteIndex;
       FocusScope.of(context).requestFocus(focusNodes[indexToFocus]);
     });
@@ -96,6 +96,9 @@ class _TransitListViewState extends State<TransitListView> {
       reduction = max(0, maxConfiguredEmission - selectedEmission);
     }
 
+    final transitType = legs?.fold(
+        "", (a, leg) => "$a!${leg.steps?.fold("", (b, step) => "$b!${step.travelMode.toString() == "TRANSIT" ? step.transit?.line?.vehicle?.type.toString() : step.travelMode.toString()}")}");
+
     final trip = Trip(
       date: DateTime.now().toIso8601String(),
       origin: legs?.first.startAddress ?? "Unknown",
@@ -109,7 +112,7 @@ class _TransitListViewState extends State<TransitListView> {
       mode: "Transit",
       reduction: reduction,
       complete: false,
-      model: "Public Transport",
+      model: transitType ?? "Unknown",
     );
 
     int id = await TripDatabase.instance.insertTrip(trip);
@@ -245,9 +248,7 @@ class _TransitListViewState extends State<TransitListView> {
                 // Determine the border color using the currently selected route
                 // If the theme is too light, use brown. Otherwise, use the seed color
                 //Default to transparent if not selected
-                Color borderColour = (selectedIndex == index)
-                    ? (theme.isTooLight ? Colors.brown : theme.seedColour)
-                    : Colors.transparent;
+                Color borderColour = (selectedIndex == index) ? (theme.isTooLight ? Colors.brown : theme.seedColour) : Colors.transparent;
 
                 // If the polyline was tapped, update the theme color
                 if (polylinesState.polyTapped) {
@@ -271,7 +272,7 @@ class _TransitListViewState extends State<TransitListView> {
                     if (focused) {
                       // theme.seedColourList.clear(); // this causes an invisible error. Do not use
                       for (int i = 0; i < widget.emissions.length; i++) {
-                       theme.calculateColour(
+                        theme.calculateColour(
                           transitState.minEmissionValue,
                           transitState.maxEmissionValue,
                           transitState.emissions[i],
@@ -417,7 +418,7 @@ class _TransitListViewState extends State<TransitListView> {
               },
               separatorBuilder: (BuildContext context, int index) => const Divider(
                 thickness: 2,
-                ),
+              ),
             ),
           ],
         );
