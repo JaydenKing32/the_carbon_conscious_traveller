@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:the_carbon_conscious_traveller/screens/event.dart';
 import 'package:the_carbon_conscious_traveller/screens/privacy.dart';
 import 'package:the_carbon_conscious_traveller/screens/settings.dart';
 import 'package:the_carbon_conscious_traveller/screens/trips_screen.dart';
@@ -61,6 +62,12 @@ class _AppDrawerState extends State<AppDrawer> {
                   children: [Icon(Icons.settings_outlined), Text(' Settings')],
                 ),
                 onPressed: () => _navigateWithUnfocus(const SettingsScreen()),
+              ),
+              TextButton(
+                child: const Row(
+                  children: [Icon(Icons.celebration_outlined), Text(' Event')],
+                ),
+                onPressed: () => _navigateWithUnfocus(const EventScreen()),
               ),
             ],
           ),
