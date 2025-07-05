@@ -122,7 +122,7 @@ class _TransitListViewState extends State<TransitListView> {
       _indexToTripId[index] = id;
     });
 
-    if (widget.settings.enableGeolocationVerification) {
+    if (widget.settings.verifyLocation) {
       List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
       VerifyService.update(coords, id);
     }
@@ -405,7 +405,7 @@ class _TransitListViewState extends State<TransitListView> {
                                 color: isCompleted ? Colors.green : Colors.black,
                                 size: screenWidth * 0.07, // Scaled size
                               ),
-                              onPressed: settings.enableGeolocationVerification ? () => _attemptGeolocCompletion(index) : () => _toggleTripCompletion(index),
+                              onPressed: settings.verifyLocation ? () => _attemptGeolocCompletion(index) : () => _toggleTripCompletion(index),
                               tooltip: isCompleted ? 'Mark Incomplete' : 'Mark Complete',
                             ),
                             SizedBox(height: screenHeight * 0.005),

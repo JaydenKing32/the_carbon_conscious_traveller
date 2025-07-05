@@ -117,7 +117,7 @@ class _CarListViewState extends State<CarListView> {
       _indexToTripId[index] = id;
     });
 
-    if (widget.settings.enableGeolocationVerification) {
+    if (widget.settings.verifyLocation) {
       List<LatLng> coords = widget.polylinesState.routeCoordinates[index];
       VerifyService.update(coords, id);
     }
@@ -419,7 +419,7 @@ class _CarListViewState extends State<CarListView> {
                                 color: isCompleted ? Colors.green : Colors.black,
                                 size: 28,
                               ),
-                              onPressed: settings.enableGeolocationVerification
+                              onPressed: settings.verifyLocation
                                   // If geolocation is ON => attempt location-based completion
                                   ? () => _attemptGeolocCompletion(index)
                                   // Otherwise => old behaviour, just toggle completion

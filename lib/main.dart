@@ -22,7 +22,7 @@ void main() async {
   final settings = Settings();
   await settings.loadPreferences();
 
-  if (settings.enableGeolocationVerification) {
+  if (settings.verifyLocation) {
     await VerifyService.initializeService();
     VerifyService.startBackgroundService();
   }

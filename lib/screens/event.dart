@@ -43,7 +43,6 @@ class _EventScreenState extends State<EventScreen> {
       int transitCount = 0;
 
       for (var trip in trips) {
-        // _trips.add(trip);
         _deviceIds.add(trip.deviceId);
         _totalDistance += trip.distance;
         _totalEmissions += trip.emissions;
@@ -85,16 +84,16 @@ class _EventScreenState extends State<EventScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Geolocation Settings',
+                          'Event Settings',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         SwitchListTile(
                           title: Text('Enable Event Mode', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04)),
                           subtitle: Text('Enable data collection for event mode', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.035)),
-                          value: settings.enableGeolocationVerification,
+                          value: settings.enableEventMode,
                           onChanged: (bool value) {
-                            settings.toggleGeolocationVerification(value);
+                            settings.toggleEventMode(value);
                           },
                         )
                       ],

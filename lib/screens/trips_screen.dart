@@ -149,7 +149,7 @@ class _TripsScreenState extends State<TripsScreen> {
                         trip.complete ? Icons.check_circle : Icons.cancel_outlined,
                         color: trip.complete ? Colors.green : Colors.black,
                       ),
-                      onPressed: settings.enableGeolocationVerification ? () => _attemptGeolocCompletion(trip) : () => _toggleTripCompletion(trip.id!, trip.complete),
+                      onPressed: settings.verifyLocation ? () => _attemptGeolocCompletion(trip) : () => _toggleTripCompletion(trip.id!, trip.complete),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.black),

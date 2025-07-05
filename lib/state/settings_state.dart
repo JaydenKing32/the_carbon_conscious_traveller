@@ -28,8 +28,12 @@ class Settings extends ChangeNotifier {
   bool get useMotorcycleInsteadOfCar => _useMotorcycleInsteadOfCar;
 
   bool _enableGeolocationVerification = false;
-
+  bool _enableEventMode = false;
+  String _selectedEvent = "";
   bool get enableGeolocationVerification => _enableGeolocationVerification;
+  bool get enableEventMode => _enableEventMode;
+  bool get verifyLocation => _enableGeolocationVerification | _enableEventMode;
+  String get selectedEvent => _selectedEvent;
 
   String _deviceId = "";
   String get deviceId => _deviceId;
@@ -51,6 +55,8 @@ class Settings extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
 
     _enableGeolocationVerification = prefs.getBool('enableGeolocationVerification') ?? false;
+    _enableEventMode = prefs.getBool('enableEventMode') ?? false;
+    _selectedEvent = prefs.getString('selectedEvent') ?? "";
     _useSpecifiedCar = prefs.getBool('useSpecifiedCar') ?? false;
     _useCarForCalculations = prefs.getBool('useCarForCalculations') ?? false;
     _useSpecifiedMotorcycle = prefs.getBool('useSpecifiedMotorcycle') ?? false;
@@ -97,6 +103,23 @@ class Settings extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('enableGeolocationVerification', value);
+  }
+
+  void toggleEventMode(bool value) async {
+    _enableEventMode = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('enableEventMode', value);
+  }
+
+  void updateSelectedEvent(String event) async {
+    if (event == "") {
+      return;
+    }
+    _selectedEvent = event;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedEvent', event);
   }
 
   void toggleUseSpecifiedCar(bool value) async {
