@@ -16,7 +16,8 @@ class EventScreen extends StatefulWidget {
 
 class _EventScreenState extends State<EventScreen> {
   final Set<String> _deviceIds = {};
-  final Set<String> _events = {};
+  // Dropdown won't show initial value unless it contains entries before initialising state
+  final Set<DropdownMenuEntry<String>> _dropdownEntries = {DropdownMenuEntry(label: "MQ Open Day 2025", value: "MQ_Open_Day_2025")};
   int _totalDistance = 0;
   double _totalEmissions = 0;
   double _totalReduction = 0;
@@ -35,8 +36,8 @@ class _EventScreenState extends State<EventScreen> {
     List<String> events = await DynamoHelper.getEvents();
     setState(() {
       _deviceIds.clear();
-      _events.clear();
-      _events.addAll(events);
+      _dropdownEntries.clear();
+      _dropdownEntries.addAll(events.map((event) => DropdownMenuEntry(label: event.replaceAll("_", " "), value: event)));
 
       _totalDistance = 0;
       _totalEmissions = 0;
@@ -101,7 +102,7 @@ class _EventScreenState extends State<EventScreen> {
                         ),
                         const SizedBox(height: 16),
                         DropdownMenu(
-                          dropdownMenuEntries: _events.map((event) => DropdownMenuEntry(label: event.replaceAll("_", " "), value: event)).toList(),
+                          dropdownMenuEntries: _dropdownEntries.toList(),
                           onSelected: (event) => settings.updateSelectedEvent(event ?? ""),
                           initialSelection: settings.selectedEvent != "" ? settings.selectedEvent : "MQ_Open_Day_2025",
                           width: MediaQuery.of(context).size.width,
