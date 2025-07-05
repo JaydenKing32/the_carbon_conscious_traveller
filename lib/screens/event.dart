@@ -105,7 +105,7 @@ class _EventScreenState extends State<EventScreen> {
                           dropdownMenuEntries: _dropdownEntries.toList(),
                           onSelected: (event) => settings.updateSelectedEvent(event ?? ""),
                           initialSelection: settings.selectedEvent != "" ? settings.selectedEvent : "MQ_Open_Day_2025",
-                          width: MediaQuery.of(context).size.width,
+                          expandedInsets: EdgeInsets.zero,
                         )
                       ],
                     ),
