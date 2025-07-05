@@ -11,7 +11,6 @@ import 'package:the_carbon_conscious_traveller/models/trip.dart';
 // https://stackoverflow.com/a/73748312
 class DynamoHelper {
   static final service = DynamoDB(region: "ap-southeast-2", credentials: AwsClientCredentials(accessKey: Constants.aws_key, secretKey: Constants.aws_secret));
-  static final table = "tcct-trips";
 
   static Future<Map<String, AttributeValue>> tripToMap(Trip trip) async {
     final prefs = await SharedPreferences.getInstance();
@@ -41,14 +40,28 @@ class DynamoHelper {
   }
 
   static Future insertTrip(Trip? trip) async {
-    if (trip != null) {
+    final event = (await SharedPreferences.getInstance()).getString("event");
+    if (trip != null && event != null) {
       debugPrint("adding trip $trip");
-      await service.putItem(item: await tripToMap(trip), tableName: table);
+      await service.putItem(item: await tripToMap(trip), tableName: event);
     }
   }
 
-  static Future<List<DynamoTrip>> getAll() async {
-    final result = await service.scan(tableName: table);
-    return result.items?.map(mapToDynamoTrip).toList() ?? List.empty();
+  static Future<List<DynamoTrip>> getTrips() async {
+    final event = (await SharedPreferences.getInstance()).getString("event");
+
+    if (event != null) {
+      final scanResult = await service.scan(tableName: event);
+      return scanResult.items?.map(mapToDynamoTrip).toList() ?? List.empty();
+    } else {
+      return List.empty();
+    }
+  }
+
+  static Future<List<String>> getEvents() async {
+    final scanResult = await service.scan(tableName: "tcct-events");
+    final events = scanResult.items?.map((map) => map["event"]?.s ?? "").toList() ?? List.empty();
+    events.remove("");
+    return events;
   }
 }

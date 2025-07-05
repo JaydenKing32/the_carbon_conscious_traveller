@@ -15,8 +15,8 @@ class EventScreen extends StatefulWidget {
 }
 
 class _EventScreenState extends State<EventScreen> {
-  // final Set<DynamoTrip> _trips = {};
   final Set<String> _deviceIds = {};
+  final Set<String> _events = {};
   int _totalDistance = 0;
   double _totalEmissions = 0;
   double _totalReduction = 0;
@@ -31,9 +31,12 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   Future<void> _loadSavedTrips() async {
-    List<DynamoTrip> trips = await DynamoHelper.getAll();
+    List<DynamoTrip> trips = await DynamoHelper.getTrips();
+    List<String> events = await DynamoHelper.getEvents();
     setState(() {
       _deviceIds.clear();
+      _events.clear();
+      _events.addAll(events);
 
       _totalDistance = 0;
       _totalEmissions = 0;
@@ -95,6 +98,13 @@ class _EventScreenState extends State<EventScreen> {
                           onChanged: (bool value) {
                             settings.toggleEventMode(value);
                           },
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownMenu(
+                          dropdownMenuEntries: _events.map((event) => DropdownMenuEntry(label: event.replaceAll("_", " "), value: event)).toList(),
+                          onSelected: (event) => settings.updateSelectedEvent(event ?? ""),
+                          initialSelection: settings.selectedEvent != "" ? settings.selectedEvent : "MQ_Open_Day_2025",
+                          width: MediaQuery.of(context).size.width,
                         )
                       ],
                     ),
