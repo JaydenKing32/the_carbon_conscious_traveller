@@ -5,6 +5,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/dynamo_helper.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
@@ -42,6 +43,7 @@ class VerifyService {
   @pragma("vm:entry-point")
   static void onStart(ServiceInstance service) async {
     const double distThreshold = 50;
+    final bool enableEventMode = (await SharedPreferences.getInstance()).getBool("enableEventMode") ?? false;
 
     service.on("stop").listen((event) {
       service.stopSelf();
@@ -69,7 +71,9 @@ class VerifyService {
           await TripDatabase.instance.updateTripCompletion(tripId, true);
           Fluttertoast.showToast(msg: "Completed trip");
           debugPrint("Completed trip");
-          await DynamoHelper.insertTrip(trip);
+          if (enableEventMode) {
+            await DynamoHelper.insertTrip(trip);
+          }
           service.stopSelf();
           return;
         }
