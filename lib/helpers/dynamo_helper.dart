@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/constants.dart';
 import 'package:the_carbon_conscious_traveller/models/dynamo_trip.dart';
 import 'package:the_carbon_conscious_traveller/models/trip.dart';
+import 'package:the_carbon_conscious_traveller/screens/event.dart' show defaultEvent;
 
 // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-1.html
 // https://pub.dev/packages/aws_dynamodb_api
@@ -40,22 +41,17 @@ class DynamoHelper {
   }
 
   static Future insertTrip(Trip? trip) async {
-    final event = (await SharedPreferences.getInstance()).getString("event");
-    if (trip != null && event != null) {
+    final event = (await SharedPreferences.getInstance()).getString("selectedEvent") ?? defaultEvent;
+    if (trip != null) {
       debugPrint("adding trip $trip");
       await service.putItem(item: await tripToMap(trip), tableName: event);
     }
   }
 
   static Future<List<DynamoTrip>> getTrips() async {
-    final event = (await SharedPreferences.getInstance()).getString("event");
-
-    if (event != null) {
-      final scanResult = await service.scan(tableName: event);
-      return scanResult.items?.map(mapToDynamoTrip).toList() ?? List.empty();
-    } else {
-      return List.empty();
-    }
+    final event = (await SharedPreferences.getInstance()).getString("selectedEvent") ?? defaultEvent;
+    final scanResult = await service.scan(tableName: event);
+    return scanResult.items?.map(mapToDynamoTrip).toList() ?? List.empty();
   }
 
   static Future<List<String>> getEvents() async {

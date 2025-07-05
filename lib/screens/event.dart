@@ -5,6 +5,8 @@ import 'package:the_carbon_conscious_traveller/models/dynamo_trip.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 
+const defaultEvent = "MQ_Open_Day_2025";
+
 class EventScreen extends StatefulWidget {
   const EventScreen({super.key});
 
@@ -17,7 +19,7 @@ class EventScreen extends StatefulWidget {
 class _EventScreenState extends State<EventScreen> {
   final Set<String> _deviceIds = {};
   // Dropdown won't show initial value unless it contains entries before initialising state
-  final Set<DropdownMenuEntry<String>> _dropdownEntries = {DropdownMenuEntry(label: "MQ Open Day 2025", value: "MQ_Open_Day_2025")};
+  final Set<DropdownMenuEntry<String>> _dropdownEntries = {DropdownMenuEntry(label: defaultEvent.replaceAll("_", " "), value: defaultEvent)};
   int _totalDistance = 0;
   double _totalEmissions = 0;
   double _totalReduction = 0;
@@ -104,7 +106,7 @@ class _EventScreenState extends State<EventScreen> {
                         DropdownMenu(
                           dropdownMenuEntries: _dropdownEntries.toList(),
                           onSelected: (event) => settings.updateSelectedEvent(event ?? ""),
-                          initialSelection: settings.selectedEvent != "" ? settings.selectedEvent : "MQ_Open_Day_2025",
+                          initialSelection: settings.selectedEvent != "" ? settings.selectedEvent : defaultEvent,
                           expandedInsets: EdgeInsets.zero,
                         )
                       ],
