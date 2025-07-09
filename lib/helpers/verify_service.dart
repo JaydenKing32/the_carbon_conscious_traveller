@@ -55,7 +55,7 @@ class VerifyService {
       final tripId = event?["trip"];
 
       final Trip? trip = await TripDatabase.instance.getTripById(tripId);
-      Fluttertoast.showToast(msg: "Starting location verification");
+      Fluttertoast.showToast(msg: "Starting trip");
       debugPrint("Starting location verification with $trip");
 
       // TODO: Set to longer duration before deploying
