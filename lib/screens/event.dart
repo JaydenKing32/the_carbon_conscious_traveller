@@ -111,7 +111,10 @@ class _EventScreenState extends State<EventScreen> {
                         const SizedBox(height: 16),
                         DropdownMenu(
                           dropdownMenuEntries: _dropdownEntries.toList(),
-                          onSelected: (event) => settings.updateSelectedEvent(event ?? ""),
+                          onSelected: (event) => setState(() {
+                            settings.updateSelectedEvent(event ?? "");
+                            _loadSavedTrips();
+                          }),
                           initialSelection: settings.selectedEvent != "" ? settings.selectedEvent : defaultEvent,
                           expandedInsets: EdgeInsets.zero,
                         )
