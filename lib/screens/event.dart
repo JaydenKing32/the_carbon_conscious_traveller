@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_carbon_conscious_traveller/data/tree_icon_values.dart';
 import 'package:the_carbon_conscious_traveller/helpers/dynamo_helper.dart';
 import 'package:the_carbon_conscious_traveller/models/dynamo_trip.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
@@ -77,6 +78,7 @@ class _EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     final settings = Provider.of<Settings>(context);
     const textSize = 0.04;
+    const iconSize = 0.2;
 
     return Center(child: Consumer<ThemeState>(builder: (BuildContext context, theme, child) {
       return Scaffold(
@@ -136,7 +138,13 @@ class _EventScreenState extends State<EventScreen> {
                           Text("Shortest travel distance: ${(_minDistance / 1000).toStringAsFixed(2)}km", style: TextStyle(fontSize: MediaQuery.of(context).size.width * textSize)),
                           Text("Longest travel distance: ${(_maxDistance / 1000).toStringAsFixed(2)}km", style: TextStyle(fontSize: MediaQuery.of(context).size.width * textSize)),
                           Text("Trips that used public transport: ${(_transitPercent * 100).toStringAsFixed(2)}%", style: TextStyle(fontSize: MediaQuery.of(context).size.width * textSize)),
-                        ])))
+                        ]))),
+                const SizedBox(height: 16),
+                Wrap(alignment: WrapAlignment.spaceEvenly, children: [
+                  Image.asset("assets/icons/${TreeIconType.defaultTreeCo2Gram.name}", width: MediaQuery.of(context).size.width * iconSize, height: MediaQuery.of(context).size.width * iconSize),
+                  Image.asset("assets/icons/${TreeIconType.defaultOneLeafC02Gram.name}", width: MediaQuery.of(context).size.width * iconSize, height: MediaQuery.of(context).size.width * iconSize),
+                  Image.asset("assets/icons/${TreeIconType.defaultTreeCo2Gram.name}", width: MediaQuery.of(context).size.width * iconSize, height: MediaQuery.of(context).size.width * iconSize),
+                ])
               ])));
     }));
   }
