@@ -44,7 +44,8 @@ class _EventScreenState extends State<EventScreen> {
       _totalDistance = 0;
       _totalEmissions = 0;
       _totalReduction = 0;
-      _minDistance = 0x7fffffff; // no MAX_INT, so use a large number
+      const largeNum = 0x7fffffff;
+      _minDistance = largeNum; // no MAX_INT, so use a large number
       _maxDistance = 0;
       int transitCount = 0;
 
@@ -63,7 +64,12 @@ class _EventScreenState extends State<EventScreen> {
           transitCount++;
         }
       }
-      _transitPercent = transitCount / trips.length;
+
+      if (_minDistance == largeNum) {
+        _minDistance = 0;
+      }
+
+      _transitPercent = trips.isNotEmpty ? transitCount / trips.length : 0;
     });
   }
 
