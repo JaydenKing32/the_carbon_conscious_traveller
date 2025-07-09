@@ -57,8 +57,8 @@ dependencies:
   flutter_background_service: ^5.1.0
   google_fonts: ^6.2.1
   aws_dynamodb_api: ^2.0.0
-  advertising_id: ^2.7.1
   fluttertoast: ^8.2.12
+  unique_identifier: ^0.4.0
 
 dev_dependencies:
   flutter_test:

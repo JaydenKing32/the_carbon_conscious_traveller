@@ -1,8 +1,8 @@
-import 'package:advertising_id/advertising_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/data/tree_icon_values.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 
 class Settings extends ChangeNotifier {
   final Map<TreeIconType, double> _emissionValues = {};
@@ -85,7 +85,7 @@ class Settings extends ChangeNotifier {
 
     if (deviceId == null || deviceId == "") {
       try {
-        deviceId = await AdvertisingId.id();
+        deviceId = await UniqueIdentifier.serial;
         if (deviceId != null && deviceId != "") {
           _deviceId = deviceId;
           prefs.setString("deviceId", deviceId);
