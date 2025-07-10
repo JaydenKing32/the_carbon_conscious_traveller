@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});
@@ -38,7 +38,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
   final String privacyMarkdown = """
 # Privacy Policy
 
-**Last updated:** January 27, 2025
+**Last updated:** July 10, 2025
 
 ## Introduction
 
@@ -47,7 +47,7 @@ This privacy notice for The Carbon-Conscious Traveller ('we', 'us', or 'our'), d
 - **Download and use** our mobile application (The Carbon-Conscious Traveller), or any other application of ours that links to this privacy notice
 - **Engage with us** in other related ways, including any sales, marketing, or events
 
-**Questions or concerns?** Reading this privacy notice will help you understand your privacy rights and choices. If you do not agree with our policies and practices, please do not use our Services. If you still have any questions or concerns, please contact us at [the.carbon.conscious.traveller@gmail.com](mailto:the.carbon.conscious.traveller@gmail.com).
+**Questions or concerns?** Reading this privacy notice will help you understand your privacy rights and choices. We are responsible for making decisions about how your personal information is processed. If you do not agree with our policies and practices, please do not use our Services. If you still have any questions or concerns, please contact us at [the.carbon.conscious.traveller@gmail.com](mailto:the.carbon.conscious.traveller@gmail.com).
 
 ## 1. WHAT INFORMATION DO WE COLLECT?
 
@@ -61,7 +61,11 @@ We collect personal information that you voluntarily provide to us when you expr
 
 **Application Data:** If you use our application(s), we also may collect the following information if you choose to provide us with access or permission:
 
-- **Geolocation Information:** We may request access or permission to track location-based information from your mobile device, either continuously or while you are using our mobile application(s), to provide certain location-based services. If you wish to change our access or permissions, you may do so in your device's settings. This information is primarily needed to maintain the security and operation of our application(s), for troubleshooting, and for our internal analytics and reporting purposes.
+- **Geolocation Information:** We may request access or permission to track location-based information from your mobile device, either continuously or while you are using our mobile application(s), to provide certain location-based services. If you wish to change our access or permissions, you may do so in your device's settings.
+- **Mobile Device Data:** We automatically collect device information (such as your mobile device ID, model, and manufacturer), operating system, version information and system configuration information, device and application identification numbers, browser type and version, hardware model Internet service provider and/or mobile carrier, and Internet Protocol (IP) address (or proxy server). If you are using our application(s), we may also collect information about the phone network associated with your mobile device, your mobile device’s operating system or platform, the type of mobile device you use, your mobile device’s unique device ID, and information about the features of our application(s) you accessed.
+- **Push Notifications**: We may request to send you push notifications regarding your account or certain features of the application(s). If you wish to opt out from receiving these types of communications, you may turn them off in your device's settings.
+
+This information is primarily needed to maintain the security and operation of our application(s), for troubleshooting, and for our internal analytics and reporting purposes.
 
 All personal information that you provide to us must be true, complete, and accurate, and you must notify us of any changes to such personal information.
 
@@ -73,6 +77,7 @@ We automatically collect certain information when you visit, use, or navigate th
 
 **The information we collect includes:**
 
+- **Device Data:** We collect device data such as information about your computer, phone, tablet, or other device you use to access the Services. Depending on the device used, this device data may include information such as your IP address (or proxy server), device and application identification numbers, location, browser type, hardware model, Internet service provider and/or mobile carrier, operating system, and system configuration information.
 - **Location Data:** We collect location data such as information about your device's location, which can be either precise or imprecise. How much information we collect depends on the type and settings of the device you use to access the Services. For example, we may use GPS and other technologies to collect geolocation data that tells us your current location (based on your IP address). You can opt out of allowing us to collect this information either by refusing access to the information or by disabling your Location setting on your device. However, if you choose to opt out, you may not be able to use certain aspects of the Services.
 
 ## 2. HOW DO WE PROCESS YOUR INFORMATION?
@@ -149,23 +154,14 @@ By using our app, you agree to this Privacy Policy.
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
-                child: MarkdownBody(
-                  data: privacyMarkdown,
-                  styleSheet: MarkdownStyleSheet(
-                    h1: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                    h2: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                    p: const TextStyle(fontSize: 14),
-                    strong: const TextStyle(fontWeight: FontWeight.bold),
-                    listBullet: const TextStyle(fontSize: 14),
-                  ),
-                  onTapLink: (text, href, title) {
-                    // Handle link taps if necessary
-                  },
-                ),
+                child: MarkdownBlock(
+                    data: privacyMarkdown,
+                    config: MarkdownConfig(configs: [
+                      PConfig(textStyle: const TextStyle(fontSize: 14)),
+                      H1Config(style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      H2Config(style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      H3Config(style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ])),
               ),
             ),
 
