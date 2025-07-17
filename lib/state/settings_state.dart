@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/data/calculation_values.dart';
 import 'package:the_carbon_conscious_traveller/data/tree_icon_values.dart';
+import 'package:the_carbon_conscious_traveller/helpers/verify_service.dart';
 import 'package:unique_identifier/unique_identifier.dart';
 
 class Settings extends ChangeNotifier {
@@ -103,6 +104,15 @@ class Settings extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('enableGeolocationVerification', value);
+
+    final isRunning = await VerifyService.isRunning();
+
+    if (value && !isRunning) {
+      await VerifyService.initializeService();
+      VerifyService.startBackgroundService();
+    } else if (!value && isRunning) {
+      VerifyService.stopBackgroundService();
+    }
   }
 
   void toggleEventMode(bool value) async {
@@ -110,6 +120,14 @@ class Settings extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('enableEventMode', value);
+    final isRunning = await VerifyService.isRunning();
+
+    if (value && !isRunning) {
+      await VerifyService.initializeService();
+      VerifyService.startBackgroundService();
+    } else if (!value && isRunning) {
+      VerifyService.stopBackgroundService();
+    }
   }
 
   void updateSelectedEvent(String event) async {

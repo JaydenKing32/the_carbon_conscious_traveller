@@ -23,6 +23,11 @@ class VerifyService {
     service.invoke("stop");
   }
 
+  static Future<bool> isRunning() {
+    final service = FlutterBackgroundService();
+    return service.isRunning();
+  }
+
   static Future<void> initializeService() async {
     debugPrint("Initialising location verification");
     // Add permission checks
