@@ -33,21 +33,14 @@ class _GoogleplacesModebuttonViewState extends State<GoogleplacesModebuttonView>
   Widget build(BuildContext context) {
     return Column(children: [
       Flexible(
-        child: Focus(
-          focusNode: _focusNode,
-          child:const  GooglePlacesView()),
+        child: Focus(focusNode: _focusNode, child: const GooglePlacesView()),
       ),
-         AnimatedOpacity(
-          curve: Curves.slowMiddle,
-          opacity: _isFocused ? 0 : 1,
-          duration: const Duration(milliseconds: 100),
-          child: const Flexible(
-              child: SizedBox(
-            height: 300,
-            child: TravelModeButtons(),
-          )
-               ),
-       ),
+      AnimatedOpacity(
+        curve: Curves.slowMiddle,
+        opacity: _isFocused ? 0 : 1,
+        duration: const Duration(milliseconds: 100),
+        child: SizedBox(height: 300, child: TravelModeButtons()),
+      ),
     ]);
   }
 }
