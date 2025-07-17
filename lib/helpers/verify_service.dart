@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -43,6 +43,7 @@ class VerifyService {
   @pragma("vm:entry-point")
   static void onStart(ServiceInstance service) async {
     const double distThreshold = 50;
+    const int checkInterval = kReleaseMode ? 60 : 10;
     final bool enableEventMode = (await SharedPreferences.getInstance()).getBool("enableEventMode") ?? false;
 
     service.on("stop").listen((event) {
@@ -50,7 +51,6 @@ class VerifyService {
     });
 
     service.on("update").listen((event) async {
-      // debugPrint("Entering update");
       final coords = event?["coords"];
       final tripId = event?["trip"];
 
@@ -58,8 +58,7 @@ class VerifyService {
       Fluttertoast.showToast(msg: "Starting trip");
       debugPrint("Starting location verification with $trip");
 
-      // TODO: Set to longer duration before deploying
-      Timer.periodic(const Duration(seconds: 10), (timer) async {
+      Timer.periodic(const Duration(seconds: checkInterval), (timer) async {
         service.on("cancel").listen((event) {
           timer.cancel();
         });
