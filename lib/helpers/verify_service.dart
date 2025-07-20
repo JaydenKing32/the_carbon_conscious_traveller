@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_carbon_conscious_traveller/db/trip_database.dart';
 import 'package:the_carbon_conscious_traveller/helpers/dynamo_helper.dart';
@@ -30,12 +32,19 @@ class VerifyService {
 
   static Future<void> initializeService() async {
     debugPrint("Initialising location verification");
-    // Add permission checks
+    if (!await Permission.locationWhenInUse.isGranted) {
+      debugPrint("Requesting locationWhenInUse permission");
+      await Permission.locationWhenInUse.request();
+    }
+    if (Platform.isIOS && !await Permission.locationAlways.isGranted) {
+      debugPrint("Requesting locationAlways permission");
+      await Permission.locationAlways.request();
+    }
     final service = FlutterBackgroundService();
 
     await service.configure(
       iosConfiguration: IosConfiguration(autoStart: false, onForeground: onStart),
-      androidConfiguration: AndroidConfiguration(autoStart: true, onStart: onStart, isForegroundMode: true, autoStartOnBoot: false),
+      androidConfiguration: AndroidConfiguration(autoStart: false, onStart: onStart, isForegroundMode: true, autoStartOnBoot: false),
     );
   }
 
