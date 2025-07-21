@@ -31,7 +31,7 @@ class ThemeState extends ChangeNotifier {
   double currentMaxEmissions = 0;
   double currentMinEmissions = 0;
 
-  calculateColour(minEmissions, maxEmissions, selectedRouteEmission,
+  void calculateColour(minEmissions, maxEmissions, selectedRouteEmission,
       int activeRouteIndex, int totalRouteCount, String mode) {
     double t = 0;
 

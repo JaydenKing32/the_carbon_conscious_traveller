@@ -61,7 +61,7 @@ class MapService {
 
   Position? _currentPosition;
 
-  getPermission() async {
+  Future<Null> getPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 // Check if location services are enabled
