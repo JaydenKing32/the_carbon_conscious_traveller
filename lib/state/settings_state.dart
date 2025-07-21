@@ -56,7 +56,7 @@ class Settings extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
 
     _enableGeolocationVerification = prefs.getBool('enableGeolocationVerification') ?? false;
-    _enableEventMode = prefs.getBool('enableEventMode') ?? false;
+    _enableEventMode = prefs.getBool('enableEventMode') ?? true;
     _selectedEvent = prefs.getString('selectedEvent') ?? "";
     _useSpecifiedCar = prefs.getBool('useSpecifiedCar') ?? false;
     _useCarForCalculations = prefs.getBool('useCarForCalculations') ?? false;

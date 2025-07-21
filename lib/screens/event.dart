@@ -6,7 +6,7 @@ import 'package:the_carbon_conscious_traveller/models/dynamo_trip.dart';
 import 'package:the_carbon_conscious_traveller/state/settings_state.dart';
 import 'package:the_carbon_conscious_traveller/state/theme_state.dart';
 
-const defaultEvent = "MQ_Open_Day_2025";
+const defaultEvent = "MQ_O_Week_2025S2";
 
 class EventScreen extends StatefulWidget {
   const EventScreen({super.key});

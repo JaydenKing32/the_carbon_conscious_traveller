@@ -14,10 +14,14 @@ import 'package:the_carbon_conscious_traveller/models/trip.dart';
 
 @pragma("vm:entry-point")
 class VerifyService {
-  static void startBackgroundService() {
-    debugPrint("Starting location verification");
-    final service = FlutterBackgroundService();
-    service.startService();
+  static void startBackgroundService() async {
+    if (await Permission.locationWhenInUse.isGranted) {
+      debugPrint("Starting location verification");
+      final service = FlutterBackgroundService();
+      service.startService();
+    } else {
+      debugPrint("Cannot start location verification, do not have necessary permissions");
+    }
   }
 
   static void stopBackgroundService() {
