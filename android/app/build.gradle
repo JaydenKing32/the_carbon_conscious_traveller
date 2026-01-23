@@ -35,7 +35,7 @@ if (keyPropertiesFile.exists()) {
 android {
     namespace = 'com.mquniversity.tcct'
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = '26.1.10909125'
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -49,8 +49,8 @@ android {
     defaultConfig {
         applicationId = 'com.mquniversity.tcct'
         // You can update the following values to match your application needs.
-        minSdk = 21
-        targetSdk = 35
+        minSdkVersion = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
