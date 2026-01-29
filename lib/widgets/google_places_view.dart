@@ -43,7 +43,7 @@ class _GooglePlacesViewState extends State<GooglePlacesView> {
   final FocusNode _destinationFocusNode = FocusNode();
   bool _isSettingControllerText = false;
 
-  PolylinePoints polylinePoints = PolylinePoints();
+  PolylinePoints polylinePoints = PolylinePoints(apiKey: Constants.googleApiKey);
 
   places.Place? origin;
   places.Place? destination;

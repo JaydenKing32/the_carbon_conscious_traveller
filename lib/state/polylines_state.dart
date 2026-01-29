@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart' as poly;
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:the_carbon_conscious_traveller/constants.dart';
 import 'package:the_carbon_conscious_traveller/models/routes_model.dart';
 
 class PolylinesState extends ChangeNotifier {
@@ -11,7 +12,7 @@ class PolylinesState extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  final poly.PolylinePoints _polylinePoints = poly.PolylinePoints();
+  final poly.PolylinePoints _polylinePoints = poly.PolylinePoints(apiKey: Constants.googleApiKey);
   final Map<PolylineId, Polyline> _polylines = {};
   final List<List<LatLng>> _routeCoordinates = [];
   List<DirectionsRoute> result = [];
@@ -112,7 +113,7 @@ class PolylinesState extends ChangeNotifier {
         }
 
         // Decode polyline points for the route.
-        List<LatLng> decodedPoints = _polylinePoints.decodePolyline(result[i].overviewPolyline!.points!).map((point) => LatLng(point.latitude, point.longitude)).toList();
+        List<LatLng> decodedPoints = poly.PolylinePoints.decodePolyline(result[i].overviewPolyline!.points!).map((point) => LatLng(point.latitude, point.longitude)).toList();
         routeCoordinate.addAll(decodedPoints);
         routeCoordinates.add(routeCoordinate);
 
@@ -152,7 +153,7 @@ class PolylinesState extends ChangeNotifier {
         onTap: () {
            _polyTapped = true;
            setActiveRoute(i);
-        } 
+        }
       );
       polylines[id] = polyline;
       getDistanceValues();
@@ -180,7 +181,7 @@ class PolylinesState extends ChangeNotifier {
         onTap: () {
            _polyTapped = true;
            setActiveRoute(i);
-        } 
+        }
       );
       polylines[id] = polyline;
     }
@@ -293,7 +294,7 @@ class PolylinesState extends ChangeNotifier {
     _darkPolyColours = colours.map((color) {
       final hsl = HSLColor.fromColor(color);
       print('HSL: $hsl');
-      
+
       if(hsl.lightness > 0.9) {
        const darker = HSLColor.fromAHSL(1, 27, 0.17, 0.7);
         return darker.toColor();

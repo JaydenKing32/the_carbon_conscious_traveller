@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as maps;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:the_carbon_conscious_traveller/constants.dart';
 import 'package:the_carbon_conscious_traveller/helpers/map_service.dart';
 import 'package:the_carbon_conscious_traveller/state/marker_state.dart';
 import 'package:the_carbon_conscious_traveller/state/polylines_state.dart';
@@ -34,7 +35,7 @@ class GoogleMapViewState extends State<GoogleMapView> {
 
   maps.CameraPosition? _initialLocation;
 
-  PolylinePoints polylinePoints = PolylinePoints();
+  PolylinePoints polylinePoints = PolylinePoints(apiKey: Constants.googleApiKey);
   Map<maps.PolylineId, maps.Polyline> polylines = {};
 
   @override
