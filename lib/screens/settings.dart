@@ -82,7 +82,7 @@ class SettingsScreen extends StatelessWidget {
                               filled: true,
                               fillColor: Colors.grey[50],
                             ),
-                            value: settings.selectedCarSize,
+                            initialValue: settings.selectedCarSize,
                             items: CarSize.values.map((CarSize size) {
                               final isSelectOption = "Select" == size.name;
 
@@ -118,7 +118,7 @@ class SettingsScreen extends StatelessWidget {
                               filled: true,
                               fillColor: Colors.grey[50],
                             ),
-                            value: settings.selectedCarFuelType,
+                            initialValue: settings.selectedCarFuelType,
                             items: CarFuelType.values.map((CarFuelType fuel) {
                               final isSelectOption = "Select" == fuel.name;
                               return DropdownMenuItem<CarFuelType>(
@@ -198,7 +198,7 @@ class SettingsScreen extends StatelessWidget {
                               filled: true,
                               fillColor: Colors.grey[50],
                             ),
-                            value: settings.selectedMotorcycleSize,
+                            initialValue: settings.selectedMotorcycleSize,
                             items: MotorcycleSize.values.map((MotorcycleSize size) {
                               final isSelectOption = "Size" == size.name;
 
