@@ -31,7 +31,7 @@ class ThemeState extends ChangeNotifier {
   double currentMaxEmissions = 0;
   double currentMinEmissions = 0;
 
-  void calculateColour(minEmissions, maxEmissions, selectedRouteEmission,
+  void calculateColour(int minEmissions, int maxEmissions, int selectedRouteEmission,
       int activeRouteIndex, int totalRouteCount, String mode) {
     double t = 0;
 
@@ -68,7 +68,7 @@ class ThemeState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setThemeColour(activeRouteIndex) {
+  void setThemeColour(int activeRouteIndex) {
     _seedColour = _seedColourList[activeRouteIndex];
     _themeData = _buildTheme();
     // We need this to ensure the theme is rebuilt
