@@ -116,13 +116,15 @@ class _TransitState extends State<Transit> {
     polylinesState.transportMode = 'transit';
     //polylinesState.setPolyColours(null);
     //Provider.of<ThemeState>(context, listen: false).seedColourList.clear();
-    final sync = context.read<ColourSyncState>();
+    if (mounted) {
+      final sync = context.read<ColourSyncState>();
 
-    if(sync.coloursReady) {
-      polylinesState.setPolyColours(Provider.of<ThemeState>(context, listen: false).seedColourList);
-       await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
-    } 
-    // await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
+      if (sync.coloursReady) {
+        polylinesState.setPolyColours(Provider.of<ThemeState>(context, listen: false).seedColourList);
+        await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
+      }
+      // await Provider.of<PolylinesState>(context, listen: false).getPolyline(coordsState.coordinates);
+    }
 
     return fetchedRoutes;
   }
