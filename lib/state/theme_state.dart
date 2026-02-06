@@ -46,10 +46,10 @@ class ThemeState extends ChangeNotifier {
     } else {
       t = (selectedRouteEmission - minEmissions) /
           (maxEmissions - minEmissions);
-      print("t value in else block: $t");
+      debugPrint("t value in else block: $t");
 
       t = t.clamp(0.0, 1.0);
-      print("Final t value after clamping: $t");
+      debugPrint("Final t value after clamping: $t");
 
       Color newColour = HSLColor.lerp(_startColour, _endColour, t)!.toColor();
       _seedColourList[activeRouteIndex] = newColour;
@@ -294,13 +294,13 @@ class ThemeState extends ChangeNotifier {
     );
 
     if (hslColour.lightness == 0) {
-      print("theme is black & hsl is $hslColour");
+      debugPrint("theme is black & hsl is $hslColour");
       return themeData1;
     } else if (hslColour.lightness > lightnessLimit) {
-      print("theme is brown & hsl is $hslColour");
+      debugPrint("theme is brown & hsl is $hslColour");
       return themeData2;
     } else {
-      print("theme is seedcolour & hsl is $hslColour");
+      debugPrint("theme is seedcolour & hsl is $hslColour");
       return themeData3;
     }
   }

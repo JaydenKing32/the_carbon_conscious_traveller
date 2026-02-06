@@ -293,7 +293,6 @@ class PolylinesState extends ChangeNotifier {
   void darkenColours(List<Color> colours) {
     _darkPolyColours = colours.map((color) {
       final hsl = HSLColor.fromColor(color);
-      print('HSL: $hsl');
 
       if(hsl.lightness > 0.9) {
        const darker = HSLColor.fromAHSL(1, 27, 0.17, 0.7);
