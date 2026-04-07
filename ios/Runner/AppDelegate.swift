@@ -3,13 +3,16 @@ import UIKit
 import GoogleMaps
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
 
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     // Read API key from Config.plist
     if let path = Bundle.main.path(forResource: "Config", ofType: "plist") {
       if let config = NSDictionary(contentsOfFile: path),
@@ -21,7 +24,5 @@ import GoogleMaps
     } else {
       fatalError("Config.plist file not found")
     }
-
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
