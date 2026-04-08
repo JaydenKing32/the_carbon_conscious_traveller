@@ -398,3 +398,4 @@ doc/api/
 ### Personal
 .vscode/settings.json
 lib/constants.dart
+android/.kotlin/sessions
