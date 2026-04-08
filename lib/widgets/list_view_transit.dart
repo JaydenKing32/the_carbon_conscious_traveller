@@ -111,7 +111,7 @@ class _TransitListViewState extends State<TransitListView> {
       emissions: widget.emissions[index],
       mode: "Transit",
       reduction: reduction,
-      complete: false,
+      complete: true,
       model: transitType ?? "Unknown",
     );
 

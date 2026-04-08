@@ -31,7 +31,7 @@ class _EventScreenState extends State<EventScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSavedTrips();
+    // _loadSavedTrips();
   }
 
   Future<void> _loadSavedTrips() async {

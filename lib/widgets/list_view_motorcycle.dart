@@ -116,7 +116,7 @@ class _MotorcycleListViewState extends State<MotorcycleListView> {
       emissions: widget.vehicleState.getEmission(index).toDouble(),
       mode: "Motorcycle",
       reduction: reduction,
-      complete: false,
+      complete: true,
       model: motoModel,
     );
 

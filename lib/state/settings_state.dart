@@ -55,9 +55,12 @@ class Settings extends ChangeNotifier {
   Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
-    _enableGeolocationVerification = prefs.getBool('enableGeolocationVerification') ?? false;
-    _enableEventMode = prefs.getBool('enableEventMode') ?? true;
-    _selectedEvent = prefs.getString('selectedEvent') ?? "";
+    // _enableGeolocationVerification = prefs.getBool('enableGeolocationVerification') ?? false;
+    // _enableEventMode = prefs.getBool('enableEventMode') ?? true;
+    // _selectedEvent = prefs.getString('selectedEvent') ?? "";
+    _enableGeolocationVerification = false;
+    _enableEventMode = false;
+    _selectedEvent = "";
     _useSpecifiedCar = prefs.getBool('useSpecifiedCar') ?? false;
     _useCarForCalculations = prefs.getBool('useCarForCalculations') ?? false;
     _useSpecifiedMotorcycle = prefs.getBool('useSpecifiedMotorcycle') ?? false;
@@ -100,44 +103,44 @@ class Settings extends ChangeNotifier {
   }
 
   void toggleGeolocationVerification(bool value) async {
-    _enableGeolocationVerification = value;
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('enableGeolocationVerification', value);
+    // _enableGeolocationVerification = value;
+    // notifyListeners();
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.setBool('enableGeolocationVerification', value);
 
-    final isRunning = await VerifyService.isRunning();
+    // final isRunning = await VerifyService.isRunning();
 
-    if (value && !isRunning) {
-      await VerifyService.initializeService();
-      VerifyService.startBackgroundService();
-    } else if (!value && isRunning) {
-      VerifyService.stopBackgroundService();
-    }
+    // if (value && !isRunning) {
+    //   await VerifyService.initializeService();
+    //   VerifyService.startBackgroundService();
+    // } else if (!value && isRunning) {
+    //   VerifyService.stopBackgroundService();
+    // }
   }
 
   void toggleEventMode(bool value) async {
-    _enableEventMode = value;
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('enableEventMode', value);
-    final isRunning = await VerifyService.isRunning();
+    // _enableEventMode = value;
+    // notifyListeners();
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.setBool('enableEventMode', value);
+    // final isRunning = await VerifyService.isRunning();
 
-    if (value && !isRunning) {
-      await VerifyService.initializeService();
-      VerifyService.startBackgroundService();
-    } else if (!value && isRunning) {
-      VerifyService.stopBackgroundService();
-    }
+    // if (value && !isRunning) {
+    //   await VerifyService.initializeService();
+    //   VerifyService.startBackgroundService();
+    // } else if (!value && isRunning) {
+    //   VerifyService.stopBackgroundService();
+    // }
   }
 
   void updateSelectedEvent(String event) async {
-    if (event == "") {
-      return;
-    }
-    _selectedEvent = event;
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedEvent', event);
+    // if (event == "") {
+    //   return;
+    // }
+    // _selectedEvent = event;
+    // notifyListeners();
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.setString('selectedEvent', event);
   }
 
   void toggleUseSpecifiedCar(bool value) async {

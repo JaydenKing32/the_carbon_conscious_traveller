@@ -107,7 +107,7 @@ class _CarListViewState extends State<CarListView> {
         emissions: widget.vehicleState.getEmission(index).toDouble(),
         mode: "Car",
         reduction: reduction,
-        complete: false,
+        complete: true,
         model: carModel);
 
     int id = await TripDatabase.instance.insertTrip(trip);
